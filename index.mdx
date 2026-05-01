@@ -1,133 +1,131 @@
 ---
 title: "Introduction"
-description: "Welcome to the new home for your documentation"
-icon: 'star'
+description: "What is Flox?"
 ---
 
-## Setting up
+Flox is a next-generation, language-agnostic package and environment manager.
 
-Get your documentation site up and running in minutes.
+- Define everything your environment needs—packages, tools, environment variables, and services—in one manifest.
+- Switch between environments easily, share them with your team, and keep everything in version control.
+- Use the same setup across macOS and Linux, on both x86 and Arm.
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+Flox achieves isolation through pre-configured sub-shells, not containers, so it works seamlessly with your existing tools, shells, and dotfiles. Under the hood, Flox uses Nix to ensure reproducibility—without requiring you to learn Nix.
 
-## Make it yours
+Flox makes it easy to work locally, test in CI, and deploy to production—all with the same environment.
 
-Design a docs site that looks great and empowers your users.
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+ <iframe width="550" height="300" src="https://www.youtube.com/embed/aidi5svDml8?si=rrgQ6a0oQzdFNgWs" title="What is Flox?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+---
+
+## Get Started
+
+<CardGroup cols={2}>
+  <Card title="Quick start with the Flox CLI" icon="terminal">
+    Install `flox` with `apt`, `yum`, `brew`, or a standalone installer to get your dev environment set up in minutes.
+
+    [Download & Install][install_flox]
+
+    [Flox in 5 minutes][flox_5_minutes]
+
+    [Search packages in FloxHub][floxhub_packages]
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+  <Card title="Already using Nix? Start here" icon="snowflake">
+    Flox brings the power of Nix to your team, and can simplify your workflows.
 
-## Create beautiful pages
+    [Install Flox with flakes or profiles](/install-flox/install#nix-generic)
 
-Everything you need to create world-class documentation.
+    [Flox brings Nix to your teams](https://flox.dev/blog/enterprise-nix-its-time-to-bring-nix-to-work/)
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
+    [Use flakes in Flox](https://flox.dev/blog/extending-flox-with-nix-flakes/)
   </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+</CardGroup>
+Examples for getting started in just a few of the many languages Flox supports:
 
-## Make your content agent ready
+[Node ](https://flox.dev/blog/using-flox-to-create-portable-reproducible-nodejs-environments/)
+[Go ](https://flox.dev/blog/using-flox-to-create-portable-reproducible-go-environments/)
+[Python ](https://flox.dev/blog/using-flox-to-create-portable-reproducible-python-environments/)
+[Rust ](https://flox.dev/blog/a-real-world-rust-project-with-flox/)
+[Ruby ](https://flox.dev/blog/making-ruby-projects-easier-to-share/)
 
-Make your docs work for humans and AI agents alike.
+---
 
-<Columns cols={2}>
-  <Card
-    title="Prompt component"
-    icon="robot"
-    href="/agent-ready/prompt"
-  >
-    Embed shareable AI prompts readers can copy or open in Cursor.
-  </Card>
-  <Card
-    title="Visibility"
-    icon="eye"
-    href="/agent-ready/visibility"
-  >
-    Show different content to humans and agents reading your docs.
-  </Card>
-  <Card
-    title="Contextual menu"
-    icon="bolt"
-    href="/agent-ready/contextual"
-  >
-    Give readers one-click access to Claude, ChatGPT, Cursor, and more.
-  </Card>
-  <Card
-    title="AI coding tools"
-    icon="wand-magic-sparkles"
-    href="/ai-tools/claude-code"
-  >
-    Set up Claude Code, Cursor, or Windsurf with Mintlify's skill.
-  </Card>
-</Columns>
+## Why Flox?
 
-## Need inspiration?
+We encounter the same challenges, no matter the stack: inconsistent environments, dependency drift, and brittle build processes that don’t scale well across machines, teams, or deployment targets. Current solutions often add complexity and fragmentation.
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+Flox takes a different approach: it provides a consistent, language-agnostic workflow for managing environments, from local development to CI to production.
+
+Use Flox to solve three common use cases:
+
+- Reproducible dev environments
+- Reliable package management across systems
+- Consistent builds from local to production
+
+### __Reproducible dev environments__
+
+Set up a [local developer environment](https://flox.dev/docs/tutorials/creating-environments/) that will work the same across multiple operating systems and architectures. Seamlessly switch between development environments across multiple language ecosystems using a consistent, unified workflow.
+
+Declare all the packages, activation scripts, environment variables and [services](https://flox.dev/docs/concepts/services/) needed to reproduce the environment in a simple manifest that can be checked into [version control along with your source code](https://flox.dev/blog/flox-and-teams-managing-your-code-and-your-runtime-environment-in-just-one-place/).
+
+Once your environment is configured, you can simplify the setup instructions in your README to a single command (`flox activate`), making it easy to [share environments](https://flox.dev/blog/flox-and-teams-using-shared-flox-environments/) and [onboard new developers](https://flox.dev/blog/flox-and-teams-onboarding-made-easy-with-github-and-flox/).
+
+
+### __Cross-platform package management for your whole system__
+
+Set up your [default environment](https://flox.dev/docs/tutorials/default-environment/) with a set of
+packages that you always want available, whether you're on macOS or Linux—x86 or Arm.
+
+Then, when you need to [set up a new laptop](https://flox.dev/blog/setting-up-a-new-laptop-made-easy-with-flox/
+), or [keep multiple machines in sync](https://flox.dev/docs/tutorials/sharing-environments/#always-using-the-same-environment-across-multiple-devices
+), you can be sure you're using the exact same versions, no matter when or where you need them.
+
+If you're already using Homebrew, you can easily [migrate or use Homebrew and Flox together](https://flox.dev/docs/tutorials/migrations/homebrew/).
+
+
+
+### __Consistent builds from local to CI to production__
+
+Flox lets you define what an environment _is_ in a way that can be reused across local dev, CI, and production.
+Leverage [pre-built integrations](https://flox.dev/docs/tutorials/ci-cd/?h=ci) for GitHub Actions, CircleCI, and GitLab to pull and activate the same environments locally, in CI and in production.
+
+Or use Flox [containerize](https://flox.dev/docs/man/flox-containerize/?h=containerize) to package your environments as OCI images—fully pinned and runnable anywhere.
+From bare metal to VMs, from Docker Swarm to Kubernetes to AWS Lambda—the runtime context might change, but Flox environments run and behave the same everywhere.
+
+Need an example? See how [the Flox Docs team uses Flox in CI](https://flox.dev/blog/integrating-flox-with-ci-for-consistent-reproducible-dev-environments/) to build, test and deploy this docs site.
+
+
+### __And more...__
+
+- Create templates or reusable toolchains to bootstrap new projects by [reusing and combining dev environments](https://flox.dev/docs/tutorials/composition/).
+
+- Create a portable [environment with transparent auth](https://flox.dev/blog/get-your-preferred-secrets-manager-in-a-portable-cross-platform-cli-toolkit/) via a third-party secrets manager so cross-platform workflows work the same everywhere: locally, in CI, or in production.
+
+## __Have questions?__
+
+__Ask us on [Slack ](https://go.flox.dev/slack) or [Discourse ](https://discourse.flox.dev)__
+
+The Flox product and engineering teams love to hear directly from users. Your questions and feedback will help us prioritize the improvements to the product that matter most to you.
+
+
+[install_flox]: /install-flox/install
+[flox_5_minutes]: /flox-5-minutes
+[create_guide]: /tutorials/creating-environments
+[share_guide]: /tutorials/sharing-environments
+[init]: /man/flox-init
+[search]: /man/flox-search
+[show]: /man/flox-show
+[catalog]: /concepts/packages-and-catalog
+[install]: /man/flox-install
+[activate]: /man/flox-activate
+[edit]: /man/flox-edit
+[push]: /man/flox-push
+[pull]: /man/flox-pull
+[delete]: /man/flox-delete
+[list]: /man/flox-list
+[manifest]: /man/manifest.toml
+[rust-cookbook]: /languages/rust
+[multi-arch]: /tutorials/multi-arch-environments
+[config]: /man/flox-config
+[services]: /concepts/services
+[floxhub_packages]: https://hub.flox.dev/packages
