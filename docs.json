@@ -242,5 +242,10 @@
       "youtube": "https://www.youtube.com/@floxdev",
       "slack": "https://go.flox.dev/slack"
     }
+  },
+  "api": {
+    "playground": {
+      "proxy": false
+    }
   }
 }
