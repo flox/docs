@@ -85,7 +85,7 @@ A FloxHub catalog references packages published to FloxHub via [`flox publish`][
 ```toml title=".flox/nix-builds.toml"
 version = 1
 
-[catalogs.ysndr]
+[catalogs.my-org]
 type = "floxhub"
 ```
 
@@ -95,7 +95,7 @@ Or with dotted key syntax:
 version = 1
 
 [catalogs]
-ysndr.type = "floxhub"
+my-org.type = "floxhub"
 ```
 
 Public catalogs work without authentication. Private catalogs (those published by an organization with restricted access) require you to authenticate first with `flox auth login`.
@@ -192,7 +192,7 @@ flox build demo
 
 ### Example: FloxHub catalog
 
-This example uses a package published to FloxHub by the user `ysndr`.
+This example uses a package published to FloxHub by the organization `my-org`.
 
 **1. Declare the catalog:**
 
@@ -200,7 +200,7 @@ This example uses a package published to FloxHub by the user `ysndr`.
 version = 1
 
 [catalogs]
-ysndr.type = "floxhub"
+my-org.type = "floxhub"
 ```
 
 **2. Write an expression that uses it:**
@@ -208,7 +208,7 @@ ysndr.type = "floxhub"
 ```nix title=".flox/pkgs/demo.nix"
 { catalogs }:
 
-catalogs.ysndr.blub
+catalogs.my-org.my-package
 ```
 
 **3. Update the lockfile and build:**
