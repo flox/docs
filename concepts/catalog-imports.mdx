@@ -18,11 +18,11 @@ Catalog imports use two files:
 - **`.flox/nix-builds.toml`**, the user-authored configuration file where you declare which catalogs to use.
 - **`.flox/nix-builds.lock`**, a generated lockfile that pins each catalog to a specific revision for reproducibility.
 
-Both files should be committed to version control. The TOML file is authored by hand; the lockfile is generated and updated by the `flox build update-catalogs` command.
+Both files must be tracked by Git (`git add`ed) and should be committed to version control. The TOML file is authored by hand; the lockfile is generated and updated by the `flox build update-catalogs` command.
 
 ## Source-ref (Git) catalogs
 
-A Git catalog points at a remote repository that contains Flox package definitions (a `.flox/pkgs/` directory). Declare one in your `nix-builds.toml` under the `[catalogs]` section:
+A Git catalog points at a remote repository that contains Flox package definitions (a `.flox/pkgs/` directory). Declare one in your `.flox/nix-builds.toml` under the `[catalogs]` section:
 
 ```toml title=".flox/nix-builds.toml"
 version = 1
@@ -58,7 +58,16 @@ my-packages.url = "https://github.com/flox/flox-build-examples"
 | `ref` | Git ref to track (branch, tag). Defaults to the repository's default branch. |
 | `dir` | Subdirectory containing the `.flox/pkgs/` tree. Useful for monorepos. |
 
-For example, to point at a subdirectory within a monorepo:
+These fields are written as separate TOML keys when using the structured form (`type` + `url`). When using the `git+` URL shorthand, encode them as query parameters instead:
+
+```toml title=".flox/nix-builds.toml"
+version = 1
+
+[catalogs.flox-demo]
+url = "git+https://github.com/flox/flox-build-examples?dir=quotes-app-rust"
+```
+
+For example, to point at a subdirectory within a monorepo using the structured form:
 
 ```toml title=".flox/nix-builds.toml"
 version = 1
@@ -93,7 +102,7 @@ Public catalogs work without authentication. Private catalogs (those published b
 
 ## Using catalogs in expressions
 
-Once catalogs are declared in `nix-builds.toml` and the lockfile is generated, you access imported packages through the `catalogs` argument in your Nix expressions.
+Once catalogs are declared in `.flox/nix-builds.toml` and the lockfile is generated, you access imported packages through the `catalogs` argument in your Nix expressions.
 
 <Warning>
   The argument name must be `catalogs` (plural). Using `catalog` (singular) will not work.
@@ -136,17 +145,17 @@ Before you can build with catalog imports, you must generate the lockfile. Run:
 flox build update-catalogs
 ```
 
-This resolves each catalog declaration in `nix-builds.toml` and writes the pinned revisions to `nix-builds.lock`.
+This resolves each catalog declaration in `.flox/nix-builds.toml` and writes the pinned revisions to `.flox/nix-builds.lock`.
 
 Re-run this command whenever you:
 
-- Add or change a catalog entry in `nix-builds.toml`
+- Add or change a catalog entry in `.flox/nix-builds.toml`
 - Want to pick up newer versions of packages from a catalog
 
-After updating, commit both `.flox/nix-builds.toml` and `.flox/nix-builds.lock` to version control.
+After updating, `git add` and commit both `.flox/nix-builds.toml` and `.flox/nix-builds.lock`.
 
 <Note>
-  If you run `flox build` without first generating or updating the lockfile, the build will fail with an error indicating that catalogs have not been resolved.
+  If you run `flox build` without first generating the lockfile, the build will fail because the catalog attributes cannot be resolved.
 </Note>
 
 ## Examples
