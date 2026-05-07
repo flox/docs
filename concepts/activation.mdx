@@ -76,14 +76,14 @@ new one configured by Flox.
 Once this shell exits (via `exit` or `Ctrl-D`, for example), your original shell
 is resumed and your are put back into it.
 
-```d2 scale="1.0"
-shape: sequence_diagram
-user_shell: User shell
-subshell: Subshell
-
-user_shell -> subshell: flox activate
-subshell -> subshell: do work in the subshell
-subshell -> user_shell: exit
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','noteBkgColor':'#e8eef6','noteTextColor':'#1f2937','noteBorderColor':'#7d96b8','actorBkg':'#e8eef6','actorBorder':'#7d96b8','actorTextColor':'#1f2937','actorLineColor':'#7d96b8','signalColor':'#1f2937','signalTextColor':'#1f2937','labelBoxBkgColor':'#e8eef6','labelBoxBorderColor':'#7d96b8','labelTextColor':'#1f2937','loopTextColor':'#1f2937','sequenceNumberColor':'#1f2937'},'sequence':{'mirrorActors':false}}}%%
+sequenceDiagram
+    participant U as User shell
+    participant S as Subshell
+    U->>S: flox activate
+    S->>S: do work in the subshell
+    S->>U: exit
 ```
 
 ### In-place
@@ -119,11 +119,12 @@ and the shell executes that code to configure itself.
   Note that `profile.common` must use shell-agnostic syntax — see
   the [guidance below](#hook-vs-profile-in-a-nutshell).
 </Tip>
-```d2 scale="1.0"
-shape: sequence_diagram
-user_shell: User shell
-user_shell -> user_shell: source <(flox activate)
-user_shell."Back to you"
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','noteBkgColor':'#e8eef6','noteTextColor':'#1f2937','noteBorderColor':'#7d96b8','actorBkg':'#e8eef6','actorBorder':'#7d96b8','actorTextColor':'#1f2937','actorLineColor':'#7d96b8','signalColor':'#1f2937','signalTextColor':'#1f2937','labelBoxBkgColor':'#e8eef6','labelBoxBorderColor':'#7d96b8','labelTextColor':'#1f2937','loopTextColor':'#1f2937','sequenceNumberColor':'#1f2937'},'sequence':{'mirrorActors':false}}}%%
+sequenceDiagram
+    participant U as User shell
+    U->>U: source <(flox activate)
+    Note over U: Back to you
 ```
 
 In order to configure a `default` environment that's activated for every new
@@ -166,14 +167,15 @@ flox activate -c "<your command>"
 This starts a Flox-configured subshell, runs your command,
 and immediately exits to put you back into your shell.
 
-```d2 scale="1.0" pad="1"
-shape: sequence_diagram
-user_shell: User shell
-subshell: Subshell
-user_shell -> subshell: "flox activate -c cmd"
-subshell -> subshell: run "cmd"
-subshell -> user_shell: automatic exit
-user_shell."Back to you"
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','noteBkgColor':'#e8eef6','noteTextColor':'#1f2937','noteBorderColor':'#7d96b8','actorBkg':'#e8eef6','actorBorder':'#7d96b8','actorTextColor':'#1f2937','actorLineColor':'#7d96b8','signalColor':'#1f2937','signalTextColor':'#1f2937','labelBoxBkgColor':'#e8eef6','labelBoxBorderColor':'#7d96b8','labelTextColor':'#1f2937','loopTextColor':'#1f2937','sequenceNumberColor':'#1f2937'},'sequence':{'mirrorActors':false}}}%%
+sequenceDiagram
+    participant U as User shell
+    participant S as Subshell
+    U->>S: flox activate -c cmd
+    S->>S: run "cmd"
+    S->>U: automatic exit
+    Note over U: Back to you
 ```
 
 ### Exec Command
@@ -224,28 +226,32 @@ The steps for a subshell activation are shown in the diagram below,
 and they're very similar for the other types of activation.
 Let's break it down step by step.
 
-```d2 scale="1.0"
-shape: sequence_diagram
-user_shell: User shell
-proc: New process
-
-user_shell -> proc: call "flox activate"
-flox activate: {
-  proc -> proc: exec bash activation_script.sh
-}
-bash: {
-  proc -> proc: run setup scripts
-  proc -> proc: set user variables
-  proc -> proc: source hook.on-activate
-  proc -> proc: exec FLOX_SHELL
-}
-FLOX_SHELL: {
-  proc -> proc: "source [profile] scripts"
-  Do work: {
-    proc -> proc: Do your work inside the shell
-  }
-}
-proc -> user_shell: exit
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','noteBkgColor':'#e8eef6','noteTextColor':'#1f2937','noteBorderColor':'#7d96b8','actorBkg':'#e8eef6','actorBorder':'#7d96b8','actorTextColor':'#1f2937','actorLineColor':'#7d96b8','signalColor':'#1f2937','signalTextColor':'#1f2937','labelBoxBkgColor':'#e8eef6','labelBoxBorderColor':'#7d96b8','labelTextColor':'#1f2937','loopTextColor':'#1f2937','sequenceNumberColor':'#1f2937'},'sequence':{'mirrorActors':false}}}%%
+sequenceDiagram
+    participant U as User shell
+    participant P as New process
+    U->>P: call "flox activate"
+    rect rgb(235, 240, 250)
+      Note over P: flox activate
+      P->>P: exec bash activation_script.sh
+    end
+    rect rgb(235, 248, 240)
+      Note over P: bash
+      P->>P: run setup scripts
+      P->>P: set user variables
+      P->>P: source hook.on-activate
+      P->>P: exec FLOX_SHELL
+    end
+    rect rgb(240, 240, 245)
+      Note over P: FLOX_SHELL
+      P->>P: source [profile] scripts
+      rect rgb(228, 232, 240)
+        Note over P: Do work
+        P->>P: Do your work inside the shell
+      end
+    end
+    P->>U: exit
 ```
 
 For a variety of reasons it's convenient to have the same process ID (PID)
@@ -334,18 +340,18 @@ subsequent activations rather than computing them again.
 We call this "attaching" to an activation, and we do it automatically for you
 to make activation as fast as possible.
 
-```d2 scale="1.0"
-shape: sequence_diagram
-shell1: First shell
-shell2: Second shell
-files: \"Somewhere\"
-
-shell1 -> shell1: flox activate
-shell1 -> files: save environment variables
-shell1."Activated"
-shell2 -> shell2: flox activate
-shell2 <- files: restore environment variables
-shell2."Activated"
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','noteBkgColor':'#e8eef6','noteTextColor':'#1f2937','noteBorderColor':'#7d96b8','actorBkg':'#e8eef6','actorBorder':'#7d96b8','actorTextColor':'#1f2937','actorLineColor':'#7d96b8','signalColor':'#1f2937','signalTextColor':'#1f2937','labelBoxBkgColor':'#e8eef6','labelBoxBorderColor':'#7d96b8','labelTextColor':'#1f2937','loopTextColor':'#1f2937','sequenceNumberColor':'#1f2937'},'sequence':{'mirrorActors':false}}}%%
+sequenceDiagram
+    participant S1 as First shell
+    participant F as Somewhere
+    participant S2 as Second shell
+    S1->>S1: flox activate
+    S1->>F: save environment variables
+    Note over S1: Activated
+    S2->>S2: flox activate
+    F->>S2: restore environment variables
+    Note over S2: Activated
 ```
 
 If you edit your manifest and activate in a new shell,
