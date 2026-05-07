@@ -42,8 +42,12 @@ flox auth status || flox auth login
 ✔ Authentication complete
 ✔ Logged in as <youruser>
 
-flox init -r <youruser>/default
+flox init -D
 ```
+
+!!! note "Shorthand for default environment"
+    You can use `-D` or `--default` as a shorthand for `-r <youruser>/default`.
+    For example: `flox init -D` is equivalent to `flox init -r <youruser>/default`.
 
 Once the environment has been created, configure your shell to activate the
 environment with every new shell. This can be done as part of the automatic
@@ -58,7 +62,7 @@ setup, or you can add a single line to your shell's RC file:
   Add the following line to the very end of each of those files:
 
   ```
-  eval "$(flox activate -r <your username>/default -m run)"
+   eval "$(flox activate -D -m run)"
   ```
   </Tab>
   <Tab title="Zsh">
@@ -67,7 +71,7 @@ setup, or you can add a single line to your shell's RC file:
   files:
 
   ```
-  eval "$(flox activate -r <your username>/default -m run)"
+   eval "$(flox activate -D -m run)"
   ```
   </Tab>
   <Tab title="Fish">
@@ -75,17 +79,18 @@ setup, or you can add a single line to your shell's RC file:
   Add the following line to the very end of your `config.fish` file:
 
   ```
-  flox activate -r <your username>/default -m run | source
+  flox activate -D -m run | source
   ```
   </Tab>
   <Tab title="Tcsh">
 
   Add the following line to the very end of your `.tcshrc` file:
 
+
   ** For FloxHub environments:**
 
   ```
-  eval "`flox activate -r <your username>/default -m run`"
+  eval "`flox activate -D -m run`"
   ```
   </Tab>
 </Tabs>
@@ -99,7 +104,7 @@ initialization scripts, you can activate the default environment
 explicitly when needed:
 
 ```
-flox activate -r <your username>/default
+flox activate -D
 ```
 
 ## Taking it for a spin
@@ -132,10 +137,10 @@ to the environment in that directory, rather than your default environment.
 
 Nevertheless, it's still easy to install whatever you wish to your `default`
 environment.
-All you need to do is pass the `-r` argument to the `install` command, like so:
+You can use the `-D` (or `--default`) flag as a shorthand:
 
-```
-flox install -r <your username>/default hello
+```{ .bash .copy }
+flox install -D hello
 ```
 
 When you do this, you should see the following output, indicating success:
@@ -236,7 +241,7 @@ For example you can
 </Tabs>
 
 ```
-flox init -d ~
+flox init --dir ~
 ```
 
 <Tabs>
@@ -246,7 +251,7 @@ flox init -d ~
 </Tabs>
 
 ```
-flox pull --copy -d ~ owner/name
+flox pull --copy --dir ~ owner/name
 ```
 
 <Tabs>
@@ -256,14 +261,14 @@ flox pull --copy -d ~ owner/name
 </Tabs>
 
 ```
-flox pull -d ~ owner/name
+flox pull --dir ~ owner/name
 ```
 
 ---
 
 If you choose to automatically activate the environment in your rc files,
 change the `flox activate -r <youruser>` accordingly
-to e.g. `flox activate -d ~`.
+to e.g. `flox activate --dir ~`.
 
 [auth]: /man/flox-auth
 [init]: /man/flox-init
