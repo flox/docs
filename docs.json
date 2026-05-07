@@ -111,6 +111,7 @@
               "concepts/builds",
               "concepts/manifest-builds",
               "concepts/nix-expression-builds",
+              "concepts/catalog-imports",
               "concepts/publishing",
               "concepts/secrets-management",
               "concepts/flox-vs-containers"
