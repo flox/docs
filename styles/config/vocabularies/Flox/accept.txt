@@ -1,1 +1,12 @@
 Flox
+FloxHub
+lockfile
+lockfiles
+monorepo
+monorepos
+nixpkgs
+Nixpkgs
+Nix
+vendoring
+vendored
+toplevel
