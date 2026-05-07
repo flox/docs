@@ -9,7 +9,7 @@ Catalog imports allow your [Nix expression builds][nix-expression-builds] to dep
 
 [Nix expression builds][nix-expression-builds] already support [vendoring][vendor-example] existing packages by copying their expressions into your `.flox/pkgs/` directory. Catalog imports extend this model by allowing expression sharing through a central registry at the granularity of catalogs, which correspond to FloxHub user or organization namespaces, or to external repositories. You declare catalogs in a configuration file and access their packages via the `catalogs` argument in your expressions; this keeps your build inputs explicit, lockable, and reproducible.
 
-You should be familiar with defining packages in `.flox/pkgs/` before using catalog imports.
+Catalog imports are a feature of [Nix expression builds][nix-expression-builds] specifically; they do not apply to manifest-based builds. You should be familiar with defining packages in `.flox/pkgs/` before using catalog imports.
 
 ## Configuring catalogs
 
@@ -79,12 +79,15 @@ my-packages.url = "https://github.com/flox/flox-build-examples"
 
 The supported source types and their fields are documented in the [Nix manual][nix-source-types].
 
-#### Optional fields
+#### Common fields for `git` sources
 
 | Field | Description |
 | ----- | ----------- |
 | `ref` | Git ref to track (branch, tag). Defaults to the repository's default branch. |
 | `dir` | Subdirectory containing the `.flox/pkgs/` tree. Useful for monorepos. |
+| `shallow` | If `true`, perform a shallow clone. Defaults to `false`. |
+
+Other source types (`github`, `gitlab`, `tarball`, etc.) accept their own fields; for example, `github` and `gitlab` support a `host` field for self-hosted instances. See the [Nix source types reference][nix-source-types] for the full list.
 
 These fields are written as separate TOML keys when using the structured form (`type` + `url`). When using the URL shorthand, encode them as query parameters instead:
 
