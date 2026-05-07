@@ -5,7 +5,7 @@ description: "Get started with creating Flox environments."
 
 Flox is a language agnostic package and environment manager that lets you create reproducible environments that work across machines, architectures, and operating systems.
 It supports macOS and Linux on both x86_64 and ARM architectures, so your team can share a single environment definition regardless of what hardware they're on.
-To learn more about what Flox is and what it can do, see the [Introduction][intro].
+To learn more about what Flox is and what it can do, see the [Introduction](/index).
 
 In this guide you'll use a sample project to create a Flox environment, install packages, set environment variables, run services, and customize your shell.
 
@@ -13,7 +13,7 @@ Buckle up, it's time for a whirlwind tour of Flox.
 
 ## Clone the sample project
 
-We've prepared a sample project for you, but you'll need to [install Flox][install_flox] to follow along.
+We've prepared a sample project for you, but you'll need to [install Flox](/install-flox/install) to follow along.
 Once you have Flox, you can clone the project:
 
 ```bash
@@ -26,7 +26,7 @@ cd flox-in-5min
 
 ## Activate and explore
 
-Run [`flox activate`][activate] to enter the environment. This will make all of the packages defined in the environment available in your shell:
+Run [`flox activate`](/man/flox-activate) to enter the environment. This will make all of the packages defined in the environment available in your shell:
 
 ```console
 $ flox activate
@@ -43,7 +43,7 @@ Hello from Flox!
 
 You didn't have to install Go yourself. The environment already had it defined, so `flox activate` made it available automatically. To get started on any project with Flox, all you need is `git clone` and `flox activate`.
 
-Now let's see what else is installed to the environment with the [`flox list`][list] command:
+Now let's see what else is installed to the environment with the [`flox list`](/man/flox-list) command:
 
 ```console
 $ flox list
@@ -54,7 +54,7 @@ nasm: nasm (2.16.03)
 nodejs_24: nodejs_24 (24.5.0)
 ```
 
-This environment includes tools across multiple languages, from Go to Node.js to [Bun][bun], all the way down to an assembler like `nasm`. Flox is language agnostic, so you can manage your entire stack of developer tools in one place. Anyone who runs `flox activate` on this project will get the exact same set of packages.
+This environment includes tools across multiple languages, from Go to Node.js to [Bun](https://bun.sh/), all the way down to an assembler like `nasm`. Flox is language agnostic, so you can manage your entire stack of developer tools in one place. Anyone who runs `flox activate` on this project will get the exact same set of packages.
 
 ## Managing packages
 
@@ -98,10 +98,10 @@ flox install ripgrep
 
 ## Push to FloxHub
 
-Now that you've made changes to the environment, share it with your team by pushing it to [FloxHub][floxhub].
+Now that you've made changes to the environment, share it with your team by pushing it to [FloxHub](https://hub.flox.dev).
 FloxHub is a platform for sharing and discovering Flox environments and packages, making it easy for your team to stay in sync.
 
-If you haven't already, [sign up for a FloxHub account][floxhub_signup]. Then authenticate with the CLI:
+If you haven't already, [sign up for a FloxHub account](https://hub.flox.dev/signup). Then authenticate with the CLI:
 
 ```bash
 flox auth login
@@ -178,42 +178,10 @@ If you want services to start automatically when you activate the environment, u
 
 You've created an environment, installed packages, pushed to FloxHub, and ran services. Here are some next steps to keep going:
 
-- [Customize your shell environment][activation-tutorial] with aliases, scripts, and hooks
-- [Design cross platform environments][multi-arch] that work on both macOS and Linux
-- [Reuse and combine environments][composition] to build modular developer toolchains
-- [Run Flox in CI][ci] for consistent builds across your pipeline
-- [Build and publish packages with Flox][build-publish]
+- [Customize your shell environment](/tutorials/customizing-environments) with aliases, scripts, and hooks
+- [Design cross platform environments](/tutorials/multi-arch-environments) that work on both macOS and Linux
+- [Reuse and combine environments](/tutorials/composition) to build modular developer toolchains
+- [Run Flox in CI](/tutorials/ci-cd) for consistent builds across your pipeline
+- [Build and publish packages with Flox](/tutorials/build-and-publish)
 
 Have questions? Reach out on [Slack](https://go.flox.dev/slack) or [Discourse](https://discourse.flox.dev).
-
-
-
-
-
-[intro]: /index
-[install_flox]: /install-flox/install
-[create_guide]: /tutorials/creating-environments
-[sharing]: /tutorials/sharing-environments
-[init]: /man/flox-init
-[search]: /man/flox-search
-[show]: /man/flox-show
-[catalog]: /concepts/packages-and-catalog
-[install]: /man/flox-install
-[activate]: /man/flox-activate
-[edit]: /man/flox-edit
-[push]: /man/flox-push
-[list]: /man/flox-list
-[manifest]: /man/manifest.toml
-[multi-arch]: /tutorials/multi-arch-environments
-[services]: /concepts/services
-[bun]: https://bun.sh/
-[zig]: https://ziglang.org/
-[floxhub]: https://hub.flox.dev
-[floxhub_signup]: https://hub.flox.dev/signup
-[sleep-issue]: https://github.com/flox/flox/pull/1931
-[install-section]: /man/manifest.toml#install
-[activation-tutorial]: /tutorials/customizing-environments
-[ci]: /tutorials/ci-cd
-[composition]: /tutorials/composition
-[homebrew]: /tutorials/migrations/homebrew
-[build-publish]: /tutorials/build-and-publish

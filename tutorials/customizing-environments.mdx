@@ -3,7 +3,7 @@ title: "Customizing the shell environment"
 description: "Using setup scripts, aliases, and environment variables to improve your workflows."
 ---
 
-Activating a Flox [environment][environment_concept] places you into a subshell.
+Activating a Flox [environment](/concepts/environments) places you into a subshell.
 You likely already have some customizations built into your shell from your shell's configuration (`.bashrc`, `.zshrc`, `config.fish`, etc), but it can be convenient to further customize your shell based on the project that you're working on.
 This guide will walk you through leveraging various features of a Flox environment to improve your quality of life when developing a Rust project, but many of the ideas are applicable to other languages as well.
 
@@ -11,9 +11,9 @@ This guide will walk you through leveraging various features of a Flox environme
 
 Let's assume you have a Rust project that you regularly work on.
 To do that work you would already have `cargo`, `rustc`, and a few other tools installed.
-For more details on what it looks like to develop in Rust with Flox, see the [Rust language guide][rust_guide].
+For more details on what it looks like to develop in Rust with Flox, see the [Rust language guide](/languages/rust).
 
-If you'd like to follow along with a real Flox environment, create an environment via [`flox init`][flox_init] and install the tools as shown below:
+If you'd like to follow along with a real Flox environment, create an environment via [`flox init`](/man/flox-init) and install the tools as shown below:
 
 ```bash
 mkdir mycli;
@@ -37,7 +37,7 @@ When customizing your shell environment you have three basic knobs you can turn:
 - The `[profile]` section
 
 The logic for deciding where a customization should go is application specific, but there are some simple guidelines you can follow.
-For a full discussion of what logic to place in which section and why, see the [activation concept page][activation_concept].
+For a full discussion of what logic to place in which section and why, see the [activation concept page](/concepts/activation).
 Otherwise, try this:
 
 
@@ -99,7 +99,7 @@ Hello, World!
 ### Why do I need to exit and re-activate?
 
 Any time the Flox CLI detects that you've changed a section of the manifest that it can't automatically make take effect, you'll need to exit and reactivate.
-For instance, when you install a new package via [`flox install`][flox_install], the CLI is able to make that immediately available to you so there's no need to exit and re-activate.
+For instance, when you install a new package via [`flox install`](/man/flox-install), the CLI is able to make that immediately available to you so there's no need to exit and re-activate.
 
 However, editing the `hook.on-activate` script has no effect on the currently activated environment because the `hook.on-activate` script is only run during the activation process (and the same goes for `[profile]`).
 Similarly, editing the `[vars]` section has no effect on the currently activated environment because the `hook.on-activate` and `[profile]` scripts may rely on the values of variables in `[vars]`, so for the sake of correctness it makes sense to re-run those scripts.
@@ -142,7 +142,7 @@ We're going to create an alias for your developer environment that will build `m
 Going back to our "vars, hook, or profile" logic, we see that we're creating a shell alias.
 This means that we'll be adding it to the `[profile]` section.
 However, the syntax for defining shell aliases is shell-specific, so we'll need to declare this alias in the subsection that corresponds to our shell.
-For this tutorial we'll assume that you're an enlightened [fish shell][fish_shell] user, meaning that we'll edit our `profile.fish` script.
+For this tutorial we'll assume that you're an enlightened [fish shell](https://fishshell.com/) user, meaning that we'll edit our `profile.fish` script.
 
 We'll call this alias `install-bin` and it will build `mycli` in "release" mode, i.e. with full optimizations so it runs as fast as possible.
 Edit your `[profile]` section to look like this:
@@ -169,13 +169,4 @@ mycli
 
 ## Where to next?
 
--  [Multiple architecture environments][multi-arch-guide]
-
-[environment_concept]: /concepts/environments
-[flox_activate]: /man/flox-activate
-[multi-arch-guide]: /tutorials/multi-arch-environments
-[rust_guide]: /languages/rust
-[flox_init]: /man/flox-init
-[activation_concept]: /concepts/activation
-[fish_shell]: https://fishshell.com/
-[flox_install]: /man/flox-install
+-  [Multiple architecture environments](/tutorials/multi-arch-environments)

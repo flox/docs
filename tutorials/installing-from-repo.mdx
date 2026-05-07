@@ -13,7 +13,7 @@ systems configured using this method will receive Flox updates
 as they are released.
 
 <Note>
-  When you [download and install a Flox `.deb` or `.rpm` package][install_flox],
+  When you [download and install a Flox `.deb` or `.rpm` package](/install-flox/install),
   the installer performs these steps for you.
   But you can easily script the steps below to automate this process.
 </Note>
@@ -65,7 +65,7 @@ sudo apt update && sudo apt install flox -y
   If you are running an end-of-life release
   (Debian 9 or earlier, Ubuntu 18.04 or earlier)
   that does not support `signed-by`,
-  see the [Debian SecureApt wiki][debian_secure_apt]
+  see the [Debian SecureApt wiki](https://wiki.debian.org/SecureApt)
   for the legacy `trusted.gpg.d` approach.
 </Note>
 ### Red Hat-based systems
@@ -184,11 +184,6 @@ sudo dnf clean all
 
 ## Where to next?
 
--  [Creating environments][creating_guide]
+-  [Creating environments](/tutorials/creating-environments)
 
--  [Sharing environments][sharing_guide]
-
-[install_flox]: /install-flox/install
-[creating_guide]: /tutorials/creating-environments
-[sharing_guide]: /tutorials/sharing-environments
-[debian_secure_apt]: https://wiki.debian.org/SecureApt
+-  [Sharing environments](/tutorials/sharing-environments)

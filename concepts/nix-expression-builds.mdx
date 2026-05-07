@@ -3,13 +3,13 @@ title: "Nix expression builds"
 description: "Nix expression builds with Flox"
 ---
 
-See the [builds concept][builds-concept] page for an overview of the different types of builds and how to perform them.
+See the [builds concept](/concepts/builds) page for an overview of the different types of builds and how to perform them.
 
 ## Overview
 
 Nix expression builds are defined by creating files in the `.flox/pkgs/` directory of a Flox environment. These expressions are written in the Nix language, which is incredibly powerful and results in truly reproducible builds.
 
-The environment that contains the builds doesn't need to have any packages installed because all of the build's dependencies are defined within the expression, but if there are any packages installed then Flox will attempt to produce a build that is compatible with any packages in the "toplevel" [package group][pkg-groups].
+The environment that contains the builds doesn't need to have any packages installed because all of the build's dependencies are defined within the expression, but if there are any packages installed then Flox will attempt to produce a build that is compatible with any packages in the "toplevel" [package group](/man/manifest.toml#package-descriptors).
 
 ## Defining builds
 
@@ -21,7 +21,7 @@ Each build specified in the `.flox/pkgs/` directory corresponds to a different p
 | `.flox/pkgs/hello/default.nix` | `hello` |
 | `.flox/pkgs/hello/how/do/you/do/default.nix` | `hello.how.do.you.do` |
 
-These names cannot conflict with [manifest builds][manifest-builds-concept] in the same environment and will result in an error if they do.
+These names cannot conflict with [manifest builds](/concepts/manifest-builds) in the same environment and will result in an error if they do.
 
 All of the files in the `.flox/pkgs` directory must be tracked by a Git repository (`git add`ed but not necessarily committed) which ensures that unnecessary cache files and secrets don't end up in your package.
 
@@ -210,7 +210,7 @@ This will extract the expression for the `hello` package in `nixpkgs` and save t
 
 Nix expression builds can depend on packages provided by external catalogs: remote repositories or FloxHub users that publish reusable packages. Rather than vendoring dependencies or using Nix flake inputs directly, you declare catalogs in `.flox/nix-builds.toml` and access their packages via the `catalogs` argument in your expressions.
 
-See [Catalog imports][catalog-imports] for full documentation and examples.
+See [Catalog imports](/concepts/catalog-imports) for full documentation and examples.
 
 ## Tips
 
@@ -246,8 +246,3 @@ error: hash mismatch in fixed-output derivation '/nix/store/srm7s6pyckifs52ikyfa
          specified: sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
             got:    sha256-WpqZbcKSzCTc9BHO6H6S9qrluNE72caBm0x6nc4IGKs=
 ```
-
-[builds-concept]: /concepts/builds
-[catalog-imports]: /concepts/catalog-imports
-[manifest-builds-concept]: /concepts/manifest-builds
-[pkg-groups]: /man/manifest.toml#package-descriptors

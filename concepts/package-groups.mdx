@@ -14,14 +14,14 @@ description: "How package groups work and when to use them"
   Flox maintains a [non-destructive fork](https://Github.com/flox/nixpkgs) of `nixpkgs`,
   sampling the upstream `unstable` branch [nixos-unstable](https://nixos.wiki/wiki/Nix_channels)
   at the same time daily.
-  The Flox [base Catalog][base-catalog-concept] evaluates a subset of packages from that fork
+  The Flox [base Catalog](/concepts/base-catalog) evaluates a subset of packages from that fork
   and records metadata such as version, license, and source provenance.
   A **catalog revision** is a snapshot of that subset of packages
   at a specific `nixpkgs` commit.
 </Note>
 Think of package groups as a convenient way to partition the resolver's search space into discrete subproblems. They make it easier for the resolver to compute a functioning dependency graph.
 
-Package groups are also useful as an **organizational tool**. You can use them to separate runtime dependencies, dev tools, and other categories of tooling into logical groupings in the [Flox environment's manifest][environments-concept]. This makes environments with a large number of dependencies easier to read and maintain. In Flox [manifest builds][manifest-builds-concept], you can use package groups to keep dev-time tools out of the build context.
+Package groups are also useful as an **organizational tool**. You can use them to separate runtime dependencies, dev tools, and other categories of tooling into logical groupings in the [Flox environment's manifest](/concepts/environments). This makes environments with a large number of dependencies easier to read and maintain. In Flox [manifest builds](/concepts/manifest-builds), you can use package groups to keep dev-time tools out of the build context.
 
 **tl;dr**: Define package groups when you need to install ABI- or version-incompatible sets of packages to a Flox environment. These are packages that need to pin to different commits in `nixpkgs`.
 
@@ -323,7 +323,7 @@ The `priority` field defaults to `5`. Lower numbers win file conflicts. Here, `g
 
 ### Only `toplevel` Packages Are Available During Flox Manifest Builds
 
-When you use `flox build` with [manifest builds][manifest-builds-concept], only packages in the `toplevel` group are available as build dependencies. Packages in named groups are **not** accessible in build commands:
+When you use `flox build` with [manifest builds](/concepts/manifest-builds), only packages in the `toplevel` group are available as build dependencies. Packages in named groups are **not** accessible in build commands:
 
 ```toml
 [install]
@@ -584,7 +584,3 @@ Nix makes coexistence _mechanically possible_; package groups make it simple, de
 Package groups also improve the Flox resolver's performance because it only needs to search for a compatible `nixpkgs` revision that satisfies all packages in a constrained set—i.e., the package group. Fewer packages per group means a smaller constraint-solving search space.
 
 This makes it faster and less costly to resolve a coherent dependency graph.
-
-[environments-concept]: /concepts/environments
-[manifest-builds-concept]: /concepts/manifest-builds
-[base-catalog-concept]: /concepts/base-catalog

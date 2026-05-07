@@ -6,7 +6,7 @@ description: "Common questions and solutions for using Ruby with Flox"
 ## Build with Flox
 
 Not only can you _develop_ your software with Flox, but you can _build_ it as well.
-See the [builds][build-concept] concept page for more details.
+See the [builds](/concepts/builds) concept page for more details.
 
 ### Manifest builds
 
@@ -41,7 +41,7 @@ command = '''
 
 #### Vendoring dependencies in pure builds
 
-As discussed in the [pure builds][pure-builds-section] of the Builds concept page, pure builds run in a sandbox without network access on Linux.
+As discussed in the [pure builds](/concepts/manifest-builds#pure-builds) of the Builds concept page, pure builds run in a sandbox without network access on Linux.
 A pure build can be run as a multi-stage build where the first step vendors dependencies.
 An example is shown below:
 
@@ -79,6 +79,3 @@ command = """
 """
 sandbox = "pure"
 ```
-
-[build-concept]: /concepts/builds
-[pure-builds-section]: /concepts/manifest-builds#pure-builds

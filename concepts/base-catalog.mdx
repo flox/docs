@@ -4,7 +4,7 @@ description: "Everything you need to know about the Base Catalog"
 ---
 
 The base Catalog is the root of all packages in Flox.
-It is generated from a fork of [nixpkgs][nixpkgs],
+It is generated from a fork of [nixpkgs](https://github.com/NixOS/nixpkgs),
 contains historical metadata
 (such as versions and system support over time),
 and is updated on an automated schedule.
@@ -14,7 +14,7 @@ or will be built upon the Base Catalog data.
 
 On a regular basis,
 Flox will evaluate a subset of packages
-from its [nixpkgs][nixpkgs] fork
+from its [nixpkgs](https://github.com/NixOS/nixpkgs) fork
 and save the metadata from the evaluation.
 This makes it available to users of Flox.
 
@@ -25,7 +25,7 @@ allows flox to make attempts to serve up known good builds.
 If you encounter a difference between `flox show` (meta data only),
 and what `flox install` gives you, it may be due to this logic.
 Refer to `allow_broken`, `allow_unfree`, and `allow_missing_builds`
-in the [environment manifest][manifest_concept] to override the defaults.
+in the [environment manifest](/concepts/environments#manifesttoml) to override the defaults.
 
 ## Which packages does Flox evaluate?
 
@@ -70,24 +70,24 @@ in other packages in the nixpkgs repository.
 
 If you have submitted a pull request to nixpkgs
 and are interested in tracking its progress,
-you can use this site: [Nixpkgs PR Tracker][nixpkgs_tracker].
+you can use this site: [Nixpkgs PR Tracker](https://nixpkgs-tracker.ocfox.me).
 
 ### Flox branches
 
-Flox maintains a fork of [nixpkgs][floxpkgs]
+Flox maintains a fork of [nixpkgs](https://github.com/flox/nixpkgs)
 and maintains several branches.
 These branches
 relate to a Flox concept of "stabilities"
 that is not yet fully exposed.
 These are not to be confused with upstream branches of the same name,
 and all derive from the `unstable` branch
-of our [fork][floxpkgs]
+of our [fork](https://github.com/flox/nixpkgs)
 (which, again, is not the same thing as `nixos-unstable`).
 
 - `unstable` is reset to upstream `unstable` daily
-- `staging` is reset to the `unstable` branch of our [fork][floxpkgs] each Saturday
-- `stable` is reset to the `staging` branch of our [fork][floxpkgs] on the first Saturday of the month
-- `lts` is reset to the `stable` branch of our [fork][floxpkgs] on the first Saturday in January and July (every 6 months)
+- `staging` is reset to the `unstable` branch of our [fork](https://github.com/flox/nixpkgs) each Saturday
+- `stable` is reset to the `staging` branch of our [fork](https://github.com/flox/nixpkgs) on the first Saturday of the month
+- `lts` is reset to the `stable` branch of our [fork](https://github.com/flox/nixpkgs) on the first Saturday in January and July (every 6 months)
 
 These "stability" channels
 will be exposed in the future,
@@ -138,8 +138,3 @@ Current settings:
 - `staging` - 156 tags (3 years weekly)
 - `stable` - 60 tags (5 years monthly)
 - `lts` - 12 tags (6 years bi-annual)
-
-[nixpkgs]: https://github.com/NixOS/nixpkgs
-[floxpkgs]: https://github.com/flox/nixpkgs
-[nixpkgs_tracker]: https://nixpkgs-tracker.ocfox.me
-[manifest_concept]: /concepts/environments#manifesttoml

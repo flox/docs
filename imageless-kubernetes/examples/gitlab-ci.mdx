@@ -27,7 +27,7 @@ To configure your GitLab runner to run Imageless Kubernetes pods, add this secti
 <Note>
   **Note**
 
-  These options can also be passed as part of the job definition in `.gitlab-ci.yml`, see the [GitLab documentation][gitlab-k8s-docs] for more details.
+  These options can also be passed as part of the job definition in `.gitlab-ci.yml`, see the [GitLab documentation](https://docs.gitlab.com/runner/executors/kubernetes/) for more details.
 </Note>
 These settings will start all GitLab job pods using the Flox runtime, with an empty container image, and allow setting additional annotations (e.g. `flox.dev/environment`) on a per-job basis.
 
@@ -35,7 +35,7 @@ The `flox.dev/skip-containers` and `flox.dev/skip-containers-exec` annotations a
 
 `flox.dev/activate-mode` is set to make build dependencies available to the job script.
 
-See the [configuration][config] page for more details on annotations.
+See the [configuration](/imageless-kubernetes/config) page for more details on annotations.
 
 ## GitLab job configuration
 
@@ -53,7 +53,7 @@ hello-job:
     - hello
 ```
 
-where the value of the annotation is the name of an environment from [FloxHub][floxhub].
+where the value of the annotation is the name of an environment from [FloxHub](/concepts/floxhub).
 
 <Note>
   **Note**
@@ -67,7 +67,3 @@ Now, any job you target to this runner will be executed with Imageless Kubernete
 If you utilize the same Flox environment used for development, you will be able to seamlessly test with the exact same packages, regardless of what system or architecture is used.
 
 Since the CI environment doesn’t rely on a container image, updates are instant: run `flox push`, and the job will pick up the changes automatically.
-
-[gitlab-k8s-docs]: https://docs.gitlab.com/runner/executors/kubernetes/
-[config]: /imageless-kubernetes/config
-[floxhub]: /concepts/floxhub

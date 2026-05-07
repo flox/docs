@@ -83,10 +83,10 @@ Everything appears to be in working order, so now we can discuss what it looks l
 
 ## Define a build
 
-In order to define a Flox build, we add an entry to the [`[build]`][flox-manifest-build-section] section of the manifest.
+In order to define a Flox build, we add an entry to the [`[build]`](/man/manifest.toml#build) section of the manifest.
 Every name added to the `build` section creates a new package.
 In our case the package will be the compiled Go program, but you can use Flox to build all kinds of things.
-See the [builds][build-concept] page for more examples of what you can build with Flox.
+See the [builds](/concepts/builds) page for more examples of what you can build with Flox.
 
 All that's necessary to define a build is a short script that does two things:
 
@@ -94,12 +94,12 @@ All that's necessary to define a build is a short script that does two things:
 - Copies the program to a directory called `$out`
 
 The `$out` shell variable holds the path to a temporary directory where your build package should be placed (again, "package" in our case means the compiled `hello` program).
-The `$out` directory adheres to the [Filesystem Hierarchy Standard (FHS)][fhs], which is just the formal name for the convention of placing executable files in `/bin`, libraries in `/lib`, etc.
+The `$out` directory adheres to the [Filesystem Hierarchy Standard (FHS)](https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard), which is just the formal name for the convention of placing executable files in `/bin`, libraries in `/lib`, etc.
 For this `hello` program we'll want to place it in `$out/bin` since `hello` is an executable program, and that's where the FHS says to put those types of files.
 Flox expects you to put executables there, and if you put them somewhere else you may experience unexpected behavior.
 
 Let's now define our build.
-Run [`flox edit`][flox-edit] so that you can edit your manifest, and add the following section:
+Run [`flox edit`](/man/flox-edit) so that you can edit your manifest, and add the following section:
 
 ```toml
 [build.hello]
@@ -113,7 +113,7 @@ command = '''
 
 ## Perform a build
 
-It's the moment of truth, let's run [`flox build`][flox-build] to have Flox build our `hello` program for us:
+It's the moment of truth, let's run [`flox build`](/man/flox-build) to have Flox build our `hello` program for us:
 
 ```text
 flox [myproject] $ flox build
@@ -198,9 +198,9 @@ Now that the package is built, we can send it somewhere.
 Every user has a private catalog that they can publish packages to.
 In order to share packages with other people you must create an organization.
 This is a paid feature, and if you would like access to it you should contact Flox directly.
-See the [organizations][organizations-concept] page for more details.
+See the [organizations](/concepts/organizations) page for more details.
 
-Now that you've built the package you can [publish][publish-concept] it to your private catalog via the [`flox publish`][flox-publish] command.
+Now that you've built the package you can [publish](/concepts/publishing) it to your private catalog via the [`flox publish`](/man/flox-publish) command.
 This command has a few requirements to make sure that the package you're publishing can be built by other people reproducibly:
 
 - The Flox environment must be in a git repository.
@@ -226,7 +226,7 @@ The `flox publish` command performs a clean build of the package in a temporary 
 
   This is a paid feature included with Flox for Teams.
 </Tip>
-Now that you've published the package, it will show up in [`flox search`][flox-search] and [`flox show`][flox-show], and can be installed via [`flox install`][flox-install].
+Now that you've published the package, it will show up in [`flox search`](/man/flox-search) and [`flox show`](/man/flox-show), and can be installed via [`flox install`](/man/flox-install).
 The package will appear with your username or organization name prefixed to the package name.
 Let's say your username is `myuser` and the package name is `hello`, in which case the published package will appear as `myuser/hello` in `flox show`, `flox search`, and `flox install`.
 Let's see that in action with `flox search`:
@@ -262,17 +262,4 @@ flox [myproject] $ flox install myuser/hello
 With Flox you have an integrated experience where the same tool you use to develop software is also used to build it, publish it, and eventually consume it.
 The story doesn't end here though.
 In this guide we've shown you how to build and distribute programs, but you can also use it to distribute configuration files (or any other file).
-See the [builds][extra-builds] concept page for examples of what else you can build and publish with Flox.
-
-[flox-manifest-build-section]: /man/manifest.toml#build
-[build-concept]: /concepts/builds
-[fhs]: https://en.wikipedia.org/wiki/Filesystem_Hierarchy_Standard
-[flox-install]: /man/flox-install
-[flox-show]: /man/flox-show
-[flox-search]: /man/flox-search
-[flox-edit]: /man/flox-edit
-[flox-build]: /man/flox-build
-[flox-publish]: /man/flox-publish
-[extra-builds]: /concepts/manifest-builds#example-configuration-files
-[publish-concept]: /concepts/publishing
-[organizations-concept]: /concepts/organizations
+See the [builds](/concepts/manifest-builds#example-configuration-files) concept page for examples of what else you can build and publish with Flox.

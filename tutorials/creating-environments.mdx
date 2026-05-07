@@ -3,7 +3,7 @@ title: "Creating environments"
 description: "Reproducible environments for any project."
 ---
 
-You can use Flox to **set up an [environment][environment_concept]** for a new
+You can use Flox to **set up an [environment](/concepts/environments)** for a new
 or existing project.
 Flox environments can either be activated in a new sub-shell or within the
 current shell,
@@ -19,7 +19,7 @@ projects as well.
 ## Initialize a project
 
 Let's set up a project called `example-project` using the
-[`flox init`][flox_init] command:
+[`flox init`](/man/flox-init) command:
 
 ```console
 $ git init example-project && cd example-project
@@ -36,9 +36,9 @@ Next:
   $ flox activate            <- Enter the environment
 ```
 
-Once an [environment][environment_concept] has been created,
+Once an [environment](/concepts/environments) has been created,
 you will notice some files have appeared in a `.flox` directory wherever you ran
-[`flox init`][flox_init].
+[`flox init`](/man/flox-init).
 This is where an environment's declarative configuration is stored by default,
 and can be checked into version control.
 
@@ -48,11 +48,11 @@ We have an environment,
 but it's empty.
 Flox has over 80,000 open source and licensable packages to install in your
 environment.
-Search for and install packages using [`flox search`][flox_search],
-[`flox show`][flox_show], and [`flox install`][flox_install].
+Search for and install packages using [`flox search`](/man/flox-search),
+[`flox show`](/man/flox-show), and [`flox install`](/man/flox-install).
 
 Let's assume `example-project` is a nodejs/npm project.
-Begin by searching for `nodejs` with [`flox search`][flox_search] in Flox:
+Begin by searching for `nodejs` with [`flox search`](/man/flox-search) in Flox:
 
 ```console
 $ flox search nodejs
@@ -74,10 +74,10 @@ Use 'flox show <package>' to see available versions
   **Note**
 
   Don't see what you're looking for? Try `flox search <search-term> --all`.
-  Still missing? Reach out to us on our [forum][discourse] for assistance.
+  Still missing? Reach out to us on our [forum](https://discourse.floxdev.com/) for assistance.
 </Note>
 For more detail about a specific package, such as the available versions,
-use [`flox show`][flox_show].
+use [`flox show`](/man/flox-show).
 
 Here we're showing nodejs:
 
@@ -101,7 +101,7 @@ Other versions:
 ```
 
 Once you've found the right package, you can install it with
-[`flox install`][flox_install].
+[`flox install`](/man/flox-install).
 
 ```console
 $ flox install nodejs
@@ -133,7 +133,7 @@ $ flox install mkcert
 ## Enter and use the environment
 
 Now we need to activate the environment with the
-[`flox activate`][flox_activate] command to make the packages we installed
+[`flox activate`](/man/flox-activate) command to make the packages we installed
 available.
 When an environment is activated,
 you will see your terminal's prompt change.
@@ -163,8 +163,8 @@ flox [example-project] $ which mkcert
 ## Customize the shell hook and environment variables
 
 The activation process of your Flox environment can be
-customized by editing the [environment's declarative manifest][manifest_concept]
-with [`flox edit`][flox_edit].
+customized by editing the [environment's declarative manifest](/concepts/environments#manifesttoml)
+with [`flox edit`](/man/flox-edit).
 This is useful for doing environment initialization,
 safely working with secrets,
 printing instructions for other developers,
@@ -210,13 +210,13 @@ Save changes to the file.
 <Note>
   **Note**
 
-  Edits made with [`flox edit`][flox_edit] will be validated and built
+  Edits made with [`flox edit`](/man/flox-edit) will be validated and built
   immediately.
-  Edits made to the [manifest][manifest_concept] with external software like
-  an IDE will be validated when you run [`flox activate`][flox_activate].
+  Edits made to the [manifest](/concepts/environments#manifesttoml) with external software like
+  an IDE will be validated when you run [`flox activate`](/man/flox-activate).
 </Note>
 Test out the new shell hook by running `exit` and
-[`flox activate`][flox_activate] again:
+[`flox activate`](/man/flox-activate) again:
 
 ```console
 flox [example-project] $ exit
@@ -233,7 +233,7 @@ flox [example-project] $
 ## Exit the environment
 
 We're done!
-To exit the last [environment][environment_concept] activated,
+To exit the last [environment](/concepts/environments) activated,
 use the `exit` command or the shell shortcut, `CTRL + D`.
 
 ```console
@@ -241,23 +241,11 @@ flox [example-project] $ exit
 $
 ```
 
-[flox_init]: /man/flox-init
-[flox_search]: /man/flox-search
-[flox_show]: /man/flox-show
-[flox_install]: /man/flox-install
-[discourse]: https://discourse.floxdev.com/
-[flox_activate]: /man/flox-activate
-[flox_edit]: /man/flox-edit
-[sharing_guide]: /tutorials/sharing-environments
-[layering_guide]: /tutorials/layering-multiple-environments
-[manifest_concept]: /concepts/environments#manifesttoml
-[environment_concept]: /concepts/environments
-[customizing_guide]: /tutorials/customizing-environments
 
 ## Where to next?
 
--  [Sharing environments][sharing_guide]
+-  [Sharing environments](/tutorials/sharing-environments)
 
--  [Layering multiple environments][layering_guide]
+-  [Layering multiple environments](/tutorials/layering-multiple-environments)
 
--  [Customizing the shell hook][customizing_guide]
+-  [Customizing the shell hook](/tutorials/customizing-environments)

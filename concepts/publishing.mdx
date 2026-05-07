@@ -3,10 +3,10 @@ title: "Publishing"
 description: "Understanding how to publish packages with Flox"
 ---
 
-Once you've built a package with the [`flox build`][flox-build] command, you likely want to _use_ it somewhere.
-The [`flox publish`][flox-publish] command gives you the ability to upload packages to your private catalog so that you can _install_ them into your environments.
+Once you've built a package with the [`flox build`](/man/flox-build) command, you likely want to _use_ it somewhere.
+The [`flox publish`](/man/flox-publish) command gives you the ability to upload packages to your private catalog so that you can _install_ them into your environments.
 In order to share packages with other people you must create an organization.
-See the [organizations][organizations-concept] page for more details.
+See the [organizations](/concepts/organizations) page for more details.
 
 ## Uploading a package
 
@@ -34,7 +34,7 @@ Flox imposes some constraints on the build and publish process.
 - The Flox environment must have at least one package installed to it.
 
 All of this is there to ensure that the published package can be locked to a point in time in the Base Catalog and an upstream source revision.
-As a reminder, the Base Catalog is the built-in [Catalog][catalog-concept] provided by Flox.
+As a reminder, the Base Catalog is the built-in [Catalog](/concepts/packages-and-catalog) provided by Flox.
 
 As part of the `flox publish` command, the CLI will clone the git repository to a temporary directory to ensure that any files referenced in the build are tracked by the repository.
 A clean `flox build` is then run in this directory.
@@ -48,7 +48,7 @@ A published package consists of two parts:
 - The package metadata
 - The package itself
 
-The package metadata is uploaded to Flox servers so that the Flox CLI can see that it's available via the [`flox search`][flox-search], [`flox show`][flox-show], and [`flox install`][flox-install] commands.
+The package metadata is uploaded to Flox servers so that the Flox CLI can see that it's available via the [`flox search`](/man/flox-search), [`flox show`](/man/flox-show), and [`flox install`](/man/flox-install) commands.
 The package itself is uploaded to a Catalog Store.
 
 A Catalog Store is effectively a cache for published packages, and Flox provides one by default.
@@ -84,12 +84,3 @@ of the organization,
 but they cannot be viewed by anyone outside the organization.
 For anyone in the organization, published packages become available in
 `flox search`, `flox show`, and `flox install`.
-
-[builds-concept]: /concepts/builds
-[catalog-concept]: /concepts/packages-and-catalog
-[flox-build]: /man/flox-build
-[flox-publish]: /man/flox-publish
-[flox-search]: /man/flox-search
-[flox-show]: /man/flox-show
-[flox-install]: /man/flox-install
-[organizations-concept]: /concepts/organizations

@@ -56,7 +56,7 @@ As explained above, this workaround is required by Kubernetes pod specification.
 
 ## Workflow
 
-Once you create a pod specification and deploy it, the pod will start up with the currently live [generation][generations-concept] of the environment.
+Once you create a pod specification and deploy it, the pod will start up with the currently live [generation](/concepts/generations) of the environment.
 
 Now let's say you want to add a package to the environment running in the pod.
 All you need to do is install the package to the environment, and redeploy the pod.
@@ -73,15 +73,11 @@ It's that simple.
 
 ## Trying it out
 
-To quickly try out Imageless Kubernetes locally, see the [examples][examples-section], which uses `kind` to create a local Kubernetes cluster.
+To quickly try out Imageless Kubernetes locally, see the [examples](/imageless-kubernetes/examples/kind-demo), which uses `kind` to create a local Kubernetes cluster.
 
 Imageless Kubernetes is also currently available for:
 
 - Amazon EKS
 - Self-managed Kubernetes
 
-See the [installation][install-section] for more details on installing Imageless Kubernetes in your cluster.
-
-[generations-concept]: /concepts/generations
-[install-section]: /imageless-kubernetes/install/eks
-[examples-section]: /imageless-kubernetes/examples/kind-demo
+See the [installation](/imageless-kubernetes/install/eks) for more details on installing Imageless Kubernetes in your cluster.

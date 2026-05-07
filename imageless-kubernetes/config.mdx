@@ -6,13 +6,13 @@ description: "Configuring Imageless Kubernetes"
 ## Authentication
 
 Imageless Kubernetes allows you to run Flox environments in place of or on top of container images.
-Flox environments are accessed centrally via [FloxHub][floxhub] and managed using the Flox CLI.
+Flox environments are accessed centrally via [FloxHub](/concepts/floxhub) and managed using the Flox CLI.
 
-In the [introduction][intro] we discussed how annotations are used to tell Imageless Kubernetes which Flox environment to run.
+In the [introduction](/imageless-kubernetes/intro) we discussed how annotations are used to tell Imageless Kubernetes which Flox environment to run.
 However, we assumed that the referenced environment was publicly available without authentication.
 If you plan to use private environments, you will have to authenticate Imageless Kubernetes using your FloxHub user credentials.
 
-To do so, you need to first login to FloxHub using the Flox CLI using [`flox auth login`][flox_auth], if you haven't done so already.
+To do so, you need to first login to FloxHub using the Flox CLI using [`flox auth login`](/man/flox-auth), if you haven't done so already.
 You then create a new Kubernetes secret:
 
 ```bash
@@ -123,7 +123,7 @@ metadata:
 
 ## Generations
 
-A specific [generation][generations] of an environment on FloxHub can be specified as part of the `flox.dev/environment` annotation.
+A specific [generation](/concepts/generations) of an environment on FloxHub can be specified as part of the `flox.dev/environment` annotation.
 This can be useful to pin a specific version of an environment to allow for intentional or staged upgrades.
 
 ```yaml
@@ -200,8 +200,3 @@ metadata:
 `flox.dev/skip-containers-exec` also accepts a comma separated list of containers, but containers specified in this annotation _will_ contain the Flox environment specified in `flox.dev/environment`.
 
 The difference from `skip-containers` is that while `skip-containers-exec` containers will have their main process run from the Flox environment, commands run via `kubectl exec` or equivalent will be run outside of it. This option is best used when you want the container's main workload to run in the Flox environment, but need exec commands (for debugging, health checks, or auxiliary tasks) to run in the base container environment without Flox.
-
-[intro]: /imageless-kubernetes/intro
-[floxhub]: /concepts/floxhub
-[flox_auth]: /man/flox-auth
-[generations]: /concepts/generations

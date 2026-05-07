@@ -40,7 +40,7 @@ Alternatively, remove the node group directly from the AWS management console.
 
 First, remove the Flox runtime from the `containerd` configuration on each node.
 
-The installer used in the [installation instructions][self-managed] makes a backup of the original configuration
+The installer used in the [installation instructions](/imageless-kubernetes/install/self-managed) makes a backup of the original configuration
 in `/etc/containerd/config.toml.bak.xx` where `xx` is an arbitrary number.
 
 Restore the backup with:
@@ -56,7 +56,4 @@ Then remove the shim from each node with:
 sudo rm /usr/local/bin/containerd-shim-flox-v2
 ```
 
-And finally, uninstall Flox from each node by following the instructions from the [Uninstall Flox][uninstall-flox] page.
-
-[self-managed]: /imageless-kubernetes/install/self-managed
-[uninstall-flox]: /install-flox/uninstall
+And finally, uninstall Flox from each node by following the instructions from the [Uninstall Flox](/install-flox/uninstall) page.

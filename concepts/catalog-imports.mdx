@@ -5,11 +5,11 @@ description: "Import packages from external catalogs for Nix expression builds"
 
 ## Overview
 
-Catalog imports allow your [Nix expression builds][nix-expression-builds] to depend on packages provided by external sources: FloxHub users and organizations that publish reusable packages, or remote repositories containing Nix expression definitions.
+Catalog imports allow your [Nix expression builds](/concepts/nix-expression-builds) to depend on packages provided by external sources: FloxHub users and organizations that publish reusable packages, or remote repositories containing Nix expression definitions.
 
-[Nix expression builds][nix-expression-builds] already support [vendoring][vendor-example] existing packages by copying their expressions into your `.flox/pkgs/` directory. Catalog imports extend this model by allowing expression sharing through a central registry at the granularity of catalogs, which correspond to FloxHub user or organization namespaces, or to external repositories. You declare catalogs in a configuration file and access their packages via the `catalogs` argument in your expressions; this keeps your build inputs explicit, lockable, and reproducible.
+[Nix expression builds](/concepts/nix-expression-builds) already support [vendoring](/concepts/nix-expression-builds#example-vendor-an-existing-package) existing packages by copying their expressions into your `.flox/pkgs/` directory. Catalog imports extend this model by allowing expression sharing through a central registry at the granularity of catalogs, which correspond to FloxHub user or organization namespaces, or to external repositories. You declare catalogs in a configuration file and access their packages via the `catalogs` argument in your expressions; this keeps your build inputs explicit, lockable, and reproducible.
 
-Catalog imports are a feature of [Nix expression builds][nix-expression-builds] specifically; they do not apply to manifest-based builds. You should be familiar with defining packages in `.flox/pkgs/` before using catalog imports.
+Catalog imports are a feature of [Nix expression builds](/concepts/nix-expression-builds) specifically; they do not apply to manifest-based builds. You should be familiar with defining packages in `.flox/pkgs/` before using catalog imports.
 
 ## Configuring catalogs
 
@@ -18,13 +18,13 @@ Catalog imports use two files:
 - **`.flox/nix-builds.toml`**, the user-authored configuration file where you declare which catalogs to use.
 - **`.flox/nix-builds.lock`**, a generated lockfile that pins each catalog to a specific revision for reproducibility.
 
-Both files must be tracked by Git (`git add`ed) and should be committed to version control. The TOML file is authored by hand; the lockfile is generated and updated by the [`flox build update-catalogs`][flox-build-update-catalogs] command.
+Both files must be tracked by Git (`git add`ed) and should be committed to version control. The TOML file is authored by hand; the lockfile is generated and updated by the [`flox build update-catalogs`](/man/flox-build-update-catalogs) command.
 
 ## Catalog types
 
 ### FloxHub catalogs
 
-A FloxHub catalog references packages published to FloxHub via [`flox publish`][publishing]. The catalog name corresponds to the FloxHub user or organization that published them.
+A FloxHub catalog references packages published to FloxHub via [`flox publish`](/concepts/publishing). The catalog name corresponds to the FloxHub user or organization that published them.
 
 ```toml title=".flox/nix-builds.toml"
 version = 1
@@ -46,7 +46,7 @@ Your own catalog is always accessible after authenticating with `flox auth login
 
 ### Nix source-ref catalogs
 
-A source-ref catalog points at any [Nix source reference][nix-source-types]: a Git repository, tarball, or other supported source type. The most common case is a Git repository that contains Flox package definitions (a `.flox/pkgs/` directory).
+A source-ref catalog points at any [Nix source reference](https://nix.dev/manual/nix/latest/language/builtins.html#source-types): a Git repository, tarball, or other supported source type. The most common case is a Git repository that contains Flox package definitions (a `.flox/pkgs/` directory).
 
 You can declare a source-ref catalog in structured form, specifying the `type` and additional fields:
 
@@ -58,7 +58,7 @@ type = "git"
 url = "https://github.com/flox/flox-build-examples"
 ```
 
-As a shorthand, you can provide a single `url` field using [Nix source reference syntax][nix-source-types] (the `git+` prefix encodes the type):
+As a shorthand, you can provide a single `url` field using [Nix source reference syntax](https://nix.dev/manual/nix/latest/language/builtins.html#source-types) (the `git+` prefix encodes the type):
 
 ```toml title=".flox/nix-builds.toml"
 version = 1
@@ -77,7 +77,7 @@ my-packages.type = "git"
 my-packages.url = "https://github.com/flox/flox-build-examples"
 ```
 
-The supported source types and their fields are documented in the [Nix manual][nix-source-types].
+The supported source types and their fields are documented in the [Nix manual](https://nix.dev/manual/nix/latest/language/builtins.html#source-types).
 
 #### Common fields for `git` sources
 
@@ -87,7 +87,7 @@ The supported source types and their fields are documented in the [Nix manual][n
 | `dir` | Subdirectory containing the `.flox/pkgs/` tree. Useful for monorepos. |
 | `shallow` | If `true`, perform a shallow clone. Defaults to `false`. |
 
-Other source types (`github`, `gitlab`, `tarball`, etc.) accept their own fields; for example, `github` and `gitlab` support a `host` field for self-hosted instances. See the [Nix source types reference][nix-source-types] for the full list.
+Other source types (`github`, `gitlab`, `tarball`, etc.) accept their own fields; for example, `github` and `gitlab` support a `host` field for self-hosted instances. See the [Nix source types reference](https://nix.dev/manual/nix/latest/language/builtins.html#source-types) for the full list.
 
 These fields are written as separate TOML keys when using the structured form (`type` + `url`). When using the URL shorthand, encode them as query parameters instead:
 
@@ -154,7 +154,7 @@ Before you can build with catalog imports, you must generate the lockfile. Run:
 flox build update-catalogs
 ```
 
-This resolves each catalog declaration in `.flox/nix-builds.toml` and writes the pinned revisions to `.flox/nix-builds.lock`. See [`flox-build-update-catalogs(1)`][flox-build-update-catalogs] for details.
+This resolves each catalog declaration in `.flox/nix-builds.toml` and writes the pinned revisions to `.flox/nix-builds.lock`. See [`flox-build-update-catalogs(1)`](/man/flox-build-update-catalogs) for details.
 
 Re-run this command whenever you:
 
@@ -264,9 +264,3 @@ rustPlatform.buildRustPackage rec {
 ```
 
 Here `rustPlatform` and `lib` come from nixpkgs, as with any standard Nix expression build. The `catalogs.shared-libs.crypto-utils` dependency is resolved from the declared catalog.
-
-[nix-expression-builds]: /concepts/nix-expression-builds
-[nix-source-types]: https://nix.dev/manual/nix/latest/language/builtins.html#source-types
-[flox-build-update-catalogs]: /man/flox-build-update-catalogs
-[publishing]: /concepts/publishing
-[vendor-example]: /concepts/nix-expression-builds#example-vendor-an-existing-package

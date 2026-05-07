@@ -7,7 +7,7 @@ A FloxHub environment allows you to centrally manage a Flox environment, trackin
 
 ## Background
 
-When you create an environment for your project, you often do so via the [`flox init`][flox-init] command, which creates a `.flox` directory that you can check into source control.
+When you create an environment for your project, you often do so via the [`flox init`](/man/flox-init) command, which creates a `.flox` directory that you can check into source control.
 
 ```bash
 flox init && git add .flox
@@ -15,7 +15,7 @@ flox init && git add .flox
 
 This allows you to track changes to the environment the same way that you track changes to your source code, but it also ties this environment to this specific project and Git repository.
 
-Another way of working is to [push][flox-push] an environment to [FloxHub][floxhub] to turn it into a reusable, centrally managed environment.
+Another way of working is to [push](/man/flox-push) an environment to [FloxHub](/concepts/floxhub) to turn it into a reusable, centrally managed environment.
 
 ```console
 $ flox push
@@ -26,13 +26,9 @@ Use this environment from another machine: 'flox activate -r myuser/myenv'
 Make a copy of this environment: 'flox pull myuser/myenv'
 ```
 
-Once pushed, the state and history of this environment are tracked on FloxHub in the form of [generations][generations].
+Once pushed, the state and history of this environment are tracked on FloxHub in the form of [generations](/concepts/generations).
 Let's explore how FloxHub environments work and the kinds of workflows they enable.
 
-[flox-init]: /man/flox-init
-[flox-push]: /man/flox-push
-[floxhub]: /concepts/floxhub
-[generations]: /concepts/generations
 
 ## Terminology
 
@@ -48,7 +44,7 @@ We call the copy of the environment on FloxHub the **"upstream"** copy, and the 
 
 ## Getting a FloxHub environment
 
-Once you've pushed an environment to FloxHub, you can then use the [`flox pull`][flox-pull] command to fetch a copy of the environment to your machine.
+Once you've pushed an environment to FloxHub, you can then use the [`flox pull`](/man/flox-pull) command to fetch a copy of the environment to your machine.
 
 A FloxHub environment can exist on your machine in two different forms:
 
@@ -71,7 +67,7 @@ The upstream state of the environment can be fetched manually via the `flox pull
 CLI commands that interact with FloxHub environments will primarily operate on the cached copy of the environment.
 This allows you to use FloxHub environments offline if a cached copy exists.
 
-As an example, installing a package via [`flox install -r`][flox-install] will operate on the local copy, creating a new [generation][generations] of the local copy.
+As an example, installing a package via [`flox install -r`](/man/flox-install) will operate on the local copy, creating a new [generation](/concepts/generations) of the local copy.
 The Flox CLI indicates when an operation has been performed on the local copy (note the `(local)` text in the example below).
 
 ```text
@@ -121,35 +117,28 @@ Use this environment from another machine: 'flox activate -r myuser/myenv'
 Make a copy of this environment: 'flox pull myuser/myenv'
 ```
 
-[flox-pull]: /man/flox-pull
-[flox-install]: /man/flox-install
 
 ## Getting information from upstream
 
 ### Generations
 
 Both the local and upstream FloxHub environments track their state over time via generations.
-For an in-depth explanation of generations, see the [Generations][generations] concept page.
+For an in-depth explanation of generations, see the [Generations](/concepts/generations) concept page.
 
-In order to view the list of generations as understood by the local copy, you use the [`flox generations list`][gen-list] command.
+In order to view the list of generations as understood by the local copy, you use the [`flox generations list`](/man/flox-generations-list) command.
 To see the list of generations as understood by the upstream copy, you add the `--upstream` flag.
 
-In order to view the _history_ of generations (which displays how the "live" generation has evolved over time, any rollbacks that occurred, etc), you use [`flox generations history`][gen-hist].
+In order to view the _history_ of generations (which displays how the "live" generation has evolved over time, any rollbacks that occurred, etc), you use [`flox generations history`](/man/flox-generations-history).
 Again, the `--upstream` flag will show you the history as understood by the upstream copy.
 
 ### Packages
 
-In order to see the list of packages in the local copy of a FloxHub environment you use the [`flox list -r`][flox-list] command.
+In order to see the list of packages in the local copy of a FloxHub environment you use the [`flox list -r`](/man/flox-list) command.
 Add the `--upstream` flag to see the packages in the upstream copy of the FloxHub environment.
 
-[gen-list]: /man/flox-generations-list
-[gen-hist]: /man/flox-generations-history
-[flox-list]: /man/flox-list
 
 ## Activating a FloxHub environment
 
-Activating a FloxHub environment is done via the [`flox activate -r`][flox-activate] command.
+Activating a FloxHub environment is done via the [`flox activate -r`](/man/flox-activate) command.
 This will activate the current state of the local copy of the FloxHub environment, which may not be up to date with the upstream copy.
 To activate the environment as it exists upstream, run `flox pull -r <owner>/<name>` before running `flox activate -r`.
-
-[flox-activate]: /man/flox-activate
