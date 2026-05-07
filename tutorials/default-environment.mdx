@@ -27,7 +27,7 @@ so let's take a look at how to set it up.
 
 At the most basic level, the `default` environment is simply an environment
 called `default`.
-`default` environments are typically [shared via FloxHub][floxhub-env], but
+`default` environments are typically [shared via FloxHub](/tutorials/sharing-environments), but
 you can also manage environments with git.
 We refer to the environment associated with your user account as _your_
 `default` environment.
@@ -176,7 +176,7 @@ You can configure that with a single command:
 
 ## Sharing
 
-Since the `default` environment is "just" another [FloxHub environment][floxhub-env],
+Since the `default` environment is "just" another [FloxHub environment](/tutorials/sharing-environments),
 it's possible to push this environment and share it between machines.
 
 In fact, activating or initializing default environments on other machines
@@ -185,7 +185,7 @@ To use the environment on other machines simply log in
 and add the activation to your dotfiles as described above.
 
 Changes made to the environment locally (e.g. newly installed packages) can be synchronized
-with [`flox push`][push] and [`pull`][pull].
+with [`flox push`](/man/flox-push) and [`pull`](/man/flox-pull).
 
 ---
 
@@ -269,9 +269,3 @@ flox pull --dir ~ owner/name
 If you choose to automatically activate the environment in your rc files,
 change the `flox activate -r <youruser>` accordingly
 to e.g. `flox activate --dir ~`.
-
-[auth]: /man/flox-auth
-[init]: /man/flox-init
-[push]: /man/flox-push
-[pull]: /man/flox-pull
-[floxhub-env]: /tutorials/sharing-environments

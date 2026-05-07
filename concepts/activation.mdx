@@ -3,7 +3,7 @@ title: "Activating environments"
 description: "How an environment is activated, and how to make the most of it"
 ---
 
-[Environments][environment-concept] are a central concept in Flox,
+[Environments](/concepts/services) are a central concept in Flox,
 representing the tools you want to use, all of their dependencies,
 various environment variables necessary to make them function properly,
 _and_ all of your customizations.
@@ -211,7 +211,7 @@ A new process inherits the environment of its parent process by default,
 meaning that it inherits all of the environment variables set by that process.
 If the parent process is a shell,
 the functions and aliases defined in the parent process (shell) are not passed
-down to the subshell (unless you use [special options like `export -f`][bash-func-export]).
+down to the subshell (unless you use [special options like `export -f`](https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html#index-export)).
 This means that if we want you to be able to define functions and aliases to be
 used by _your_ shell in your environment,
 we have to make your shell source their definitions.
@@ -264,9 +264,9 @@ you activate an environment.
 
 As part of this activation script,
 Flox runs some initial setup, then sets the variables you've provided in the
-[[vars] section of your manifest][vars-section].
+[[vars] section of your manifest](/man/manifest.toml#vars).
 Next, the script _sources_ the `hook.on-activate` script that you've provided
-in the [[hook] section of your manifest][hook-section].
+in the [[hook] section of your manifest](/man/manifest.toml#hook).
 Since this script is run by the Bash shell we're using,
 you only need to worry about the syntax and oddities of one shell when writing
 this script.
@@ -282,7 +282,7 @@ via the `hook.on-activate` script will not be inherited by your shell later.
 Finally, we `exec` your shell with some overrides that allow us to inject our
 own configuration,
 such as `source`-ing the scripts defined in the
-[[profile] section of your manifest][profile-section].
+[[profile] section of your manifest](/man/manifest.toml#profile).
 Once those scripts have been sourced,
 we hand control back to you.
 Since the scripts in the `[profile]` section are sourced by your shell,
@@ -370,9 +370,3 @@ Hopefully after reading this you have a deeper understanding of how a Flox
 environment is activated,
 and you feel confident that you can write `[hook]` and `[profile]` scripts
 that prepare your environment just how you like them.
-
-[environment-concept]: /concepts/services
-[bash-func-export]: https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html#index-export
-[vars-section]: /man/manifest.toml#vars
-[hook-section]: /man/manifest.toml#hook
-[profile-section]: /man/manifest.toml#profile

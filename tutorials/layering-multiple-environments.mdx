@@ -3,17 +3,17 @@ title: "Layering multiple environments"
 description: "Using more than one environment at a time"
 ---
 
-This guide walks you through layering a [`default`][default-env] environment
+This guide walks you through layering a [`default`](/tutorials/default-environment) environment
 with a project's environment.
 
 ## Create your default `$HOME` environment
 
 First, create your `default` environment by following
-[`default` environment tutorial][default-env].
+[`default` environment tutorial](/tutorials/default-environment).
 
 ## Install packages
 
-Now lets [`flox install`][flox_install] **tools that will be useful on any
+Now lets [`flox install`](/man/flox-install) **tools that will be useful on any
 system** regardless of the project.
 Here we are installing `curl`, `gitFull`, `gnupg`, `inetutils`, `tree`, and
 `vim`.
@@ -28,7 +28,7 @@ $ flox install curl gitFull gnupg inetutils tree vim
 ✔ 'vim' installed to environment default at /Users/youruser
 ```
 
-Let's inspect the contents of the environment with [`flox list`][flox_list]:
+Let's inspect the contents of the environment with [`flox list`](/man/flox-list):
 
 ```console
 $ flox list
@@ -41,7 +41,7 @@ vim: vim (9.0.2116)
 ```
 
 We can test the environment is working properly with
-[`flox activate`][flox_activate].
+[`flox activate`](/man/flox-activate).
 
 ```console
 $ flox activate
@@ -69,7 +69,7 @@ Cloning into ...
 flox [default] $ cd material-ui
 ```
 
-Use [`flox init`][flox_init] from the `material-ui` directory that we are in.
+Use [`flox init`](/man/flox-init) from the `material-ui` directory that we are in.
 
 ```console
 flox [default] $ flox init
@@ -82,7 +82,7 @@ Next:
 ```
 
 This project only requires `yarn` so let's install it with
-[`flox install`][flox_install].
+[`flox install`](/man/flox-install).
 
 ```console
 flox [default] $ flox install yarn
@@ -118,17 +118,8 @@ Inactive environments:
 
 ## Where to next
 
--  [Sharing environments][sharing_guide]
+-  [Sharing environments](/tutorials/sharing-environments)
 
--  [Customizing the shell hook][customizing_guide]
+-  [Customizing the shell hook](/tutorials/customizing-environments)
 
--  [Designing multiple architecture environments][multi_arch_guide]
-
-[default-env]: /tutorials/default-environment
-[flox_init]: /man/flox-init
-[flox_install]: /man/flox-install
-[flox_activate]: /man/flox-activate
-[flox_list]: /man/flox-list
-[sharing_guide]: /tutorials/sharing-environments
-[customizing_guide]: /tutorials/customizing-environments
-[multi_arch_guide]: /tutorials/multi-arch-environments
+-  [Designing multiple architecture environments](/tutorials/multi-arch-environments)

@@ -4,35 +4,35 @@ description: "Everything you need to know about generations."
 ---
 
 Generations refer to a **version number of an environment** on
-[FloxHub][floxhub_concept].
+[FloxHub](/concepts/floxhub).
 Both imperative and declarative commands that modify an environment on
 FloxHub increment the generation number for the environment.
 
 Read more about creating your first generation in the
-[sharing guide][sharing_guide].
+[sharing guide](/tutorials/sharing-environments).
 
 ## First generation
 
 The first environment generation (1) is created when you use
-**[`flox push`][flox_push]** to send an environment to
-[FloxHub][floxhub_concept].
+**[`flox push`](/man/flox-push)** to send an environment to
+[FloxHub](/concepts/floxhub).
 
 ## New generations
 
 **New generations are created automatically** when you use a CLI command that
 modifies the environment,
-such as [`flox install`][flox_install] or [`flox edit`][flox_edit].
+such as [`flox install`](/man/flox-install) or [`flox edit`](/man/flox-edit).
 
 ## Staged local generations
 
-With a [FloxHub environment][environment_guide] **new local
+With a [FloxHub environment](/tutorials/creating-environments) **new local
 generations are staged automatically**,
 whether you pull into a directory or use `--reference`.
-Suppose you [`flox pull`][flox_pull] an environment at generation 15 on
-[FloxHub][floxhub_concept].
-If you now run [`flox install`][flox_install] three times then you will have
+Suppose you [`flox pull`](/man/flox-pull) an environment at generation 15 on
+[FloxHub](/concepts/floxhub).
+If you now run [`flox install`](/man/flox-install) three times then you will have
 generations 16-18 locally.
-The next [`flox push`][flox_push] would sync these three new generations to
+The next [`flox push`](/man/flox-push) would sync these three new generations to
 FloxHub if you have permission to write to the environment.
 
 ## Switching and viewing generations
@@ -70,16 +70,8 @@ an environment was pulled.
 
 ## Generation lock
 
-[FloxHub environments][environment_guide] that are pulled with
-[`flox pull`][flox_pull] will store a generation lock which describes
+[FloxHub environments](/tutorials/creating-environments) that are pulled with
+[`flox pull`](/man/flox-pull) will store a generation lock which describes
 **the current pulled generation**.
 This allows this environment to advance to newer generations explicitly on the
-next [`flox pull`][flox_pull].
-
-[floxhub_concept]: /concepts/floxhub
-[flox_push]: /man/flox-push
-[flox_install]: /man/flox-install
-[flox_edit]: /man/flox-edit
-[flox_pull]: /man/flox-pull
-[sharing_guide]: /tutorials/sharing-environments
-[environment_guide]: /tutorials/creating-environments
+next [`flox pull`](/man/flox-pull).

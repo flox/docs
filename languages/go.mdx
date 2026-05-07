@@ -6,7 +6,7 @@ description: "Common questions and solutions for using Go with Flox"
 ## Build with Flox
 
 Not only can you _develop_ your software with Flox, but you can _build_ it as well.
-See the [builds][build-concept] concept page for more details.
+See the [builds](/concepts/builds) concept page for more details.
 
 ### Manifest builds
 
@@ -68,7 +68,7 @@ runtime-packages = [
 
 #### Vendoring dependencies in pure builds
 
-As discussed in the [pure builds][pure-builds-section] of the Builds concept page, pure builds run in a sandbox without network access on Linux.
+As discussed in the [pure builds](/concepts/manifest-builds#pure-builds) of the Builds concept page, pure builds run in a sandbox without network access on Linux.
 A pure build can be run as a multi-stage build where the first step vendors dependencies.
 An example is shown below:
 
@@ -91,7 +91,7 @@ sandbox = "pure"
 
 ### Nix expression builds
 
-To build a project using [`buildGoModule`](https://nixos.org/manual/nixpkgs/stable/#sec-language-go) which will import your existing dependency file, but you will need to [update the hash][nix-expression-hashes]:
+To build a project using [`buildGoModule`](https://nixos.org/manual/nixpkgs/stable/#sec-language-go) which will import your existing dependency file, but you will need to [update the hash](/concepts/nix-expression-builds#generating-hashes):
 
 ```go
 { buildGoModule }:
@@ -104,7 +104,3 @@ buildGoModule {
   vendorHash = "<YOUR_HASH>";
 }
 ```
-
-[build-concept]: /concepts/builds
-[pure-builds-section]: /concepts/manifest-builds#pure-builds
-[nix-expression-hashes]: /concepts/nix-expression-builds#generating-hashes

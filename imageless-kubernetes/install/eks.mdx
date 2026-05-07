@@ -5,7 +5,7 @@ description: "Installing Imageless Kubernetes to Amazon EKS"
 
 If you have an existing EKS cluster, we recommend creating a new node group specifically for Imageless Kubernetes.
 
-This guide will walk through the steps needed to create the node group and configure the cluster with both [Terraform][terraform] and [eksctl][eksctl].
+This guide will walk through the steps needed to create the node group and configure the cluster with both [Terraform](https://developer.hashicorp.com/terraform) and [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/).
 
 To run on EKS, each node in the node group will need to:
 
@@ -14,14 +14,14 @@ To run on EKS, each node in the node group will need to:
 - Register the shim with `containerd`
 - Register the shim with Kubernetes
 
-Most of this can be done as part of the node bootstrapping process, using custom user data to pass instructions to [nodeadm][nodeadm].
+Most of this can be done as part of the node bootstrapping process, using custom user data to pass instructions to [nodeadm](https://github.com/awslabs/amazon-eks-ami/blob/main/nodeadm).
 
-If you would like to create a new cluster for Imageless Kubernetes, examples are available on [GitHub][k8s-shim-install].
+If you would like to create a new cluster for Imageless Kubernetes, examples are available on [GitHub](https://github.com/flox/flox-containerd-shim-deploy).
 
 <Note>
   **Note**
 
-  Additional information on `nodeadm` and bootstrapping with user data can be found in the [EKS documentation][userdata-docs].
+  Additional information on `nodeadm` and bootstrapping with user data can be found in the [EKS documentation](https://docs.aws.amazon.com/eks/latest/userguide/launch-templates.html#launch-template-user-data).
 </Note>
 ## Versioning
 
@@ -32,7 +32,7 @@ Any time you replace a node, either of these may be updated to the latest versio
 <Tip>
   **Tip**
 
-  The following examples are tailored towards adding node groups to existing clusters -- complete examples for creating new clusters with Imageless Kubernetes are available on [GitHub][k8s-shim-install].
+  The following examples are tailored towards adding node groups to existing clusters -- complete examples for creating new clusters with Imageless Kubernetes are available on [GitHub](https://github.com/flox/flox-containerd-shim-deploy).
 </Tip>
 ## Node Configuration via Terraform
 
@@ -44,19 +44,19 @@ To create the node group, you will need:
 - IDs for cluster and node security groups
 - The cluster's service CIDR (i.e. the range from which cluster services will receive IPs)
 
-If you've used a public module such as [terraform-aws-eks][terraform-aws-eks], most of these details should be available either from the module configuration or outputs.
+If you've used a public module such as [terraform-aws-eks](https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest), most of these details should be available either from the module configuration or outputs.
 
 ### Terraform node group creation
 
-This example will use the [eks-managed-node-group][eks-managed-node-group] submodule of [terraform-aws-eks][terraform-aws-eks], but it can also be used standalone, regardless of how the cluster was defined in Terraform.
+This example will use the [eks-managed-node-group](https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest/submodules/eks-managed-node-group) submodule of [terraform-aws-eks](https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest), but it can also be used standalone, regardless of how the cluster was defined in Terraform.
 
 The following Terraform configuration can be used to provision a node group with the Flox runtime; see comments for guidance on each input.
-This example assumes you already have Terraform configuration for a cluster including the [AWS provider][aws-tf-provider].
+This example assumes you already have Terraform configuration for a cluster including the [AWS provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs).
 
 <Note>
   **Note**
 
-  See the [upstream module documentation][terraform-aws-eks] for details on adding this node group to an autoscaling scheme (e.g. Cluster Autoscaler, Karpenter).
+  See the [upstream module documentation](https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest) for details on adding this node group to an autoscaling scheme (e.g. Cluster Autoscaler, Karpenter).
 </Note>
 ```hcl title="nodegroup.tf"
 module "eks_managed_node_group" {
@@ -141,7 +141,7 @@ In the above example, the `cloudinit_pre_nodeadm` section is used by `nodeadm` t
 
 First, it installs Flox on the node using the latest `rpm` package, which will then be used to create pods backed by Flox environments.
 
-Then, the `flox activate` command executes an [installer][shim-installer] that detects the node's running `containerd` version, downloads the correct version of the Flox runtime shim to match, and installs it to `/usr/local/bin` on the node.
+Then, the `flox activate` command executes an [installer](https://hub.flox.dev/flox/containerd-shim-flox-installer) that detects the node's running `containerd` version, downloads the correct version of the Flox runtime shim to match, and installs it to `/usr/local/bin` on the node.
 
 Finally, it uses a `NodeConfig` manifest to leverage `nodeadm`'s native functionality to update the node's `containerd` configuration to be aware of the Flox runtime.
 
@@ -150,7 +150,7 @@ The `label` is used in concert with a `RuntimeClass` in the next section to make
 
 ## Node Configuration via eksctl
 
-For clusters created using methods other than Terraform (e.g. AWS management console), we recommend using [eksctl][eksctl] to create the Flox node group.
+For clusters created using methods other than Terraform (e.g. AWS management console), we recommend using [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/) to create the Flox node group.
 
 `eksctl` is a utility developed by AWS to create and manage EKS clusters, including clusters it did not create.
 
@@ -186,7 +186,7 @@ Next, we'll create a `ClusterConfig` manifest that will be used to create the Fl
 <Note>
   **Note**
 
-  See the [eksctl documentation][eksctl-docs] for guidance on additional parameters such as IAM configuration and autoscaler support.
+  See the [eksctl documentation](https://docs.aws.amazon.com/eks/latest/eksctl/nodegroup-managed.html) for guidance on additional parameters such as IAM configuration and autoscaler support.
 </Note>
 Apply the below `ClusterConfig` with `eksctl create nodegroup -f nodegroup.yaml`. You can also visualize the changes before deployment with `eksctl create --dry-run`.
 
@@ -272,16 +272,4 @@ The `nodeSelector` ensures that Flox pods will only be scheduled on nodes with t
 
 Once the node group is running, you are ready to create pods using the Flox runtime.
 
-A sample `Pod` manifest is available in the [Introduction][intro-section], but any Kubernetes resource that creates a pod (e.g. `Deployment`) can be used by setting the `runtimeClassName` parameter to `flox`.
-
-[intro-section]: /imageless-kubernetes/intro
-[eksctl]: https://docs.aws.amazon.com/eks/latest/eksctl/
-[eksctl-docs]: https://docs.aws.amazon.com/eks/latest/eksctl/nodegroup-managed.html
-[terraform]: https://developer.hashicorp.com/terraform
-[terraform-aws-eks]: https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest
-[eks-managed-node-group]: https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest/submodules/eks-managed-node-group
-[userdata-docs]: https://docs.aws.amazon.com/eks/latest/userguide/launch-templates.html#launch-template-user-data
-[nodeadm]: https://github.com/awslabs/amazon-eks-ami/blob/main/nodeadm
-[shim-installer]: https://hub.flox.dev/flox/containerd-shim-flox-installer
-[aws-tf-provider]: https://registry.terraform.io/providers/hashicorp/aws/latest/docs
-[k8s-shim-install]: https://github.com/flox/flox-containerd-shim-deploy
+A sample `Pod` manifest is available in the [Introduction](/imageless-kubernetes/intro), but any Kubernetes resource that creates a pod (e.g. `Deployment`) can be used by setting the `runtimeClassName` parameter to `flox`.

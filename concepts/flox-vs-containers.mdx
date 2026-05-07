@@ -23,7 +23,7 @@ mkdir myproject && cd myproject
 <Tabs>
   <Tab title="Flox">
 
-  Create a Flox environment for the project via [`flox init`][init]:
+  Create a Flox environment for the project via [`flox init`](/man/flox-init):
 
   ```
   flox init
@@ -119,7 +119,7 @@ What does it look like to configure your Flox environment compared to a
 container?
 
 A Flox environment is configured via a declarative TOML file called a
-["manifest"][manifest].
+["manifest"](/concepts/environments#manifesttoml).
 The manifest for the environment created above looks like this:
 
 ```toml
@@ -270,7 +270,7 @@ same environment.
 <Tabs>
   <Tab title="Flox">
 
-  Since [`flox init`][init] creates a `.flox` directory inside your project,
+  Since [`flox init`](/man/flox-init) creates a `.flox` directory inside your project,
   you can simply check this directory into source control.
 
   ```bash
@@ -286,12 +286,12 @@ same environment.
 
   Any packages not locally cached would be downloaded.
   Since the Flox environment produces a lockfile each time it is built,
-  every developer that does a [`flox activate`][activate] with the same
+  every developer that does a [`flox activate`](/man/flox-activate) with the same
   lockfile will get the same exact software down to the `git` revisions of the
   upstream source repositories.
 
   If your environment doesn't need to be tied to this specific project you
-  could also push the environment to FloxHub with [`flox push`][push].
+  could also push the environment to FloxHub with [`flox push`](/man/flox-push).
   Then your team would activate the environment as a "remote" environment:
 
   ```console
@@ -341,7 +341,7 @@ environment variables set.
   flox install caddy
   ```
 
-  Then [edit][edit] your manifest to create a new [service][services]:
+  Then [edit](/man/flox-edit) your manifest to create a new [service](/concepts/services):
 
   ```toml
   [services.server]
@@ -354,7 +354,7 @@ environment variables set.
   you don't need to map any ports.
 
   You can start this service from inside the environment with
-  [`flox services start`][services-start],
+  [`flox services start`](/man/flox-services-start),
   or you can have it start automatically when entering the environment via
   `flox activate --start-services`.
   </Tab>
@@ -404,7 +404,7 @@ Say you've done some development and now want to run your changes through CI.
 
   Flox provides a number of plugins for CI providers,
   including GitHub Actions, CircleCI, and GitLab.
-  See the [CI/CD tutorial][ci-cd] for more information.
+  See the [CI/CD tutorial](/tutorials/ci-cd) for more information.
   </Tab>
   <Tab title="Containers">
 
@@ -425,7 +425,7 @@ you need to build a container so that it can be deployed.
   <Tab title="Flox">
 
   You can create a container from an environment via the
-  [`flox containerize`][containerize] command,
+  [`flox containerize`](/man/flox-containerize) command,
   and this image will contain the same exact software
   (again, down to the `git` revisions of the upstream source repositories)
   that you used for both local development and CI.
@@ -433,7 +433,7 @@ you need to build a container so that it can be deployed.
   production, you're in good shape.
 
   You can also produce build artifacts from a Flox environment.
-  See the [builds documentation][builds] for more information.
+  See the [builds documentation](/concepts/builds) for more information.
   </Tab>
   <Tab title="Containers">
 
@@ -447,15 +447,3 @@ you need to build a container so that it can be deployed.
   </Tab>
 </Tabs>
 ---
-
-[init]: /man/flox-init
-[edit]: /man/flox-edit
-[install]: /man/flox-install
-[push]: /man/flox-push
-[containerize]: /man/flox-containerize
-[activate]: /man/flox-activate
-[services-start]: /man/flox-services-start
-[services]: /concepts/services
-[manifest]: /concepts/environments#manifesttoml
-[builds]: /concepts/builds
-[ci-cd]: /tutorials/ci-cd

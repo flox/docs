@@ -6,7 +6,7 @@ description: "Common questions and solutions for using Rust with Flox"
 ## What do I need for a basic environment?
 
 First we'll show you the answer, and then we'll explain.
-The full example environment can be found in the [floxenvs repository][example_env].
+The full example environment can be found in the [floxenvs repository](https://github.com/flox/floxenvs/tree/main/rust).
 
 A manifest that provides you a Rust development environment would look like
 this:
@@ -51,7 +51,7 @@ clang.systems = ["aarch64-darwin", "x86_64-darwin"]
 systems = ["aarch64-darwin", "x86_64-darwin", "aarch64-linux", "x86_64-linux"]
 ```
 
-The typical Rust developer probably uses [rustup][rustup] to manage their
+The typical Rust developer probably uses [rustup](https://rustup.rs) to manage their
 toolchains.
 Flox aims to be an all-in-one solution, so you'll use Flox instead of `rustup`.
 The main difference here is that the toolchain components are unbundled in
@@ -159,19 +159,16 @@ rust-nightly.flake = "github:rust-dev/my-nightly"
 
 Popular projects used by the Nix community for this purpose are:
 
-- [nix-community/fenix][fenix]
-- [oxalica/rust-overlay][rust-overlay]
+- [nix-community/fenix](https://github.com/nix-community/fenix)
+- [oxalica/rust-overlay](https://github.com/oxalica/rust-overlay)
 
-[rustup]: https://rustup.rs
-[fenix]: https://github.com/nix-community/fenix
-[rust-overlay]: https://github.com/oxalica/rust-overlay
 
-An example flake is provided at [zmitchell/rust-toolchains][custom-toolchains].
+An example flake is provided at [zmitchell/rust-toolchains](https://github.com/zmitchell/rust-toolchains).
 This flake uses `fenix` to provide three different toolchains:
 
 - `stable`, which tracks the latest stable release of Rust
 - `nightly`, which tracks the latest nightly release of Rust
-- `esp32-riscv-no-std`, which provides a nightly toolchain with support for the [ESP32-C3][esp32], a microprocessor based on the [RISC-V][risc-v] architecture.
+- `esp32-riscv-no-std`, which provides a nightly toolchain with support for the [ESP32-C3](https://www.espressif.com/en/products/socs/esp32), a microprocessor based on the [RISC-V](https://en.wikipedia.org/wiki/RISC-V) architecture.
 
 You are encouraged to fork that repository and use the examples to provide your own custom Rust toolchains.
 It includes a GitHub Action that runs daily to keep up to date with the latest Rust releases.
@@ -179,7 +176,7 @@ It includes a GitHub Action that runs daily to keep up to date with the latest R
 ## Build with Flox
 
 Not only can you _develop_ your software with Flox, but you can _build_ it as well.
-See the [builds][build-concept] concept page for more details.
+See the [builds](/concepts/builds) concept page for more details.
 
 ### Manifest builds
 
@@ -234,7 +231,7 @@ runtime-packages = [… "gcc"]
 </Note>
 #### Vendoring dependencies in pure builds
 
-As discussed in the [pure builds][pure-builds-section] of the Builds concept page, pure builds run in a sandbox without network access on Linux.
+As discussed in the [pure builds](/concepts/manifest-builds#pure-builds) of the Builds concept page, pure builds run in a sandbox without network access on Linux.
 A pure build can be run as a multi-stage build where the first step vendors dependencies.
 An example is shown below:
 
@@ -284,10 +281,3 @@ rustPlatform.buildRustPackage {
   };
 }
 ```
-
-[example_env]: https://github.com/flox/floxenvs/tree/main/rust
-[custom-toolchains]: https://github.com/zmitchell/rust-toolchains
-[esp32]: https://www.espressif.com/en/products/socs/esp32
-[risc-v]: https://en.wikipedia.org/wiki/RISC-V
-[build-concept]: /concepts/builds
-[pure-builds-section]: /concepts/manifest-builds#pure-builds

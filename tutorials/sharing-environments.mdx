@@ -11,12 +11,12 @@ Flox provides **three main ways of sharing environments** with others:
 
 ## Sharing environments with files
 
-New [environments][environment_concept] created with [`flox init`][flox_init] will create a `.flox` folder in the directory where [`flox init`][flox_init] was run. This folder contains everything required to run this environment on their system and can be sent to another user any way files are shared. It is most common to commit the `.flox` to a version controlled code repository such as git. If shared this way, the user needs only `git clone` the project and `flox activate` in the directory containing the `.flox`.
+New [environments](/concepts/environments) created with [`flox init`](/man/flox-init) will create a `.flox` folder in the directory where [`flox init`](/man/flox-init) was run. This folder contains everything required to run this environment on their system and can be sent to another user any way files are shared. It is most common to commit the `.flox` to a version controlled code repository such as git. If shared this way, the user needs only `git clone` the project and `flox activate` in the directory containing the `.flox`.
 
 <Note>
   **Note**
 
-  If you are sharing an environment with a user on a different CPU architecture or OS from the person who created the environment, you may run into some issues where system-specific packages are not available on their OS. This can be fixed with a minor edit to the manifest, described in the [manifest concept][manifest_concept]. If you get stumped, reach out to us on our [forum][discourse] for assistance.
+  If you are sharing an environment with a user on a different CPU architecture or OS from the person who created the environment, you may run into some issues where system-specific packages are not available on their OS. This can be fixed with a minor edit to the manifest, described in the [manifest concept](/concepts/environments#manifesttoml). If you get stumped, reach out to us on our [forum](https://discourse.flox.dev/) for assistance.
 </Note>
 Here is an example of sharing a project with files. The first person creates the environment:
 
@@ -45,7 +45,7 @@ Add the `.flox` directory and commit the changes.
 git add .flox && git commit -m "sharing flox environment"
 ```
 
-Another developer on the same project can get started immediately with [`flox activate`][flox_activate], which will automatically download the same versions of those packages to their machine:
+Another developer on the same project can get started immediately with [`flox activate`](/man/flox-activate), which will automatically download the same versions of those packages to their machine:
 
 ```console
 $ git clone <repository-url>
@@ -53,14 +53,11 @@ $ cd example-project
 $ flox activate
 ```
 
-[flox_init]: /man/flox-init
-[discourse]: https://discourse.flox.dev/
-[manifest_concept]: /concepts/environments#manifesttoml
 
 ## Sharing environments on FloxHub
 
 Instead of sharing environments with files, you can share them on
-[FloxHub][floxhub_concept] with a free account, which eliminates the need to
+[FloxHub](/concepts/floxhub) with a free account, which eliminates the need to
 clone a repository when using the environment.
 
 Once an environment has been pushed to FloxHub, it can be used in number of
@@ -109,9 +106,9 @@ This will implicitly pull the environment and create a local copy of the environ
 
 ### Pulling a FloxHub environment into a directory (and pushing updates)
 
-If you intend to commit the environment to version control, you may want to [`flox pull`][flox_pull] it instead.
+If you intend to commit the environment to version control, you may want to [`flox pull`](/man/flox-pull) it instead.
 
-[`flox pull`][flox_pull] adds a `.flox` folder to the directory you are in that is linked to the FloxHub environment. When using a [FloxHub][floxhub_concept] environment in multiple projects it allows centralized management of the dependencies used across these projects. Run `flox pull` to sync the latest changes from FloxHub:
+[`flox pull`](/man/flox-pull) adds a `.flox` folder to the directory you are in that is linked to the FloxHub environment. When using a [FloxHub](/concepts/floxhub) environment in multiple projects it allows centralized management of the dependencies used across these projects. Run `flox pull` to sync the latest changes from FloxHub:
 
 ```console
 $ cd similar-example-project
@@ -121,7 +118,7 @@ $ flox pull youruser/example-project
     You can activate this environment with 'flox activate'
 ```
 
-After pulling an environment you can install changes to it locally and, when you're ready, [`flox push`][flox_push] them to FloxHub if you have permissions:
+After pulling an environment you can install changes to it locally and, when you're ready, [`flox push`](/man/flox-push) them to FloxHub if you have permissions:
 
 ```console
 $ flox install yarn
@@ -137,10 +134,6 @@ $ flox push
 
   Right now, only environment owners can push edits to their environments.
 </Note>
-[flox_push]: /man/flox-push
-[flox_pull]: /man/flox-pull
-[flox_activate]: /man/flox-activate
-[floxhub_concept]: /concepts/floxhub
 
 ## Sharing with containers
 
@@ -160,7 +153,7 @@ Loaded image: example-project:latest
 ⚡︎ Container written to Docker runtime
 ```
 
-1. See [`flox containerize`][flox_containerize] for more output options.
+1. See [`flox containerize`](/man/flox-containerize) for more output options.
 
 <Note>
   **Why so many layers?**
@@ -178,14 +171,8 @@ telnet (GNU inetutils) 2.5
 
 ## Where to next?
 
--  [Layering multiple environments][layering_guide]
+-  [Layering multiple environments](/tutorials/layering-multiple-environments)
 
--  [Customizing the shell hook][customizing_guide]
+-  [Customizing the shell hook](/tutorials/customizing-environments)
 
--  [Designing multiple architecture environments][multi_arch_guide]
-
-[multi_arch_guide]: /tutorials/multi-arch-environments
-[environment_concept]: /concepts/environments
-[layering_guide]: /tutorials/layering-multiple-environments
-[customizing_guide]: /tutorials/customizing-environments
-[flox_containerize]: /man/flox-containerize
+-  [Designing multiple architecture environments](/tutorials/multi-arch-environments)

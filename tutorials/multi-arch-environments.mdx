@@ -3,7 +3,7 @@ title: "Designing cross-platform environments"
 description: "Creating environments that run on different systems."
 ---
 
-Flox makes it simple to have the **same [environment][environment_concept] on
+Flox makes it simple to have the **same [environment](/concepts/environments) on
 multiple systems and CPU architectures**.
 This guide walks through an example between two coworkers who have different
 system types,
@@ -12,15 +12,15 @@ and shows how to customize your environment with system-specific dependencies.
 ## Creating an environment
 
 To get started,
-let's create an [environment][environment_concept] from a Linux laptop.
+let's create an [environment](/concepts/environments) from a Linux laptop.
 This laptop is using an ARM CPU (aarch64) which makes its full system
 type `aarch64-linux`.
 
-When using [`flox search`][flox_search] you may see packages that won't immediately work with your manifest, but finding and allowing system specific packages is very easy.
+When using [`flox search`](/man/flox-search) you may see packages that won't immediately work with your manifest, but finding and allowing system specific packages is very easy.
 Flox shows software from the following systems: `aarch64-darwin`, `x86_64-darwin`, `aarch64-linux`, and `x86_64-linux`.
 
 Some packages may support only a subset of system types. You can inspect a
-package with [`flox show`][flox_show] to see what system types are supported:
+package with [`flox show`](/man/flox-show) to see what system types are supported:
 
 ```console
 $ flox show gdb
@@ -44,7 +44,7 @@ $ flox install gnupg vim
 ```
 
 To make it easy to share this system across platforms we are going to share it
-on FloxHub with [`flox push`][flox_push].
+on FloxHub with [`flox push`](/man/flox-push).
 
 ```console
 $ flox push
@@ -54,13 +54,13 @@ $ flox push
 ```
 
 Learn more about this and other sharing options in the
-[sharing environments guide][sharing_guide].
+[sharing environments guide](/tutorials/sharing-environments).
 
 ## Using the environment from a different system type
 
 Many packages in Flox will work without any issue across system types.
 
-To test this out, run [`flox pull`][flox_pull] from another system such as an
+To test this out, run [`flox pull`](/man/flox-pull) from another system such as an
 Apple machine with an M-series processor.
 This system type is `aarch64-darwin`.
 Then lets run the a simple `gpg --version` command to test everything is working.
@@ -132,12 +132,4 @@ get the `systemd` package.
 
 ## Where to next?
 
--  [Environment concept][environment_concept]
-
-[environment_concept]: /concepts/environments
-[sharing_guide]: /tutorials/sharing-environments
-[flox_search]: /man/flox-search
-[flox_show]: /man/flox-show
-[flox_edit]: /man/flox-edit
-[flox_push]: /man/flox-push
-[flox_pull]: /man/flox-pull
+-  [Environment concept](/concepts/environments)

@@ -6,11 +6,11 @@ description: "Common questions and solutions for using the JVM ecosystem with Fl
 ## Build with Flox
 
 Not only can you _develop_ your software with Flox, but you can _build_ it as well.
-See the [builds][build-concept] concept page for more details.
+See the [builds](/concepts/builds) concept page for more details.
 
 ### Manifest builds
 
-This example will use [Gradle][gradle] and the [shadowJar][shadow] plugin, though a number of build systems exist in the Java ecosystem.
+This example will use [Gradle](https://gradle.org/) and the [shadowJar](https://gradleup.com/shadow/) plugin, though a number of build systems exist in the Java ecosystem.
 The core of building a Java artifact with Flox looks like this:
 
 - Bundle the application into a JAR
@@ -39,7 +39,3 @@ The core of building a Java artifact with Flox looks like this:
 
 Since `$out` is not set at runtime, the script that calls `java -jar <path to jar>` needs to find the location of the JAR at runtime.
 Note that `pwd` will return the location from which the built artifact is run, not the location of the artifact itself, which is why the script goes through the process of setting `SCRIPT_DIR` and `JAR_PATH`.
-
-[gradle]: https://gradle.org/
-[shadow]: https://gradleup.com/shadow/
-[build-concept]: /concepts/builds

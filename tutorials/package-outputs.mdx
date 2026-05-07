@@ -3,7 +3,7 @@ title: "Selecting package outputs"
 description: "Learn how to intentionally declare which parts of a package you want to install"
 ---
 
-Packages in the [Flox Catalog][catalog-and-pkgs] contain metadata about their origin, license, version, etc.
+Packages in the [Flox Catalog](/concepts/packages-and-catalog) contain metadata about their origin, license, version, etc.
 They _also_ contain metadata about the various "parts" of a package.
 We call these "parts" of a package its "outputs".
 
@@ -34,11 +34,11 @@ This can make the surface area of your environment smaller, but it can also make
 For example, the difference between the default outputs and all outputs for `curl` is roughly 20MB.
 That's not a _huge_ difference, but this is a relatively small package, and only a single package.
 
-It's a different story once you start including very large packages like parts of the [CUDA Toolkit][cuda], which add up to several GB.
+It's a different story once you start including very large packages like parts of the [CUDA Toolkit](/tutorials/cuda), which add up to several GB.
 
 ## Discovering outputs
 
-The main way that you'll discover the outputs of a package is with the [`flox show`][flox-show] command.
+The main way that you'll discover the outputs of a package is with the [`flox show`](/man/flox-show) command.
 
 Let's see what it looks like for the `hello` package:
 
@@ -131,7 +131,7 @@ curl.pkg-path = "curl"
 # curl.outputs = [ "bin" ]
 ```
 
-You can also specify which outputs to install via the [`flox install`][flox-install] command using the following syntax:
+You can also specify which outputs to install via the [`flox install`](/man/flox-install) command using the following syntax:
 
 ```bash
 flox install curl^bin,man,out
@@ -144,9 +144,3 @@ In the future you will be able to install and uninstall specific outputs of exis
 ## Conclusion
 
 Hopefully you now have an understanding that packages consist of chunks called "outputs" and that you have the ability to select precisely which ones you want to include in an environment.
-
-[catalog-and-pkgs]: /concepts/packages-and-catalog
-[flox-show]: /man/flox-show
-[flox-install]: /man/flox-install
-[flox-uninstall]: /man/flox-uninstall
-[cuda]: /tutorials/cuda

@@ -8,12 +8,12 @@ In this tutorial you'll see how to significantly cut down on the work required t
 
 ## Create a reusable toolchain
 
-Let's say that you frequently work on Python projects and use [Poetry][poetry] as your package manager of choice.
+Let's say that you frequently work on Python projects and use [Poetry](https://python-poetry.org/) as your package manager of choice.
 If you work on a bunch of projects that need these tools, you can save yourself some time by creating an environment that contains `python312` and `poetry` and reusing it in some way.
 Let's do that now and we'll show you some examples of different ways you can reuse it.
 
 Create a new directory called `myproject` and `cd` into it.
-Then create a new environment called `python_env` in it with the [`flox init`][flox-init] command.
+Then create a new environment called `python_env` in it with the [`flox init`](/man/flox-init) command.
 
 ```console
 $ mkdir myproject && cd myproject
@@ -35,14 +35,14 @@ myproject/
     .flox
 ```
 
-Now install `python312` and `poetry` to this environment with the [`flox install`][flox-install] command:
+Now install `python312` and `poetry` to this environment with the [`flox install`](/man/flox-install) command:
 
 ```console
 $ flox install -d python_env python312 poetry
 ✔ 'python312', 'poetry' installed to environment 'python_env'
 ```
 
-Now you can push this environment to [FloxHub][floxhub].
+Now you can push this environment to [FloxHub](/concepts/floxhub).
 Once the environment is on FloxHub you can share it with other people, but, more importantly, you can now use it as a template for new projects.
 Let's start by pushing the environment to FloxHub:
 
@@ -65,7 +65,7 @@ Instead of `myuser` you will see your username.
 
 Now that the environment is on FloxHub, we can use it to bootstrap new projects.
 One way to do this is to make a new, local copy of the environment that's not connected to FloxHub.
-You accomplish this with the [`flox pull --copy`][flox-pull] command.
+You accomplish this with the [`flox pull --copy`](/man/flox-pull) command.
 Let's create a new copy of this environment in a directory called `new_python_project`:
 
 ```console
@@ -147,7 +147,7 @@ myproject/
 Pretend that this is the environment you would use to do your work on your Python project.
 You're going to need a Python toolchain, and you may need some additional dependencies.
 In order to bring in the Python toolchain we'll need to edit the manifest of the `composed_python_project` environment and include the `python_env` environment.
-Run the [`flox edit`][flox-edit] command and make the `include` section of the manifest look like this:
+Run the [`flox edit`](/man/flox-edit) command and make the `include` section of the manifest look like this:
 
 ```toml
 [include]
@@ -173,7 +173,7 @@ In those cases, the priority order of the environments determines which one wins
 When one manifest overrides another, you are shown a message indicating which fields were overridden so that there are no surprises.
 The message about `options.systems` is simply a result of the fact that the default manifest sets this field explicitly.
 
-If you now run [`flox list`][flox-list], you should see the packages from the `python_env` environment, even though we never ran a `flox install` command on the `composed_python_project` environment!
+If you now run [`flox list`](/man/flox-list), you should see the packages from the `python_env` environment, even though we never ran a `flox install` command on the `composed_python_project` environment!
 
 ```console
 $ flox list -d composed_python_project
@@ -223,7 +223,7 @@ If you run `flox edit -d composed_python_project` you'll see that the package is
 ### Getting the latest versions of included environments
 
 At some point a template environment may change.
-Say that you decide you want to use [hypothesis][hypothesis] for testing all of your Python projects.
+Say that you decide you want to use [hypothesis](https://hypothesis.readthedocs.io/en/latest/) for testing all of your Python projects.
 To do that, you would install the `hypothesis` package to your `python_env` environment, and somehow propagate those changes to the composed environment.
 This is accomplished with the `flox include upgrade` command, which fetches the latest versions of each of the included environments.
 
@@ -269,7 +269,7 @@ $ flox push -d python_env
 Use 'flox pull myuser/python_env to get this environment in any other location.
 ```
 
-Run the [`flox edit`][flox-edit] command and make the `include` section of the manifest look like this:
+Run the [`flox edit`](/man/flox-edit) command and make the `include` section of the manifest look like this:
 
 ```toml
 [include]
@@ -293,12 +293,3 @@ python312: python312 (python3-3.12.9)
 The ability to reuse and combine environments means that you can now assemble a developer environment for a project from reusable building blocks.
 This means you can spend less time getting started, and more time developing your software.
 Similarly, since you're treating environments like dependencies, if you make an improvement to a template environment while working on one project, the improvement will become available to all of your other projects that use that environment as soon as they run `flox include upgrade`.
-
-[poetry]: https://python-poetry.org/
-[flox-init]: /man/flox-init
-[flox-pull]: /man/flox-pull
-[flox-install]: /man/flox-install
-[flox-edit]: /man/flox-edit
-[flox-list]: /man/flox-list
-[floxhub]: /concepts/floxhub
-[hypothesis]: https://hypothesis.readthedocs.io/en/latest/

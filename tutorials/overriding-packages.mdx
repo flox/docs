@@ -3,17 +3,17 @@ title: "Using a newer version of a package"
 description: ">"
 ---
 
-The Flox Catalog tracks [nixpkgs][nixpkgs], which means there can be a
+The Flox Catalog tracks [nixpkgs](https://github.com/NixOS/nixpkgs), which means there can be a
 short delay between an upstream release and its availability in
 the catalog.
-See [What is the Base Catalog?][base-catalog] for details on how
+See [What is the Base Catalog?](/concepts/base-catalog) for details on how
 the catalog tracks nixpkgs and how often it updates.
 If you need a newer version right away, you can **override** the
 existing build recipe to point at the new release, then build
 and publish it so the updated version is available everywhere.
 
 This tutorial walks through the full workflow using
-[Nix expression builds][nix-expression-builds].
+[Nix expression builds](/concepts/nix-expression-builds).
 
 ## Scenario
 
@@ -50,7 +50,7 @@ recipe and overrides its `version` and `src` attributes:
   The attributes you need to override depend on how the
   package is defined in nixpkgs. Different packages may use
   different attribute names or build patterns. Check the
-  [nixpkgs source][nixpkgs] for the package you're modifying.
+  [nixpkgs source](https://github.com/NixOS/nixpkgs) for the package you're modifying.
 </Note>
 ```bash
 mkdir -p .flox/pkgs/hello
@@ -135,7 +135,7 @@ Hello, world!
 
 ## Publish the package
 
-The [`flox publish`][flox-publish] command requires a remote and
+The [`flox publish`](/man/flox-publish) command requires a remote and
 all tracked files committed and pushed.
 Let's set that up and publish:
 
@@ -162,7 +162,7 @@ Use 'flox install myuser/hello' to install it.
 
 The `flox publish` command performs a clean build from a
 temporary checkout to ensure the package is fully reproducible.
-See the [publishing concept][publishing-concept] page for more
+See the [publishing concept](/concepts/publishing) page for more
 details.
 
 ## Install from another environment
@@ -189,23 +189,13 @@ hello (GNU Hello) 2.12.2
 
 This tutorial covered the simplest override — bumping a
 version number.
-The [Nix expression builds][nix-expression-builds] concept page
+The [Nix expression builds](/concepts/nix-expression-builds) concept page
 covers additional patterns:
 
-- [Adding extensions][extensions-example] to an existing package
-- [Applying patches][patches-example] to fix bugs
-- [Vendoring a package][vendor-example] for deeper modifications
+- [Adding extensions](/concepts/nix-expression-builds#example-extensions-of-an-existing-package) to an existing package
+- [Applying patches](/concepts/nix-expression-builds#example-patches-to-an-existing-package) to fix bugs
+- [Vendoring a package](/concepts/nix-expression-builds#example-vendor-an-existing-package) for deeper modifications
 
 For a full walkthrough of the build and publish workflow,
 including manifest builds, see the
-[Building and publishing packages][build-and-publish] tutorial.
-
-[nixpkgs]: https://github.com/NixOS/nixpkgs
-[base-catalog]: /concepts/base-catalog
-[nix-expression-builds]: /concepts/nix-expression-builds
-[flox-publish]: /man/flox-publish
-[publishing-concept]: /concepts/publishing
-[extensions-example]: /concepts/nix-expression-builds#example-extensions-of-an-existing-package
-[patches-example]: /concepts/nix-expression-builds#example-patches-to-an-existing-package
-[vendor-example]: /concepts/nix-expression-builds#example-vendor-an-existing-package
-[build-and-publish]: /tutorials/build-and-publish
+[Building and publishing packages](/tutorials/build-and-publish) tutorial.
