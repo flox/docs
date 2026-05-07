@@ -42,7 +42,7 @@ version = 1
 my-org.type = "floxhub"
 ```
 
-Public catalogs work without authentication. Private catalogs (those published by an organization with restricted access) require you to authenticate first with `flox auth login`.
+Your own catalog is always accessible after authenticating with `flox auth login`. Organization catalogs are accessible to all members of the organization. Cross-user catalog sharing is not yet available on public FloxHub; for now, catalog imports between users require Flox on-prem.
 
 ### Nix source-ref catalogs
 
@@ -161,13 +161,20 @@ Re-run this command whenever you:
 After updating, `git add` and commit both `.flox/nix-builds.toml` and `.flox/nix-builds.lock`.
 
 <Note>
-  If you run `flox build` before the lockfile is generated or after changing `.flox/nix-builds.toml` without re-running `flox build update-catalogs`, the build will fail with an error like:
+  If you run `flox build` without a lockfile, you will see:
+
+  ```
+  error: `nix-builds.lock` not found, run `flox build update-catalogs` to generate it
+  and add it to version control.
+  ```
+
+  If the lockfile exists but is stale (you added or changed a catalog in `.flox/nix-builds.toml` without re-running `flox build update-catalogs`), the error will be:
 
   ```
   error: attribute 'flox-demo' missing
   ```
 
-  Run `flox build update-catalogs` to resolve catalog entries and regenerate the lockfile.
+  In either case, run `flox build update-catalogs` to resolve catalog entries and regenerate the lockfile.
 </Note>
 
 ## Examples
