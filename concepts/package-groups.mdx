@@ -63,16 +63,19 @@ Every dependency in a package group gets pinned to the same historical `nixpkgs`
 
 ### Default Group: `toplevel`
 
-```d2 scale="0.9"
-toplevel: "Group: toplevel" {
-  packages: "bash, curl, Git, jq"
-  rev: "Catalog rev b40629e…\n(nixpkgs commit 2026-03-18)"
-}
-
-ml: "Group: ml" {
-  packages: "python311, numpy, scipy"
-  rev: "Catalog rev c5296fd…\n(nixpkgs commit 2025-07-22)"
-}
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','clusterBkg':'#f4f6fa','clusterBorder':'#7d96b8','edgeLabelBackground':'#ffffff'}}}%%
+flowchart LR
+  subgraph toplevel ["Group: toplevel"]
+    direction TB
+    tp["bash, curl, Git, jq"]
+    tr["Catalog rev b40629e…<br/>(nixpkgs commit 2026-03-18)"]
+  end
+  subgraph ml ["Group: ml"]
+    direction TB
+    mp["python311, numpy, scipy"]
+    mr["Catalog rev c5296fd…<br/>(nixpkgs commit 2025-07-22)"]
+  end
 ```
 
 When you install a package with `flox install`, it goes into **`toplevel`**, the default package group. `toplevel` is an **implicit** package group: any package installed without defining a `pkg-group` field gets placed into it.

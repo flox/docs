@@ -17,19 +17,15 @@ Environments are the building blocks from which a "composed" environment is crea
 In this composition there is a hierarchy consisting of a "composing" environment and a list of "included" environments that it treats as dependencies.
 The manifests of the included and composing environments are merged and then the resulting "merged" manifest is locked and built.
 
-```d2 scale="0.9"
-composer: "Composing\nenvironment"
-
-includes: Included environments {
-  envA: Env A
-  envB: Env B
-  envC: Env C
-  direction: down
-  envA -> envB: Overridden by
-  envB -> envC: Overridden by
-}
-
-includes -> composer: Overridden by
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','clusterBkg':'#f4f6fa','clusterBorder':'#7d96b8','edgeLabelBackground':'#ffffff'}}}%%
+flowchart TB
+  subgraph includes ["Included environments"]
+    direction TB
+    A["Env A"] -->|Overridden by| B["Env B"]
+    B -->|Overridden by| C["Env C"]
+  end
+  includes -->|Overridden by| composer["Composing<br/>environment"]
 ```
 
 ## Including an environment
