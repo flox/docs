@@ -2,6 +2,9 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Flox",
+  "appearance": {
+    "default": "light"
+  },
   "colors": {
     "primary": "#8D45FF",
     "light": "#B080FF",
