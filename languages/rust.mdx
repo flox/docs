@@ -98,7 +98,7 @@ The `rustPlatform.rustLibSrc` provides the source code for `std` so that
 `rust-analyzer` can provide diagnostics and documentation for standard library
 code.
 
-As a final step, you want to make sure that your Rust toolchain componenents
+As a final step, you want to make sure that your Rust toolchain components
 share the same exact versions of their dependencies,
 so you'll want to add them to a package group
 (`rust-toolchain` in the example above).
@@ -126,7 +126,7 @@ and it will automatically be kept up to date on every `cargo build`.
 The `[profile]` section allows you to add aliases to your development shell
 that are available after activating your environment.
 If you currently use `make`, `just`, or a `.cargo/config.toml` file to set
-provide simple aliaes in your development environment,
+provide simple aliases in your development environment,
 you may be able to remove those dependencies and just use the Flox manifest
 instead:
 

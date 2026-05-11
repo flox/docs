@@ -11,7 +11,7 @@ This means that you can spend less time debugging your CI/CD pipeline and more t
 Let's look at how you can use Flox with a variety of CI/CD platforms.
 For the following examples assume that you have a repository that contains a Flox environment, and assume that you've installed some Node.js dependencies for your project.
 
-## Github Actions
+## GitHub Actions
 
 Flox provides two different actions that you can use in a GitHub Actions workflow:
 
@@ -53,7 +53,7 @@ jobs:
           command: netlify deploy
 ```
 
-1. You are looking at an example project, your project will probably look a little different. Important parts of how to integrate Flox with Github Actions are highlighted below.
+1. You are looking at an example project, your project will probably look a little different. Important parts of how to integrate Flox with GitHub Actions are highlighted below.
 2. `flox/install-flox-action` will install the latest version of Flox.
 3. `flox/activate-action` allows you to run a command inside the Flox environment.
 

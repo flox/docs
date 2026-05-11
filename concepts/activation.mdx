@@ -187,7 +187,7 @@ flox activate -- <your command>
 This is similar to `activate -c` in that it activates the environment, runs a
 command, and then exits.
 
-Unlike `-c`, when exec'ing a command directly with `--`:
+Unlike `-c`, when `exec`-ing a command directly with `--`:
 
 1. `[profile]` scripts aren't run
 1. Shell syntax isn't supported, so it's not possible to chain commands (e.g. `cmd1 && cmd2`), use shell builtins, or use aliases.
@@ -268,7 +268,7 @@ Flox runs some initial setup, then sets the variables you've provided in the
 Next, the script _sources_ the `hook.on-activate` script that you've provided
 in the [[hook] section of your manifest][hook-section].
 Since this script is run by the Bash shell we're using,
-you only need to worry about the synax and oddities of one shell when writing
+you only need to worry about the syntax and oddities of one shell when writing
 this script.
 This is convenient, but it comes with some tradeoffs.
 
@@ -281,7 +281,7 @@ via the `hook.on-activate` script will not be inherited by your shell later.
 
 Finally, we `exec` your shell with some overrides that allow us to inject our
 own configuration,
-such as `source`ing the scripts defined in the
+such as `source`-ing the scripts defined in the
 [[profile] section of your manifest][profile-section].
 Once those scripts have been sourced,
 we hand control back to you.
