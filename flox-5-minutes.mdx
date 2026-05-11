@@ -16,11 +16,11 @@ Buckle up, it's time for a whirlwind tour of Flox.
 We've prepared a sample project for you, but you'll need to [install Flox][install_flox] to follow along.
 Once you have Flox, you can clone the project:
 
-```
+```bash
 git clone https://github.com/flox/flox-in-5min.git
 ```
 
-```
+```bash
 cd flox-in-5min
 ```
 
@@ -28,7 +28,7 @@ cd flox-in-5min
 
 Run [`flox activate`][activate] to enter the environment. This will make all of the packages defined in the environment available in your shell:
 
-```
+```console
 $ flox activate
 ✔ You are now using the environment 'flox-in-5min'.
 To stop using this environment, type 'exit'
@@ -36,7 +36,7 @@ To stop using this environment, type 'exit'
 
 With all the dependencies installed, you can confirm everything is working by running the sample Go project:
 
-```
+```console
 $ go run main.go
 Hello from Flox!
 ```
@@ -45,7 +45,7 @@ You didn't have to install Go yourself. The environment already had it defined, 
 
 Now let's see what else is installed to the environment with the [`flox list`][list] command:
 
-```
+```console
 $ flox list
 bun: bun (1.2.20)
 coreutils: coreutils (9.7)
@@ -62,7 +62,7 @@ Flox makes it easy to search for, inspect, and install packages from the Flox Ca
 
 Use `flox search` to find packages. For example, to search for `ripgrep`:
 
-```
+```console
 $ flox search ripgrep
 ripgrep                           Utility that combines the usability of The Silver Searcher with the raw speed of grep
 ripgrep-all                       Ripgrep, but also search in PDFs, E-Books, Office documents, zip, tar.gz, and more
@@ -79,7 +79,7 @@ Use 'flox show <package>' to see available versions
 
 To check available versions of a package, use `flox show`:
 
-```
+```console
 $ flox show ripgrep
 ripgrep - Utility that combines the usability of The Silver Searcher with the raw speed of grep
     ripgrep@14.1.1
@@ -92,7 +92,7 @@ ripgrep - Utility that combines the usability of The Silver Searcher with the ra
 
 To install a package, run:
 
-```
+```bash
 flox install ripgrep
 ```
 
@@ -103,7 +103,7 @@ FloxHub is a platform for sharing and discovering Flox environments and packages
 
 If you haven't already, [sign up for a FloxHub account][floxhub_signup]. Then authenticate with the CLI:
 
-```
+```bash
 flox auth login
 ```
 
@@ -113,7 +113,7 @@ This will open your browser and ask you to confirm the device code displayed in 
 
 Push your environment to FloxHub:
 
-```
+```bash
 flox push
 ```
 
@@ -131,7 +131,7 @@ Most projects need more than just packages. You might need a web server, a datab
 
 The sample environment includes a simple `stopwatch` service. Start it up:
 
-```
+```console
 $ flox services start
 <<<<<<< HEAD
 ✓ Service 'stopwatch' started.
@@ -142,13 +142,13 @@ $ flox services start
 
 You can check on the status of services and tail their logs just like you would with any process manager:
 
-```
+```console
 $ flox services status
 NAME       STATUS       PID
 stopwatch  Running    51774
 ```
 
-```
+```console
 $ flox services logs --follow
 stopwatch: Fri Aug 22 19:17:30 MDT 2025
 stopwatch: Fri Aug 22 19:17:35 MDT 2025
@@ -162,7 +162,7 @@ stopwatch: Fri Aug 22 19:18:05 MDT 2025
 
 Press `Ctrl-C` to stop watching the logs. When you're done, stop the service:
 
-```
+```console
 $ flox services stop
 <<<<<<< HEAD
 ✓ Service 'stopwatch' stopped

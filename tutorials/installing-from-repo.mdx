@@ -42,20 +42,20 @@ do the following.
 
 First, download Flox's GPG keyring to `/usr/share/keyrings/`.
 
-```
+```bash
 wget -qO - https://downloads.flox.dev/by-env/stable/deb/flox-archive-keyring.gpg | sudo tee /usr/share/keyrings/flox-archive-keyring.gpg >/dev/null
 ```
 
 Next, add the Flox repository to `/etc/apt/sources.list.d/flox.list`,
 pinning it to the keyring you just downloaded.
 
-```
+```bash
 echo "deb [signed-by=/usr/share/keyrings/flox-archive-keyring.gpg] https://downloads.flox.dev/by-env/stable/deb/ stable/" | sudo tee /etc/apt/sources.list.d/flox.list >/dev/null
 ```
 
 Finally, update and install Flox.
 
-```
+```bash
 sudo apt update && sudo apt install flox -y
 ```
 
@@ -75,19 +75,19 @@ that use `dnf`, do the following.
 
 First, download Flox's GPG keyring.
 
-```
+```bash
 sudo rpm --import https://downloads.flox.dev/by-env/stable/rpm/flox-archive-keyring.asc
 ```
 
 Next, add Flox's repository to `/etc/yum.repos.d/flox.repo`.
 
-```
+```bash
 sudo dnf config-manager --add-repo https://downloads.flox.dev/by-env/stable/rpm
 ```
 
 Finally, install Flox.
 
-```
+```bash
 sudo dnf install flox
 ```
 
@@ -114,13 +114,13 @@ To install Flox from its repository using `yum`, do the following.
 
 First, download and import Flox's GPG key.
 
-```
+```bash
 sudo rpm --import https://downloads.flox.dev/by-env/stable/rpm/flox-archive-keyring.asc
 ```
 
 Next, configure the Flox repository and install Flox with yum.
 
-```
+```bash
 sudo yum --repofrompath=flox,https://downloads.flox.dev/by-env/stable/rpm install flox
 ```
 
@@ -135,21 +135,21 @@ By default, the Flox repository's source list is in
 `/etc/apt/sources.list.d/flox.list`.
 However, you can double-check this by running the following command:
 
-```
+```bash
 grep -r 'flox' /etc/apt/sources.list /etc/apt/sources.list.d/
 ```
 
 Once you've confirmed the existence and location of this file,
 delete it along with the GPG keyring.
 
-```
+```bash
 sudo rm /etc/apt/sources.list.d/flox.list
 sudo rm /usr/share/keyrings/flox-archive-keyring.gpg
 ```
 
 Finally, update your package list.
 
-```
+```bash
 sudo apt update
 ```
 
@@ -166,19 +166,19 @@ By default, the Flox repository's source list is in
 `/etc/yum.repos.d/flox.repo`.
 However, you can double-check this by running the following command:
 
-```
+```bash
 sudo dnf repolist | grep flox
 ```
 
 Delete the `flox.repo` file from `/etc/yum.repos.d/`.
 
-```
+```bash
 sudo rm /etc/yum.repos.d/flox.repo
 ```
 
 Finally, clean the `dnf` cache.
 
-```
+```bash
 sudo dnf clean all
 ```
 

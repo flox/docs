@@ -52,11 +52,11 @@ recipe and overrides its `version` and `src` attributes:
   different attribute names or build patterns. Check the
   [nixpkgs source][nixpkgs] for the package you're modifying.
 </Note>
-```
+```bash
 mkdir -p .flox/pkgs/hello
 ```
 
-```
+```json
 { hello, fetchurl }:
 
 hello.overrideAttrs (finalAttrs: _oldAttrs: {
@@ -80,7 +80,7 @@ Nix expression builds require that all files in `.flox/pkgs/`
 are tracked by Git.
 Let's initialize a repository and add our files:
 
-```
+```bash
 git init
 git add .
 ```
@@ -102,7 +102,7 @@ error: hash mismatch in fixed-output derivation:
 Copy the hash from the `got:` line and paste it into your
 expression:
 
-```
+```json
 { hello, fetchurl }:
 
 hello.overrideAttrs (finalAttrs: _oldAttrs: {

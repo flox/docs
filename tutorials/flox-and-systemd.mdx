@@ -42,7 +42,7 @@ and run it as a systemd user unit.
 
 Pull the `flox/redis` environment from FloxHub into your home directory:
 
-```
+```bash
 flox pull flox/redis -d ~/redis
 ```
 
@@ -51,7 +51,7 @@ flox pull flox/redis -d ~/redis
 Before creating the systemd unit,
 verify that the environment works:
 
-```
+```bash
 cd ~/redis
 flox activate -s
 flox services status
@@ -63,7 +63,7 @@ exit
 
 Create the systemd user unit file:
 
-```
+```bash
 mkdir -p ~/.config/systemd/user/
 cat > ~/.config/systemd/user/redis.service << 'EOF'
 [Unit]
@@ -82,13 +82,13 @@ Enabling **lingering** allows the service to start at boot without a login sessi
 If you only need the service to run while you are logged in,
 you can skip this step.
 
-```
+```bash
 sudo loginctl enable-linger $USER
 ```
 
 Load, enable, and start the service:
 
-```
+```bash
 systemctl --user daemon-reload
 systemctl --user enable redis.service
 systemctl --user start redis.service
@@ -96,13 +96,13 @@ systemctl --user start redis.service
 
 Verify the service is running:
 
-```
+```bash
 systemctl --user status redis.service
 ```
 
 Verify Redis is responding:
 
-```
+```bash
 flox activate -d ~/redis -c 'redis-cli -p "$REDIS_PORT" ping'
 # should respond PONG
 ```
@@ -111,7 +111,7 @@ flox activate -d ~/redis -c 'redis-cli -p "$REDIS_PORT" ping'
 
 To stop and fully remove the systemd user unit:
 
-```
+```bash
 systemctl --user stop redis.service
 systemctl --user disable redis.service
 rm ~/.config/systemd/user/redis.service
@@ -126,7 +126,7 @@ you can create a system-level systemd unit instead.
 
 ### Create a dedicated Redis user and environment
 
-```
+```bash
 sudo useradd --system --create-home --shell /usr/sbin/nologin redis
 sudo -u redis flox pull flox/redis -d /home/redis/redis
 ```
@@ -137,7 +137,7 @@ Since the `redis` user has no login session,
 user units will not work.
 Create a system unit instead:
 
-```
+```bash
 sudo tee /etc/systemd/system/redis.service << 'EOF'
 [Unit]
 Description=Redis Server (Flox)
@@ -159,7 +159,7 @@ EOF
 </Note>
 ### Load, enable, and start
 
-```
+```bash
 sudo systemctl daemon-reload
 sudo systemctl enable redis.service
 sudo systemctl start redis.service
@@ -167,11 +167,11 @@ sudo systemctl start redis.service
 
 ### Verify
 
-```
+```bash
 sudo systemctl status redis.service
 ```
 
-```
+```bash
 flox activate -d ~/redis -c 'redis-cli -p $REDIS_PORT ping'
 # should respond PONG
 ```
@@ -189,7 +189,7 @@ flox activate -d ~/redis -c 'redis-cli -p $REDIS_PORT ping'
 
 To stop and fully remove the systemd system unit:
 
-```
+```bash
 sudo systemctl stop redis.service
 sudo systemctl disable redis.service
 sudo rm /etc/systemd/system/redis.service

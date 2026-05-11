@@ -8,7 +8,7 @@ flox-build-import-nixpkgs - Import package definition from nixpkgs
 
 ## SYNOPSIS
 
-```
+```bash
 flox [<general-options>] build import-nixpkgs
      [-d=<path>]
      [--force]
@@ -80,7 +80,7 @@ Silence logs except for errors.
 
 Import the `hello` package from nixpkgs:
 
-```
+```console
 $ flox build import-nixpkgs hello
 ```
 
@@ -90,7 +90,7 @@ This creates `.flox/pkgs/hello/default.nix` with the package definition.
 
 Import a package from a specific nixpkgs revision:
 
-```
+```console
 $ flox build import-nixpkgs github:nixos/nixpkgs/nixos-23.11#hello
 ```
 
@@ -98,7 +98,7 @@ $ flox build import-nixpkgs github:nixos/nixpkgs/nixos-23.11#hello
 
 Force import a package, overwriting any existing definition:
 
-```
+```console
 $ flox build import-nixpkgs --force hello
 ```
 
@@ -106,7 +106,7 @@ $ flox build import-nixpkgs --force hello
 
 Import a package with a nested attribute path:
 
-```
+```console
 $ flox build import-nixpkgs python310Packages.requests
 ```
 

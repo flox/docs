@@ -8,7 +8,7 @@ flox-build - Build packages with Flox
 
 ## SYNOPSIS
 
-```
+```bash
 flox [<general-options>] build
      [-d=<path>]
      [--stability <stability>]
@@ -126,7 +126,7 @@ Silence logs except for errors.
 
 1. Add build instructions to the manifest:
 
-```
+```toml
 ## file: .flox/env/manifest.toml
 
 ...
@@ -142,7 +142,7 @@ version = "0.0.0"
 
 1. Build the package and verify its contents:
 
-```
+```console
 $ flox build hello
 $ ls ./result-hello
 hello.txt
@@ -154,7 +154,7 @@ hello, world
 
 Assume a simple `nodejs` project
 
-```
+```text
 .
 ├── .git/
 ├── package-lock.json
@@ -167,13 +167,13 @@ Assume a simple `nodejs` project
 
 1. Initialize a Flox environment
 
-```
+```console
 $ flox init
 ```
 
 1. Install dependencies and add build instructions
 
-```
+```toml
 ## file: .flox/env/manifest.toml
 version = 1
 
@@ -201,7 +201,7 @@ mv dist $out/
 
 1. Verify the result
 
-```
+```console
 $ npx serve result-app
 ```
 

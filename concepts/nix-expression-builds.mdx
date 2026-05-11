@@ -38,7 +38,7 @@ You can also make modifications to existing packages that are already in the Flo
 
 To distribute a simple shell script which has a dependency on existing packages:
 
-```
+```json
 {writeShellApplication, curl}:
 
 writeShellApplication {
@@ -56,7 +56,7 @@ This will ensure that a known version of `bash` and `curl` are available to the 
 
 To build a Rust project that lives in the same repository as your Flox environment:
 
-```
+```json
 { rustPlatform, lib }:
 
 rustPlatform.buildRustPackage rec {
@@ -79,7 +79,7 @@ This will vendor dependencies from your `Cargo.lock` file, run `cargo build`, an
 
 If there's an open source Go project that isn't already available in the Flox Catalog:
 
-```
+```json
 { buildGoModule, fetchFromGitHub, lib }:
 
 buildGoModule rec {
@@ -108,7 +108,7 @@ This will vendor dependencies from your `go.mod` file, run `go build`, and packa
 
 If you want to use VS Code with some pre-installed extensions:
 
-```
+```json
 {vscode, vscode-utils, vscode-extensions, vscode-with-extensions}:
 
 vscode-with-extensions.override {
@@ -134,7 +134,7 @@ This will add the Nix, GitHub Copilot, and Flox extensions to the VS Code packag
 
 If the latest version of a package isn't yet available in the Flox Catalog then you can often just override the `version` and `src` attributes of the existing package:
 
-```
+```json
 { hello, fetchurl }:
 
 hello.overrideAttrs (finalAttrs: _oldAttrs: {
@@ -150,7 +150,7 @@ hello.overrideAttrs (finalAttrs: _oldAttrs: {
 
 If you want to apply a patch, such as an unreleased bug fix, to an existing package:
 
-```
+```json
 { hello }:
 
 hello.overrideAttrs (oldAttrs: {
@@ -196,7 +196,7 @@ diff -ru hello-2.12.2/tests/hello-1 hello-patched/tests/hello-1
 
 Typically you would only override specific attributes of an existing package, which allows you to continue benefiting from upstream changes and surface failures if there are any conflicts, but if you want to copy a package to make more fundamental changes or because it's being removed upstream:
 
-```
+```bash
 mkdir -p .flox/pkgs
 EDITOR=cat \
   nix --extra-experimental-features "nix-command flakes" \
@@ -220,7 +220,7 @@ Expressions that fetch external dependencies will often specify hashes to ensure
 
 If you don't have a way of verifying the current hash and you trust the source then you can specify an empty string value:
 
-```
+```nix
   src = fetchurl {
     url = "mirror://gnu/hello/hello-${finalAttrs.version}.tar.gz";
     hash = "";

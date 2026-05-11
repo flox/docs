@@ -37,7 +37,7 @@ The most common way to activate an environment is simply by calling
 `flox activate`,
 which starts a new subshell with everything configured:
 
-```
+```console
 $ flox activate
 flox [myenv] $ # Now you can use your packages
 ```
@@ -96,13 +96,13 @@ To make this happen you could do one of these options in Bash:
 
 Option 1
 
-```
+```bash
 source <(flox activate)
 ```
 
 Option 2
 
-```
+```bash
 eval "$(flox activate)"
 ```
 
@@ -159,7 +159,7 @@ which you may not want.
 
 The easy way to do this is:
 
-```
+```bash
 flox activate -c "<your command>"
 ```
 
@@ -180,7 +180,7 @@ user_shell."Back to you"
 
 The final way to activate an environment is to exec a command directly without an intermediate shell, which can be done with:
 
-```
+```bash
 flox activate -- <your command>
 ```
 

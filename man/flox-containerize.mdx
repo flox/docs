@@ -8,7 +8,7 @@ flox-containerize - export an environment as a container image
 
 ## SYNOPSIS
 
-```
+```bash
 flox [<general-options>] containerize
      [-d=<path> | -r=<owner/name>]
      [-f=<file>] [--runtime=<runtime>]
@@ -95,7 +95,7 @@ The following options from the OCI spec are supported, specified in
 directly as container image config, while others are also used at
 container build time. See details below.
 
-```
+```text
 ContainerizeConfig ::= {
   user                      = null | <STRING>
 , exposed-ports             = null | [<STRING>, ...]
@@ -159,14 +159,14 @@ rules](https://github.com/opencontainers/image-spec/blob/main/annotations.md#rul
 
 Create a container image file and load it into Docker:
 
-```
+```console
 $ flox containerize -f ./mycontainer.tar
 $ docker load -i ./mycontainer.tar
 ```
 
 Load the image into Docker:
 
-```
+```console
 $ flox containerize --runtime docker
 
 # or through stdout e.g. if `docker` is not in `PATH`:
@@ -176,7 +176,7 @@ $ flox containerize -f - | /path/to/docker
 
 Run the container interactively:
 
-```
+```console
 $ flox init
 $ flox install hello
 $ flox containerize -f - | docker load
@@ -188,7 +188,7 @@ Hello, world!
 Run a specific command from within the container, but do not launch a
 subshell.
 
-```
+```console
 $ flox init
 $ flox install hello
 $ flox containerize -f - | docker load
@@ -198,7 +198,7 @@ Hello, world
 
 Create a container with a specific tag:
 
-```
+```console
 $ flox init
 $ flox install hello
 $ flox containerize --tag 'v1' -f - | docker load

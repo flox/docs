@@ -7,7 +7,7 @@ This guide describes how to remove Imageless Kubernetes from a cluster.
 
 First, remove the `RuntimeClass` with:
 
-```sh
+```bash
 kubectl delete runtimeclass flox
 ```
 
@@ -28,7 +28,7 @@ If Terraform was used to add a node group to an existing cluster:
 
 If `eksctl` was used, remove the node group with:
 
-```sh
+```bash
 eksctl delete nodegroup -f nodegroup.yaml
 ```
 
@@ -45,14 +45,14 @@ in `/etc/containerd/config.toml.bak.xx` where `xx` is an arbitrary number.
 
 Restore the backup with:
 
-```sh
+```bash
 mv /etc/containerd/config.toml.bak.xx /etc/containerd/config.toml
 systemctl restart containerd
 ```
 
 Then remove the shim from each node with:
 
-```sh
+```bash
 rm /usr/local/bin/containerd-shim-flox-v2
 ```
 

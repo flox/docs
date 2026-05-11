@@ -8,7 +8,7 @@ flox-services-logs - show logs of services
 
 ## SYNOPSIS
 
-```
+```bash
 flox [<general-options>] services logs
      [-d=<path> | -r=<owner/name>]
      [--follow]
@@ -77,7 +77,7 @@ Silence logs except for errors.
 
 Follow logs for all services:
 
-```
+```console
 $ flox services logs --follow
 service1: hello
 service2: hello
@@ -86,7 +86,7 @@ service2: hello
 
 Follow logs for a subset of services:
 
-```
+```console
 $ flox services logs --follow service1 service3
 service1: hello
 service3: hello
@@ -95,7 +95,7 @@ service3: hello
 
 Display all available logs for a single service:
 
-```
+```console
 $ flox services logs myservice
 starting...
 running...

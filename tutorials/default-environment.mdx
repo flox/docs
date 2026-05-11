@@ -37,7 +37,7 @@ To create the `default` environment yourself,
 make sure you are logged in to FloxHub,
 and initialize a FloxHub environment under your account:
 
-```
+```bash
 flox auth status || flox auth login
 ✔ Authentication complete
 ✔ Logged in as <youruser>
@@ -103,7 +103,7 @@ If you don't want to activate it automatically from your shell
 initialization scripts, you can activate the default environment
 explicitly when needed:
 
-```
+```bash
 flox activate -D
 ```
 
@@ -116,7 +116,7 @@ Let's do the same with Flox.
 
 Let's create a new temporary directory that we know doesn't have an environment in it.
 
-```
+```bash
 cd $(mktemp -d)
 ```
 
@@ -196,7 +196,7 @@ To see how generations can be used to undo changes, edit the environment,
 perhaps adding a variable `FOO = "bar"` to the `[vars]` section.
 Then push the environment to FloxHub:
 
-```
+```bash
 flox edit;
 flox push
 ```
@@ -207,7 +207,7 @@ This should show the most recent generation created by the `flox edit` command.
 
 To revert to the version of the environment prior to the edit, run rollback:
 
-```
+```bash
 flox generations rollback;
 flox push
 ```
@@ -240,7 +240,7 @@ For example you can
   </Tab>
 </Tabs>
 
-```
+```bash
 flox init --dir ~
 ```
 
@@ -250,7 +250,7 @@ flox init --dir ~
   </Tab>
 </Tabs>
 
-```
+```bash
 flox pull --copy --dir ~ owner/name
 ```
 
@@ -260,7 +260,7 @@ flox pull --copy --dir ~ owner/name
   </Tab>
 </Tabs>
 
-```
+```bash
 flox pull --dir ~ owner/name
 ```
 
