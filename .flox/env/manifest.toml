@@ -8,6 +8,7 @@ schema-version = "1.12.0"
 ## -------------------------------------------------------------------
 [install]
 nodejs.pkg-path = "nodejs"
+vale.pkg-path = "vale"
 # gum.pkg-path = "gum"
 # gum.version = "^0.14.5"
 
@@ -41,6 +42,7 @@ on-activate = '''
   echo "  mint dev            Preview docs locally at http://localhost:3000"
   echo "  mint broken-links   Check for broken links across all pages"
   echo "  mint update         Update the Mintlify CLI (stays within this environment)"
+  echo "  vale <file>         Spell-check an .mdx file against the project's Vale config"
   echo ""
 '''
 
