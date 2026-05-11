@@ -8,7 +8,7 @@ flox-services-stop - stop running services
 
 ## SYNOPSIS
 
-```
+```bash
 flox [<general-options>] services stop
      [-d=<path> | -r=<owner/name>]
      [<name>] ...
@@ -63,26 +63,26 @@ Silence logs except for errors.
 
 Stop a running service named ‘server’:
 
-```
+```console
 $ flox services stop server
 ```
 
 Stop all running services:
 
-```
+```console
 $ flox services stop
 ```
 
 Attempt to stop a service that doesn’t exist:
 
-```
+```console
 $ flox services stop myservice doesnt_exist
 ✘ ERROR: Service 'doesnt_exist' not found.
 ```
 
 Attempt to stop a service that isn’t running:
 
-```
+```console
 $ flox services stop running not_running
 ⚠️  Service 'not_running' is not running
 ✔ Service 'running' stopped

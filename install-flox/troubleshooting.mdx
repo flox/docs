@@ -17,7 +17,7 @@ The macOS system installer logs to `/var/log/install.log`.
 
 The install log contains logs from installations of other installed macOS packages, so to get just the lines relevant to Flox, run this script:
 
-```
+```bash
 awk '
 /com\.floxdev\.flox/ {
   if (first == 0) first = NR
@@ -48,7 +48,7 @@ For example:
 
 List matching files to find it:
 
-```
+```bash
 ls -al /tmp/flox-installation.log.*
 ```
 
@@ -299,7 +299,7 @@ you may need to force a full cleanup before re-installing.
 
 #### Solution
 
-```
+```bash
 brew uninstall --force --zap flox
 ```
 
@@ -350,7 +350,7 @@ it does not cause Nix to query those caches on its own.
 
 ##### Diagnosis
 
-```
+```bash
 nix config show | grep substituters
 ```
 
@@ -382,7 +382,7 @@ extra-trusted-public-keys = flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GE
 
 Verify the change took effect:
 
-```
+```bash
 nix config show | grep substituters
 ```
 

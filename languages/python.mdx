@@ -9,13 +9,13 @@ This provides an overview of how to create Flox environments for new or existing
 
 Getting started with Flox is super simple. First, create and/or `cd` into your project directory.
 
-```
+```bash
 mkdir new-python-project && cd new-python-project
 ```
 
 Next, initialize your Flox environment:
 
-```
+```bash
 flox init
 ```
 
@@ -38,7 +38,7 @@ This Flox environment is now ready to be populated with packages.
 
 To begin, we need a Python interpreter. For this example, we will be using Python 3.11. Search for the version of Python your project requires, omitting the dot between major and minor numbers:
 
-```
+```bash
 flox search python311
 ```
 
@@ -54,7 +54,7 @@ Use 'flox show <package>' to see available versions
 
 To see the specific versions of Python available in the Flox Catalog, use the `flox show` command:
 
-```
+```bash
 flox show python311Full
 ```
 
@@ -76,7 +76,7 @@ python311Full - High-level dynamically-typed programming language
 
 At this point, you can install the latest version by running `flox install` without a version specified:
 
-```
+```bash
 flox install python311Full
 ```
 
@@ -91,7 +91,7 @@ python311Full: python311Full (python3-3.11.9)
 
 When `flox upgrade` is run in this environment, the version of Python will be upgraded to the latest version available in the catalog matching those major and minor numbers. If you wish to pin your Flox environment to a specific release of Python, you can specify it in the `flox install` command:
 
-```
+```bash
 flox install python311Full@python3-3.11.3
 ```
 
@@ -101,7 +101,7 @@ Python projects often require a collection of packages in addition to an interpr
 
 To find these Python packages in the Flox Catalog, use the same `flox search` syntax from before:
 
-```
+```bash
 flox search numpy
 ```
 
@@ -116,7 +116,7 @@ python311Packages.numpy    Scientific tools for Python
 
 Python packages will have a prefix of `pythonXXXPackages.` in their package name, with `XXX` matching the version of Python you have installed into your environment. To install them, use the entire package name including the prefix:
 
-```
+```bash
 flox install python311Packages.numpy python311Packages.pandas
 ```
 
@@ -132,7 +132,7 @@ $ flox install python311Packages.numpy python311Packages.pandas
 
 Once the packages have been installed, activate the new environment:
 
-```
+```bash
 flox activate
 ```
 
@@ -152,7 +152,7 @@ If you are working with an existing project that is already configured for Pytho
 
 For this example we will clone the `eralchemy` repo, which already contains Python configuration:
 
-```
+```bash
 git clone https://github.com/eralchemy/eralchemy.git && cd eralchemy
 ```
 
@@ -160,7 +160,7 @@ git clone https://github.com/eralchemy/eralchemy.git && cd eralchemy
 
 Once inside the `eralchemy` project directory, initialize a new Flox environment:
 
-```
+```bash
 flox init
 ```
 
@@ -244,7 +244,7 @@ zsh = '''
 
 If you choose “Yes” to accept this configuration, you can edit or customize it once Flox finishes building just by typing `flox edit`. For future projects, you can automate this setup process for Python environments by running:
 
-```
+```bash
 flox init --auto-setup
 ```
 
@@ -254,7 +254,7 @@ The only dependency from `pyproject.toml` that Flox did not install for us is [G
 
 To do this, we could run `flox edit` and add `graphviz` to the `[install]` section of our environment's software manifest, but it's just as easy to install it from the command line. So let’s do that instead:
 
-```
+```bash
 flox install graphviz
 ```
 
@@ -264,7 +264,7 @@ Now it's time to put this environment through its paces.
 
 First let's activate the environment:
 
-```
+```bash
 flox activate
 ```
 

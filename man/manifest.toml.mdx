@@ -37,7 +37,7 @@ that are represented as TOML tables:
 `schema-version` is a top-level field that specifies the minimum version
 of Flox that the manifest is compatible with.
 
-```
+```toml
 schema-version = "1.10.0"
 ```
 
@@ -58,7 +58,7 @@ version will emit a warning but not block the command. This is useful
 when an environment depends on behavior introduced in a specific release
 (e.g. a bugfix or feature that isn’t schema related).
 
-```
+```toml
 minimum-cli-version = "1.11.0"
 ```
 
@@ -68,7 +68,7 @@ The value must be a valid [semantic version](https://semver.org/) string
 An optional `reason` can be provided using the table form which will be
 included in the emitted warning message:
 
-```
+```toml
 [minimum-cli-version]
 version = "1.11.0"
 reason = "Needs feature X"
@@ -80,7 +80,7 @@ The `[install]` table is the core of the environment, specifying which
 packages you’d like installed in the environment. An example of the
 `[install]` table is shown below:
 
-```
+```toml
 [install]
 ripgrep.pkg-path = "ripgrep"
 pip.pkg-path = "python310Packages.pip"
@@ -88,7 +88,7 @@ pip.pkg-path = "python310Packages.pip"
 
 Since this is TOML, equivalent ways of writing this would be
 
-```
+```toml
 [install]
 ripgrep = { pkg-path = "ripgrep" }
 pip = { pkg-path = "python310Packages.pip" }
@@ -96,7 +96,7 @@ pip = { pkg-path = "python310Packages.pip" }
 
 or
 
-```
+```toml
 [install.ripgrep]
 pkg-path = "ripgrep"
 
@@ -118,7 +118,7 @@ The pkg-path is searched when you execute a `flox search` command. The
 pkg-path is what’s shown by `flox show`. Finally, the pkg-path appears
 in your manifest after a `flox install`.
 
-```
+```toml
 [install]
 ripgrep.pkg-path = "ripgrep"
 pip.pkg-path = "python310Packages.pip"
@@ -150,7 +150,7 @@ install from an arbitrary Nix flake.
 
 The full list of catalog descriptor options is:
 
-```
+```text
 Descriptor ::= {
   pkg-group          = null | <STRING>
 , version            = null | <STRING>
@@ -257,7 +257,7 @@ Flake descriptors allow installing software from an arbitrary Nix flake.
 
 The full list of flake descriptor options is:
 
-```
+```text
 Descriptor ::= {
   flake              = <STRING>
 , systems            = null | [<STRING>, ...]
@@ -290,7 +290,7 @@ store path.
 
 The full list of store path descriptor options is:
 
-```
+```text
 Descriptor ::= {
   store-path         = STRING
 , systems            = null | [<STRING>, ...]
@@ -326,7 +326,7 @@ activation script, so capitalization will be preserved.
 
 Example:
 
-```
+```toml
 [vars]
 DB_URL = "http://localhost:2000"
 SERVER_PORT = "3000"
@@ -352,7 +352,7 @@ Any output written to `stdout` in a hook script is redirected to
 `stderr` to avoid it being mixed with the output of profile section
 scripts that write to `stdout` for “in-place” activations.
 
-```
+```toml
 [hook]
 on-activate = """
     # Interact with the tty as you would in any script
@@ -405,7 +405,7 @@ sourced by the corresponding shell.
 These scripts are useful for performing shell-specific customizations
 such as setting aliases or configuring the prompt.
 
-```
+```toml
 [profile]
 common = """
     echo "it's gettin' flox in here"
@@ -446,7 +446,7 @@ determine how to configure and run the services.
 
 An example service definition is shown below:
 
-```
+```toml
 [services.database]
 command = "postgres start"
 vars.PGUSER = "myuser"
@@ -460,7 +460,7 @@ a PostgreSQL database.
 
 The full set of options is show below:
 
-```
+```text
 ServiceDescriptor ::= {
   command    = STRING
 , vars       = null | Map[STRING, STRING]
@@ -534,7 +534,7 @@ The merged manifest can be viewed with `flox list --config`.
 
 An example `[include]` section is shown below:
 
-```
+```toml
 [include]
 environments = [
     { dir = "../path/to/env" },
@@ -546,7 +546,7 @@ As mentioned above, you include other environments my listing them as an
 array of tables in the `include.environments` array. The schema for
 these “include descriptors” is shown below:
 
-```
+```text
 IncludeDescriptor ::= LocalIncludeDescriptor
                     | FloxHubIncludeDescriptor
                     | RemoteIncludeDescriptor (deprecated)
@@ -667,7 +667,7 @@ determine how to build the package.
 
 An example build definition is shown below:
 
-```
+```toml
 [build.hello]
 command = '''
 mkdir -p $out
@@ -681,7 +681,7 @@ for more details.
 
 The full set of options is shown below:
 
-```
+```text
 BuildDescriptor ::= {
   command          = STRING
 , sandbox          = null | ("off" | "pure")
@@ -738,7 +738,7 @@ environment itself.
 
 The full set of options are listed below:
 
-```
+```text
 Options ::= {
   systems                   = null | [<STRING>, ...]
 , activate                  = null | Activate

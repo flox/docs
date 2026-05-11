@@ -8,7 +8,7 @@ flox-activate - activate environments
 
 ## SYNOPSIS
 
-```
+```bash
 flox [<general-options>] activate
      [-d=<path> | -r=<owner>/<name>]
      [-t]
@@ -54,7 +54,7 @@ shells for any of the detection mechanisms described above.
 When invoked interactively, the shell prompt will be modified to display
 the active environments, as shown below:
 
-```
+```bash
 flox [env1 env2 env3] <normal prompt>
 ```
 
@@ -214,26 +214,26 @@ chart](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.
 
 Activate an environment stored in the current directory:
 
-```
+```console
 $ flox activate
 ```
 
 Activate an environment `some_user/myenv` that’s been pushed to FloxHub:
 
-```
+```console
 $ flox activate -r some_user/myenv
 ```
 
 Invoke a command inside an environment without entering its subshell:
 
-```
+```console
 $ flox activate -- cmd --some-arg arg1 arg2
 ```
 
 Activate `default` Flox environment only within the current shell (add
 to the relevant “rc” file, e.g. `~/.bashrc` or `~/.zprofile`):
 
-```
+```console
 $ eval "$(flox activate)"
 ```
 

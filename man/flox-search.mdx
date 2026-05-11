@@ -8,7 +8,7 @@ flox-search - search for packages
 
 ## SYNOPSIS
 
-```
+```bash
 flox [<general options>] search
      [--json]
      [-a]
@@ -38,7 +38,7 @@ The pkg-path is searched when you execute a `flox search` command. The
 pkg-path is what’s shown by `flox show`. Finally, the pkg-path appears
 in your manifest after a `flox install`.
 
-```
+```toml
 [install]
 ripgrep.pkg-path = "ripgrep"
 pip.pkg-path = "python310Packages.pip"
