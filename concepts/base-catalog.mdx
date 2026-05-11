@@ -18,8 +18,8 @@ from its [nixpkgs][nixpkgs] fork
 and save the metadata from the evaluation.
 This makes it available to users of Flox.
 
-An addional process continously checks newly added packages
-and records actual build information (narino) from `nixos.cache.org`.
+An additional process continuously checks newly added packages
+and records actual build information (narinfo) from `nixos.cache.org`.
 This along, with considerations for packages flagged as _unfree_ and _broken_,
 allows flox to make attempts to serve up known good builds.
 If you encounter a difference between `flox show` (meta data only),
@@ -124,13 +124,13 @@ The last `N` tags of each stability are retained.
 This means revisions may "fall out" of the catalog over time.
 Existing lockfiles save the metadata and will work forever.
 However, a `flox update` to an environment
-that contins a specific version,
+that contains a specific version,
 _may_ in the future fail to resolve.
 In practice, with our retention settings,
 this is very unlikely.
 Weekly captures are generally sufficient
 to capture every package change,
-in effect keeping every version in the past 3 years availble.
+in effect keeping every version in the past 3 years available.
 
 Current settings:
 
