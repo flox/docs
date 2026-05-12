@@ -54,8 +54,7 @@ Only the files stored in this directory are considered part of the output of a b
 This is why you see the following line in the build command for the `myproject` example above
 
 ```bash
-mkdir -p $out/bin
-cp target/release/myproject $out/bin/myproject
+mkdir -p $out/bin && cp target/release/myproject $out/bin/myproject
 ```
 
 The contents of the `$out` directory should adhere to the [Filesystem Hierarchy Standard (FHS)][fhs-docs], which is just the official name for the familiar `bin`, `lib`, etc directories you may be familiar with from using Unix-based systems.

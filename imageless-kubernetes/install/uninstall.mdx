@@ -46,7 +46,7 @@ in `/etc/containerd/config.toml.bak.xx` where `xx` is an arbitrary number.
 Restore the backup with:
 
 ```bash
-mv /etc/containerd/config.toml.bak.xx /etc/containerd/config.toml
+mv /etc/containerd/config.toml.bak.xx /etc/containerd/config.toml &&
 systemctl restart containerd
 ```
 

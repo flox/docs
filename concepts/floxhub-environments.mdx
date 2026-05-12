@@ -10,8 +10,7 @@ A FloxHub environment allows you to centrally manage a Flox environment, trackin
 When you create an environment for your project, you often do so via the [`flox init`][flox-init] command, which creates a `.flox` directory that you can check into source control.
 
 ```bash
-flox init
-git add .flox
+flox init && git add .flox
 ```
 
 This allows you to track changes to the environment the same way that you track changes to your source code, but it also ties this environment to this specific project and Git repository.

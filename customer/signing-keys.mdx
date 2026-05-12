@@ -77,7 +77,7 @@ sudo systemctl restart nix-daemon
 On macOS the Nix daemon is managed via `launchd`, so you can restart it with the following command (note that you have to run the command twice, this is not a typo):
 
 ```bash
-sudo launchctl kickstart -k system/org.nixos.nix-daemon;
+sudo launchctl kickstart -k system/org.nixos.nix-daemon &&
 sudo launchctl kickstart -k system/org.nixos.nix-daemon
 ```
 
