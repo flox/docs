@@ -39,7 +39,7 @@ If you instead require a _specific version_ of one of these packages—say, v1.1
 
 A problem arises if you require specific historical versions of both `openssl` _and_ `curl`. In such cases, the Flox resolver cannot always compute a coherent dependency graph. For instance, defining `openssl` v1.1.1q (June 2022) and `curl` v8.18.0 (January 2026) in the same environment triggers this error:
 
-```bash
+```console
 ✘ ERROR: resolution failed: constraints for group 'toplevel' are too tight
 
    Use 'flox edit' to adjust version constraints in the [install] section,
