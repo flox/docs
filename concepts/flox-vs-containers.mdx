@@ -218,9 +218,9 @@ However, with containers you also need to mount in your source code, etc.
 
   This is pretty straightforward:
 
-  ```console
-  $ exit # leave the container shell
-  $ docker stop myproject_container
+  ```bash
+  exit # leave the container shell
+  docker stop myproject_container
   ```
   </Tab>
 </Tabs>
@@ -274,10 +274,10 @@ same environment.
   Since [`flox init`][init] creates a `.flox` directory inside your project,
   you can simply check this directory into source control.
 
-  ```console
-  $ git add .flox
-  $ git commit -m "Add Flox environment"
-  $ git push
+  ```bash
+  git add .flox
+  git commit -m "Add Flox environment"
+  git push
   ```
 
   Anyone with Flox installed can now work on this project with two commands:
