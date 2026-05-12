@@ -51,12 +51,12 @@ flox pull flox/redis -d ~/redis
 Before creating the systemd unit,
 verify that the environment works:
 
-```bash
-cd ~/redis &&
-flox activate -s &&
-flox services status &&
-redis-cli -p $REDIS_PORT ping &&
-exit
+```console
+$ cd ~/redis
+$ flox activate -s
+$ flox services status
+$ redis-cli -p $REDIS_PORT ping
+$ exit
 ```
 
 ### Create the systemd user service
