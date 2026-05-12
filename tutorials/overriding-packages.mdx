@@ -56,7 +56,7 @@ recipe and overrides its `version` and `src` attributes:
 mkdir -p .flox/pkgs/hello
 ```
 
-```json
+```nix title=".flox/pkgs/hello/default.nix"
 { hello, fetchurl }:
 
 hello.overrideAttrs (finalAttrs: _oldAttrs: {
@@ -102,7 +102,7 @@ error: hash mismatch in fixed-output derivation:
 Copy the hash from the `got:` line and paste it into your
 expression:
 
-```json
+```nix title=".flox/pkgs/hello/default.nix"
 { hello, fetchurl }:
 
 hello.overrideAttrs (finalAttrs: _oldAttrs: {
