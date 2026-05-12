@@ -46,14 +46,14 @@ in `/etc/containerd/config.toml.bak.xx` where `xx` is an arbitrary number.
 Restore the backup with:
 
 ```bash
-mv /etc/containerd/config.toml.bak.xx /etc/containerd/config.toml &&
-systemctl restart containerd
+sudo mv /etc/containerd/config.toml.bak.xx /etc/containerd/config.toml &&
+sudo systemctl restart containerd
 ```
 
 Then remove the shim from each node with:
 
 ```bash
-rm /usr/local/bin/containerd-shim-flox-v2
+sudo rm /usr/local/bin/containerd-shim-flox-v2
 ```
 
 And finally, uninstall Flox from each node by following the instructions from the [Uninstall Flox][uninstall-flox] page.
