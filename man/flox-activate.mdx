@@ -214,27 +214,27 @@ chart](https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.
 
 Activate an environment stored in the current directory:
 
-```console
-$ flox activate
+```bash
+flox activate
 ```
 
 Activate an environment `some_user/myenv` that’s been pushed to FloxHub:
 
-```console
-$ flox activate -r some_user/myenv
+```bash
+flox activate -r some_user/myenv
 ```
 
 Invoke a command inside an environment without entering its subshell:
 
-```console
-$ flox activate -- cmd --some-arg arg1 arg2
+```bash
+flox activate -- cmd --some-arg arg1 arg2
 ```
 
 Activate `default` Flox environment only within the current shell (add
 to the relevant “rc” file, e.g. `~/.bashrc` or `~/.zprofile`):
 
-```console
-$ eval "$(flox activate)"
+```bash
+eval "$(flox activate)"
 ```
 
 ## SEE ALSO
