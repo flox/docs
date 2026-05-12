@@ -112,9 +112,9 @@ flox activate -d ~/redis -c 'redis-cli -p "$REDIS_PORT" ping'
 To stop and fully remove the systemd user unit:
 
 ```bash
-systemctl --user stop redis.service &&
-systemctl --user disable redis.service &&
-rm ~/.config/systemd/user/redis.service &&
+systemctl --user stop redis.service
+systemctl --user disable redis.service
+rm ~/.config/systemd/user/redis.service
 systemctl --user daemon-reload
 ```
 
@@ -190,9 +190,9 @@ flox activate -d ~/redis -c 'redis-cli -p $REDIS_PORT ping'
 To stop and fully remove the systemd system unit:
 
 ```bash
-sudo systemctl stop redis.service &&
-sudo systemctl disable redis.service &&
-sudo rm /etc/systemd/system/redis.service &&
+sudo systemctl stop redis.service
+sudo systemctl disable redis.service
+sudo rm /etc/systemd/system/redis.service
 sudo systemctl daemon-reload
 ```
 
