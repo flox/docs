@@ -40,11 +40,10 @@ examples in this repository.
 If you already have Flox installed, getting up and running is *very* easy:
 
 ```bash
-git clone https://github.com/flox/cuda-samples.git
-cd cuda-samples
-git checkout flox-env
+git clone https://github.com/flox/cuda-samples.git &&
+cd cuda-samples &&
+git checkout flox-env &&
 flox activate
-
 ```
 
 This may take some time because the download is quite large (~9GB), but that's because the full CUDA
@@ -114,7 +113,6 @@ Navigate to `Samples/5_Domain_Specific/Mandelbrot` then run the following comman
 
 ```bash
 mkdir build && cd build && cmake .. && make -j8 && ./Mandelbrot
-
 ```
 
 This will open a window with a rendering of the [Mandelbrot set](https://en.wikipedia.org/wiki/Mandelbrot_set),
@@ -133,10 +131,9 @@ and this time we'll build the environment from scratch to see how easy it is.
 Clone the PyTorch repository, navigate to the `mnist` example, and create a Flox environment in it:
 
 ```bash
-git clone <https://github.com/pytorch/examples.git> pytorch-examples
-cd pytorch-examples/mnist
+git clone https://github.com/pytorch/examples.git pytorch-examples &&
+cd pytorch-examples/mnist &&
 flox init
-
 ```
 
 At this point the Flox CLI will ask to install some packages for you, but in this case we want to say
