@@ -160,8 +160,7 @@ rules](https://github.com/opencontainers/image-spec/blob/main/annotations.md#rul
 Create a container image file and load it into Docker:
 
 ```bash
-flox containerize -f ./mycontainer.tar
-docker load -i ./mycontainer.tar
+flox containerize -f ./mycontainer.tar && docker load -i ./mycontainer.tar
 ```
 
 Load the image into Docker:

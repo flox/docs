@@ -17,8 +17,7 @@ Let's say you've created a new directory for your project,
 and entered it:
 
 ```bash
-mkdir myproject;
-cd myproject
+mkdir myproject && cd myproject
 ```
 
 <Tabs>
@@ -218,9 +217,9 @@ However, with containers you also need to mount in your source code, etc.
 
   This is pretty straightforward:
 
-  ```bash
-  exit # leave the container shell
-  docker stop myproject_container
+  ```console
+  $ exit # leave the container shell
+  $ docker stop myproject_container
   ```
   </Tab>
 </Tabs>
@@ -275,9 +274,7 @@ same environment.
   you can simply check this directory into source control.
 
   ```bash
-  git add .flox
-  git commit -m "Add Flox environment"
-  git push
+  git add .flox && git commit -m "Add Flox environment" && git push
   ```
 
   Anyone with Flox installed can now work on this project with two commands:
