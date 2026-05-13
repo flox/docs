@@ -33,7 +33,7 @@ openssl.pkg-path = "openssl"
 curl.pkg-path = "curl"
 ```
 
-The Flox [environment manifest](https://flox.dev/docs/concepts/environments/#environment-uses) above defines the `openssl` and `curl` packages. Flox resolves both against the same `nixpkgs` commit, selecting v3.6.1 of `openssl` and v8.18.0 of `curl`.
+The Flox [environment manifest](/concepts/environments#environment-uses) above defines the `openssl` and `curl` packages. Flox resolves both against the same `nixpkgs` commit, selecting v3.6.1 of `openssl` and v8.18.0 of `curl`.
 
 If you instead require a _specific version_ of one of these packages—say, v1.1.1q of `openssl`—but do not specify a version of `curl`, Flox resolves both packages to an older, compatible catalog revision. In this case, the environment pulls in a historical version of `curl`: v7.84.0, from June 2022, the same catalog revision that includes v1.1.1q of `openssl`, which was released the following month.
 

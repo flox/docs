@@ -130,10 +130,13 @@ The 'default' environment will be activated for every new shell.
 ✔ 'jq' installed to environment '<owner>/default' (local)
 ```
 
-!!! note "Shorthand for default environment"
-    You can use `-D` or `--default` as a shorthand for `-r <youruser>/default` in all Flox commands.
-    For example: `flox activate -D` is equivalent to `flox activate -r <youruser>/default`.
-    
+<Note>
+  **Shorthand for default environment**
+
+  You can use `-D` or `--default` as a shorthand for `-r <youruser>/default` in all Flox commands.
+  For example: `flox activate -D` is equivalent to `flox activate -r <youruser>/default`.
+</Note>
+
 When Flox is configured with a default environment, it behaves very similarly to Homebrew. The Flox CLI will assume the default environment when you run `flox install` in a directory that doesn't contain an environment of its own.
 
 Creating a Flox default environment is optional.

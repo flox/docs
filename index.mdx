@@ -64,32 +64,31 @@ Use Flox to solve three common use cases:
 
 ### __Reproducible dev environments__
 
-Set up a [local developer environment](https://flox.dev/docs/tutorials/creating-environments/) that will work the same across multiple operating systems and architectures. Seamlessly switch between development environments across multiple language ecosystems using a consistent, unified workflow.
+Set up a [local developer environment](/tutorials/creating-environments) that will work the same across multiple operating systems and architectures. Seamlessly switch between development environments across multiple language ecosystems using a consistent, unified workflow.
 
-Declare all the packages, activation scripts, environment variables and [services](https://flox.dev/docs/concepts/services/) needed to reproduce the environment in a simple manifest that can be checked into [version control along with your source code](https://flox.dev/blog/flox-and-teams-managing-your-code-and-your-runtime-environment-in-just-one-place/).
+Declare all the packages, activation scripts, environment variables and [services](/concepts/services) needed to reproduce the environment in a simple manifest that can be checked into [version control along with your source code](https://flox.dev/blog/flox-and-teams-managing-your-code-and-your-runtime-environment-in-just-one-place/).
 
 Once your environment is configured, you can simplify the setup instructions in your README to a single command (`flox activate`), making it easy to [share environments](https://flox.dev/blog/flox-and-teams-using-shared-flox-environments/) and [onboard new developers](https://flox.dev/blog/flox-and-teams-onboarding-made-easy-with-github-and-flox/).
 
 
 ### __Cross-platform package management for your whole system__
 
-Set up your [default environment](https://flox.dev/docs/tutorials/default-environment/) with a set of
+Set up your [default environment](/tutorials/default-environment) with a set of
 packages that you always want available, whether you're on macOS or Linux—x86 or Arm.
 
 Then, when you need to [set up a new laptop](https://flox.dev/blog/setting-up-a-new-laptop-made-easy-with-flox/
-), or [keep multiple machines in sync](https://flox.dev/docs/tutorials/sharing-environments/#always-using-the-same-environment-across-multiple-devices
-), you can be sure you're using the exact same versions, no matter when or where you need them.
+), or [keep multiple machines in sync](/tutorials/sharing-environments#always-using-the-same-environment-across-multiple-devices), you can be sure you're using the exact same versions, no matter when or where you need them.
 
-If you're already using Homebrew, you can easily [migrate or use Homebrew and Flox together](https://flox.dev/docs/tutorials/migrations/homebrew/).
+If you're already using Homebrew, you can easily [migrate or use Homebrew and Flox together](/tutorials/migrations/homebrew).
 
 
 
 ### __Consistent builds from local to CI to production__
 
 Flox lets you define what an environment _is_ in a way that can be reused across local dev, CI, and production.
-Leverage [pre-built integrations](https://flox.dev/docs/tutorials/ci-cd/?h=ci) for GitHub Actions, CircleCI, and GitLab to pull and activate the same environments locally, in CI and in production.
+Leverage [pre-built integrations](/tutorials/ci-cd) for GitHub Actions, CircleCI, and GitLab to pull and activate the same environments locally, in CI and in production.
 
-Or use Flox [containerize](https://flox.dev/docs/man/flox-containerize/?h=containerize) to package your environments as OCI images—fully pinned and runnable anywhere.
+Or use Flox [containerize](/man/flox-containerize) to package your environments as OCI images—fully pinned and runnable anywhere.
 From bare metal to VMs, from Docker Swarm to Kubernetes to AWS Lambda—the runtime context might change, but Flox environments run and behave the same everywhere.
 
 Need an example? See how [the Flox Docs team uses Flox in CI](https://flox.dev/blog/integrating-flox-with-ci-for-consistent-reproducible-dev-environments/) to build, test and deploy this docs site.
@@ -97,7 +96,7 @@ Need an example? See how [the Flox Docs team uses Flox in CI](https://flox.dev/b
 
 ### __And more...__
 
-- Create templates or reusable toolchains to bootstrap new projects by [reusing and combining dev environments](https://flox.dev/docs/tutorials/composition/).
+- Create templates or reusable toolchains to bootstrap new projects by [reusing and combining dev environments](/tutorials/composition).
 
 - Create a portable [environment with transparent auth](https://flox.dev/blog/get-your-preferred-secrets-manager-in-a-portable-cross-platform-cli-toolkit/) via a third-party secrets manager so cross-platform workflows work the same everywhere: locally, in CI, or in production.
 
