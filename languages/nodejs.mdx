@@ -38,7 +38,7 @@ mv ./dist $out/
 
 # Create a run script # (2)!
 mkdir -p $out/bin
-echo "#!/usr/bin/env sh"
+echo "#!/usr/bin/env sh" > $out/bin/myproject
 echo 'exec node $out/dist/index.js "$@"' >> $out/bin/myproject
 chmod 755 $out/bin/myproject
 '''
