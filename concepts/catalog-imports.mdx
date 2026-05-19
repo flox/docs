@@ -18,7 +18,7 @@ Catalog imports use two files:
 - **`.flox/nix-builds.toml`**, the user-authored configuration file where you declare which catalogs to use.
 - **`.flox/nix-builds.lock`**, a generated lockfile that pins each catalog to a specific revision for reproducibility.
 
-Both files must be tracked by Git (`git add`ed) and should be committed to version control. The TOML file is authored by hand; the lockfile is generated and updated by the [`flox build update-catalogs`](/man/flox-build-update-catalogs) command.
+Both files must be tracked by Git (`git add`ed) and should be committed to version control. The TOML file is authored by hand; the lockfile is generated and updated by the `flox build update-catalogs` command.
 
 ## Catalog types
 
@@ -154,7 +154,7 @@ Before you can build with catalog imports, you must generate the lockfile. Run:
 flox build update-catalogs
 ```
 
-This resolves each catalog declaration in `.flox/nix-builds.toml` and writes the pinned revisions to `.flox/nix-builds.lock`. See [`flox-build-update-catalogs(1)`](/man/flox-build-update-catalogs) for details.
+This resolves each catalog declaration in `.flox/nix-builds.toml` and writes the pinned revisions to `.flox/nix-builds.lock`.
 
 Re-run this command whenever you:
 

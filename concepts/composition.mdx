@@ -36,11 +36,11 @@ Each entry in this array is an "include descriptor", which specifies where to fi
 ```text
 IncludedEnvironments ::= [IncludeDescriptor]
 IncludeDescriptor ::= LocalIncludeDescriptor | RemoteIncludeDescriptor
-LocalIncludeDescriptor :: = {
+LocalIncludeDescriptor ::= {
   dir  = STRING
 , name = null | STRING
 }
-RemoteIncludeDescriptor :: = {
+RemoteIncludeDescriptor ::= {
   remote = STRING
 , name   = null | STRING
 }
@@ -82,37 +82,13 @@ The manifests are merged during the process of building the environment, and if 
 
 Most manifest fields are merged the way you would expect:
 
-`install`
-
-:  The install section contains the union of all package descriptors from all manifests. When there are conflicts, the entire package descriptor is overridden.
-
-`services`
-
-: Same behavior as the `install` section.
-
-`vars`
-
-: Same behavior as the `install` section.
-
-`hook.on-activate`
-
-: The `hook.on-activate` scripts are appended to each other.
-
-`profile`
-
-: The corresponding scripts in the `profile` section are also appended to each other e.g. all of the `profile.common` scripts are appended, all of the `profile.bash` scripts are appended, etc.
-
-`containerize`
-
-: The options in the `containerize` section are more complicated because merging some options instead of overriding them would lead to unintuitive behavior.
-`user`, `cmd`, `working-dir`, and `stop-signal` are completely overridden.
-`exposed-ports`, `volumes`, and `labels` are merged.
-
-`options`
-
-: The options in the `options` section are all overridden completely.
-This prevents a merge of `options.systems` from providing more systems than the environment can support.
-Similarly, this prevents a merge of `allow.licenses` from allowing more licenses than intended.
+- **`install`** — The install section contains the union of all package descriptors from all manifests. When there are conflicts, the entire package descriptor is overridden.
+- **`services`** — Same behavior as the `install` section.
+- **`vars`** — Same behavior as the `install` section.
+- **`hook.on-activate`** — The `hook.on-activate` scripts are appended to each other.
+- **`profile`** — The corresponding scripts in the `profile` section are also appended to each other e.g. all of the `profile.common` scripts are appended, all of the `profile.bash` scripts are appended, etc.
+- **`containerize`** — The options in the `containerize` section are more complicated because merging some options instead of overriding them would lead to unintuitive behavior. `user`, `cmd`, `working-dir`, and `stop-signal` are completely overridden. `exposed-ports`, `volumes`, and `labels` are merged.
+- **`options`** — The options in the `options` section are all overridden completely. This prevents a merge of `options.systems` from providing more systems than the environment can support. Similarly, this prevents a merge of `allow.licenses` from allowing more licenses than intended.
 
 One option to note is `options.activate.mode`.
 Recall that the activation mode determines whether development dependencies of packages are added to `PATH`, etc when the environment is activated.

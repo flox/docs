@@ -25,7 +25,7 @@ mkdir myproject && cd myproject
 
   Create a Flox environment for the project via [`flox init`](/man/flox-init):
 
-  ```
+  ```bash
   flox init
   ```
 
@@ -37,7 +37,7 @@ mkdir myproject && cd myproject
 
   Create a new `Dockerfile`.
 
-  ```
+  ```bash
   touch Dockerfile
   ```
 
@@ -45,7 +45,7 @@ mkdir myproject && cd myproject
   image to build on top of (there's no `FROM` line).
   Let's pick the latest Ubuntu LTS release.
 
-  ```
+  ```bash
   echo "FROM ubuntu:noble" >> Dockerfile
   ```
 
@@ -76,7 +76,7 @@ We'll pick a single package from each category:
 
   This is pretty straightforward:
 
-  ```
+  ```bash
   flox install curl yarn@1.22 python3@3.10
   ```
 
@@ -87,7 +87,7 @@ We'll pick a single package from each category:
 
   Add a `RUN` command to your `Dockerfile`:
 
-  ```
+  ```dockerfile
   RUN apt update && apt install curl npm
   ```
 
@@ -96,7 +96,7 @@ We'll pick a single package from each category:
   so you must install it from a Personal Package Archive (PPA).
   Do that with another `RUN` command:
 
-  ```
+  ```dockerfile
   RUN sudo add-apt-repository ppa:deadsnakes/ppa -y && \
       sudo apt update && \
       sudo apt install python3.10
@@ -183,7 +183,7 @@ However, with containers you also need to mount in your source code, etc.
 
   First build the image:
 
-  ```
+  ```bash
   docker build -t myproject .
   ```
 
@@ -337,7 +337,7 @@ environment variables set.
 
   First install Caddy:
 
-  ```
+  ```bash
   flox install caddy
   ```
 

@@ -3,7 +3,7 @@ title: "Activating environments"
 description: "How an environment is activated, and how to make the most of it"
 ---
 
-[Environments](/concepts/services) are a central concept in Flox,
+[Environments](/concepts/environments) are a central concept in Flox,
 representing the tools you want to use, all of their dependencies,
 various environment variables necessary to make them function properly,
 _and_ all of your customizations.
@@ -62,10 +62,10 @@ run:
 
 | Mode | Command | `hook.on-activate` | `profile.*` |
 | --- | --- | :---: | :---: |
-| Subshell | `flox activate` | | |
-| In-place | `eval "$(flox activate)"` | | |
-| Shell command | `flox activate -c` | | |
-| Exec | `flox activate --` | | :x: |
+| Subshell | `flox activate` | :white_check_mark: | :white_check_mark: |
+| In-place | `eval "$(flox activate)"` | :white_check_mark: | :white_check_mark: |
+| Shell command | `flox activate -c` | :white_check_mark: | :white_check_mark: |
+| Exec | `flox activate --` | :white_check_mark: | :x: |
 
 ### Subshell
 
@@ -74,7 +74,7 @@ which is to put you into a subshell.
 When you activate this way your existing shell is paused and you're put into a
 new one configured by Flox.
 Once this shell exits (via `exit` or `Ctrl-D`, for example), your original shell
-is resumed and your are put back into it.
+is resumed and you are put back into it.
 
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','noteBkgColor':'#e8eef6','noteTextColor':'#1f2937','noteBorderColor':'#7d96b8','actorBkg':'#e8eef6','actorBorder':'#7d96b8','actorTextColor':'#1f2937','actorLineColor':'#7d96b8','signalColor':'#1f2937','signalTextColor':'#1f2937','labelBoxBkgColor':'#e8eef6','labelBoxBorderColor':'#7d96b8','labelTextColor':'#1f2937','loopTextColor':'#1f2937','sequenceNumberColor':'#1f2937'},'sequence':{'mirrorActors':false}}}%%
