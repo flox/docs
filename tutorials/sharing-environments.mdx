@@ -5,7 +5,7 @@ description: "Multiple ways to share your environment with others."
 
 Flox provides **three main ways of sharing environments** with others:
 
-- **Sharing environments with files:**: Flox environments are shared via the `.flox` folder and often checked into version control.
+- **Sharing environments with files**: Flox environments are shared via the `.flox` folder and often checked into version control.
 - **Sharing environments on FloxHub**: Flox environments are shared via FloxHub and available to all `flox` commands with `-r username/environment`. Commands operate on your local copy; use `flox push` to sync changes to FloxHub.
 - **Containers**: Flox environments are used to create container images.
 
@@ -164,8 +164,8 @@ Loaded image: example-project:latest
 Now let's run a command from our image:
 
 ```console
-$  docker run --rm -it example-project -- telnet --version
-telnet (GNU inetutils) 2.5
+$  docker run --rm -it example-project -- node --version
+v20.19.0
 ...
 ```
 
