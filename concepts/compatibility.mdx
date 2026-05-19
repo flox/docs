@@ -16,14 +16,14 @@ When a new manifest schema version is released, its schema version will be the v
 For instance, since CLI version 1.10.0 released the schema that contains this `schema-version` field, it would contain `schema-version = "1.10.0"`.
 If a future CLI version X.Y.Z introduced a change to the manifest schema, it would introduce `schema-version = "X.Y.Z"`.
 
-# Backwards incompatible changes
+## Backwards incompatible changes
 
 CLI version 1.10.0 introduced an `outputs` field for package descriptors so that you can specify exactly which parts of a package you want to include in your environment ([see here for more details](/tutorials/package-outputs)).
 The previous manifest schema version (`version = 1`) doesn't support this field. That makes a manifest that contains `mypkg.outputs = "all"` backwards incompatible with a `version = 1` manifest.
 
 On the other hand, nothing about the _other_ manifest sections changed (either in terms of semantics or adding/removing fields) between CLI versions 1.9.1 and 1.10.0. This means that editing the `hook.on-activate` script (for example) would be a backwards compatible change.
 
-# Automatic migrations
+## Automatic migrations
 
 When an edit to a manifest introduces a backwards incompatible change, the manifest will be automatically migrated to the latest schema version.
 In all other situations, the manifest will be left at its original schema version.

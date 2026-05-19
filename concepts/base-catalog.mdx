@@ -19,7 +19,7 @@ and save the metadata from the evaluation.
 This makes it available to users of Flox.
 
 An additional process continuously checks newly added packages
-and records actual build information (narinfo) from `nixos.cache.org`.
+and records actual build information (narinfo) from `cache.nixos.org`.
 This along, with considerations for packages flagged as _unfree_ and _broken_,
 allows flox to make attempts to serve up known good builds.
 If you encounter a difference between `flox show` (meta data only),
@@ -119,7 +119,7 @@ Storage is not boundless
 so Flox uses the stabilities to garbage collect
 package metadata when new packages are added.
 When a stability is updated,
-a tag is created in the form of `<stabilty>.<date>`.
+a tag is created in the form of `<stability>.<date>`.
 The last `N` tags of each stability are retained.
 This means revisions may "fall out" of the catalog over time.
 Existing lockfiles save the metadata and will work forever.

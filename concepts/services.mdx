@@ -47,6 +47,7 @@ Some services cannot be shut down by the default mechanism (sending the spawned 
 Most often this is because the spawned process itself spawns another process (typically a daemon) and then terminates. In this case you need to provide your own command for shutting down the service. You do this by setting `is-daemon = true` for the service and providing a `shutdown.command`. Below is an example that uses `pg_ctl` (the daemon-spawning launcher) instead of `exec postgres`, which launches postgres in the foreground. It demonstrates the `is-daemon = true` + `shutdown.command` pattern for programs that background themselves. Together these fields allow the service manager to shut down services that background themselves.
 
 ```toml
+[services.database]
 command = "pg_ctl start -D \"$PGDATA\" -l \"$PGDATA/server.log\" -o \"-p $PGPORT\""
 is-daemon = true
 shutdown.command = "pg_ctl stop -D \"$PGDATA\" -m fast"
