@@ -33,7 +33,7 @@ Flox makes it easy to work locally, test in CI, and deploy to production—all w
   <Card title="Already using Nix? Start here" icon="snowflake">
     Flox brings the power of Nix to your team, and can simplify your workflows.
 
-    [Install Flox with flakes or profiles](/install-flox/install#nix-generic)
+    [Install Flox with flakes or profiles](/install-flox/install)
 
     [Flox brings Nix to your teams](https://flox.dev/blog/enterprise-nix-its-time-to-bring-nix-to-work/)
 
@@ -42,11 +42,11 @@ Flox makes it easy to work locally, test in CI, and deploy to production—all w
 </CardGroup>
 Examples for getting started in just a few of the many languages Flox supports:
 
-[Node ](https://flox.dev/blog/using-flox-to-create-portable-reproducible-nodejs-environments/)
-[Go ](https://flox.dev/blog/using-flox-to-create-portable-reproducible-go-environments/)
-[Python ](https://flox.dev/blog/using-flox-to-create-portable-reproducible-python-environments/)
-[Rust ](https://flox.dev/blog/a-real-world-rust-project-with-flox/)
-[Ruby ](https://flox.dev/blog/making-ruby-projects-easier-to-share/)
+[Node](https://flox.dev/blog/using-flox-to-create-portable-reproducible-nodejs-environments/)
+[Go](https://flox.dev/blog/using-flox-to-create-portable-reproducible-go-environments/)
+[Python](https://flox.dev/blog/using-flox-to-create-portable-reproducible-python-environments/)
+[Rust](https://flox.dev/blog/a-real-world-rust-project-with-flox/)
+[Ruby](https://flox.dev/blog/making-ruby-projects-easier-to-share/)
 
 ---
 
@@ -62,7 +62,7 @@ Use Flox to solve three common use cases:
 - Reliable package management across systems
 - Consistent builds from local to production
 
-### __Reproducible dev environments__
+### Reproducible dev environments
 
 Set up a [local developer environment](/tutorials/creating-environments) that will work the same across multiple operating systems and architectures. Seamlessly switch between development environments across multiple language ecosystems using a consistent, unified workflow.
 
@@ -71,19 +71,18 @@ Declare all the packages, activation scripts, environment variables and [service
 Once your environment is configured, you can simplify the setup instructions in your README to a single command (`flox activate`), making it easy to [share environments](https://flox.dev/blog/flox-and-teams-using-shared-flox-environments/) and [onboard new developers](https://flox.dev/blog/flox-and-teams-onboarding-made-easy-with-github-and-flox/).
 
 
-### __Cross-platform package management for your whole system__
+### Cross-platform package management for your whole system
 
 Set up your [default environment](/tutorials/default-environment) with a set of
 packages that you always want available, whether you're on macOS or Linux—x86 or Arm.
 
-Then, when you need to [set up a new laptop](https://flox.dev/blog/setting-up-a-new-laptop-made-easy-with-flox/
-), or [keep multiple machines in sync](/tutorials/sharing-environments#always-using-the-same-environment-across-multiple-devices), you can be sure you're using the exact same versions, no matter when or where you need them.
+Then, when you need to [set up a new laptop](https://flox.dev/blog/setting-up-a-new-laptop-made-easy-with-flox/), or [keep multiple machines in sync](/tutorials/sharing-environments#always-using-the-same-environment-across-multiple-devices), you can be sure you're using the exact same versions, no matter when or where you need them.
 
 If you're already using Homebrew, you can easily [migrate or use Homebrew and Flox together](/tutorials/migrations/homebrew).
 
 
 
-### __Consistent builds from local to CI to production__
+### Consistent builds from local to CI to production
 
 Flox lets you define what an environment _is_ in a way that can be reused across local dev, CI, and production.
 Leverage [pre-built integrations](/tutorials/ci-cd) for GitHub Actions, CircleCI, and GitLab to pull and activate the same environments locally, in CI and in production.
@@ -94,14 +93,14 @@ From bare metal to VMs, from Docker Swarm to Kubernetes to AWS Lambda—the runt
 Need an example? See how [the Flox Docs team uses Flox in CI](https://flox.dev/blog/integrating-flox-with-ci-for-consistent-reproducible-dev-environments/) to build, test and deploy this docs site.
 
 
-### __And more...__
+### And more...
 
 - Create templates or reusable toolchains to bootstrap new projects by [reusing and combining dev environments](/tutorials/composition).
 
 - Create a portable [environment with transparent auth](https://flox.dev/blog/get-your-preferred-secrets-manager-in-a-portable-cross-platform-cli-toolkit/) via a third-party secrets manager so cross-platform workflows work the same everywhere: locally, in CI, or in production.
 
-## __Have questions?__
+## Have questions?
 
-__Ask us on [Slack ](https://go.flox.dev/slack) or [Discourse ](https://discourse.flox.dev)__
+__Ask us on [Slack](https://go.flox.dev/slack) or [Discourse](https://discourse.flox.dev)__
 
 The Flox product and engineering teams love to hear directly from users. Your questions and feedback will help us prioritize the improvements to the product that matter most to you.

@@ -64,12 +64,12 @@ description: "How to install or upgrade the Flox CLI"
   started!
 
   ```console
-  $ flox --version # (1)!
+  $ flox --version
   1.12.0
 
   ```
 
-  4.  The version you will see might be different.
+  The version you see might be different.
 
   **Upgrades to existing Flox installation**
 
@@ -129,7 +129,7 @@ description: "How to install or upgrade the Flox CLI"
 
   ```
 
-  1.  The version you will see might be different.
+  The version you see might be different.
 
   **Upgrade existing Flox installation**
 
@@ -192,13 +192,13 @@ description: "How to install or upgrade the Flox CLI"
   If the following command returns without error then you're ready to get
   started!
 
-  ``` console
-  $ flox --version # (1)!
+  ```console
+  $ flox --version
   1.12.0
 
   ```
 
-  1.  The version you will see might be different.
+  The version you see might be different.
 
   **Upgrade existing Flox installation**
 
@@ -265,12 +265,12 @@ description: "How to install or upgrade the Flox CLI"
   started!
 
   ```console
-  $ flox --version # (1)!
+  $ flox --version
   1.12.0
 
   ```
 
-  1.  The version you will see might be different.
+  The version you see might be different.
 
   **Upgrade existing Flox installation**
 
@@ -304,7 +304,7 @@ description: "How to install or upgrade the Flox CLI"
       with any `trusted-substituters` or `trusted-public-keys` values that may
       already be defined:
 
-      ``` title="/etc/nix/nix.conf"
+      ```bash title="/etc/nix/nix.conf"
       extra-trusted-substituters = https://cache.flox.dev
       extra-trusted-public-keys = flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs=
       ```
@@ -365,7 +365,7 @@ description: "How to install or upgrade the Flox CLI"
     Flox hosts a binary cache for its packages, that can be added to your `/etc/nix/nix.conf` file.
     We recommend doing this if you are installing Flox system-wide.
 
-    ``` title="/etc/nix/nix.conf"
+    ```bash title="/etc/nix/nix.conf"
     extra-trusted-substituters = https://cache.flox.dev
     extra-trusted-public-keys = flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs=
     ```
@@ -373,7 +373,7 @@ description: "How to install or upgrade the Flox CLI"
     Or, to your flake configuration by using the `nixConfig` attribute.
     This will ensure that Flox's binary cache is used for all operation within that flake.
 
-    ```title="flake.nix"
+    ```nix title="flake.nix"
     {
         nixConfig = {
             extra-trusted-substituters = ["https://cache.flox.dev"];
@@ -385,9 +385,9 @@ description: "How to install or upgrade the Flox CLI"
     Note that if you don't add either of these options, Flox will be built from source, together with a patched version of Nix.
     Which might take a while on less powerful systems.
   </Accordion>
-  ```
+  ```nix
   {
-    decription = "Example Darwin system flake";
+    description = "Example Darwin system flake";
 
     nixConfig = {
       extra-trusted-substituters = ["https://cache.flox.dev"];
@@ -447,12 +447,12 @@ description: "How to install or upgrade the Flox CLI"
   started!
 
   ```console
-  $ flox --version # (1)!
+  $ flox --version
   1.12.0
 
   ```
 
-  1.  The version you will see might be different.
+  The version you see might be different.
 
 
   **Upgrade existing Flox installation**
@@ -538,12 +538,12 @@ description: "How to install or upgrade the Flox CLI"
   started!
 
   ```console
-  $ flox --version # (1)!
+  $ flox --version
   1.12.0
 
   ```
 
-  1.  The version you will see might be different.
+  The version you see might be different.
   </Tab>
   <Tab title="Container">
 
@@ -561,13 +561,13 @@ description: "How to install or upgrade the Flox CLI"
   If the following command returns without error then you're ready to get
   started!
 
-  ``` console
-  $ flox --version # (1)!
+  ```console
+  $ flox --version
   1.12.0
 
   ```
 
-  1.  The version you will see might be different.
+  The version you see might be different.
   </Tab>
   <Tab title="WSL 2">
 
@@ -706,12 +706,12 @@ description: "How to install or upgrade the Flox CLI"
   started!
 
   ```console
-  $ flox --version # (1)!
+  $ flox --version
   1.12.0
 
   ```
 
-  1.  The version you will see might be different.
+  The version you see might be different.
 
   **Upgrade existing Flox installation**
 
