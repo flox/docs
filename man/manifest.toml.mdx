@@ -458,7 +458,7 @@ vars.PGPORT = "9001"
 This would define a service called `database` that configures and starts
 a PostgreSQL database.
 
-The full set of options is show below:
+The full set of options is shown below:
 
 ```text
 ServiceDescriptor ::= {
@@ -542,7 +542,7 @@ environments = [
 ]
 ```
 
-As mentioned above, you include other environments my listing them as an
+As mentioned above, you include other environments by listing them as an
 array of tables in the `include.environments` array. The schema for
 these “include descriptors” is shown below:
 
@@ -551,18 +551,18 @@ IncludeDescriptor ::= LocalIncludeDescriptor
                     | FloxHubIncludeDescriptor
                     | RemoteIncludeDescriptor (deprecated)
 
-LocalIncludeDescriptor :: = {
+LocalIncludeDescriptor ::= {
   dir  = STRING
 , name = null | STRING
 }
 
-FloxHubIncludeDescriptor :: = {
+FloxHubIncludeDescriptor ::= {
   remote = STRING
 , name   = null | STRING
 }
 
 # Deprecated, will be removed in a future release
-RemoteIncludeDescriptor :: = {
+RemoteIncludeDescriptor ::= {
   remote = STRING
 , name   = null | STRING
 }
@@ -574,7 +574,7 @@ The fields in these include descriptors are as follows:
 The local path to the environment to include. This has the same
 semantics as the `--dir` flag passed to many Flox commands.
 
-`reference`  
+`remote`  
 The FloxHub reference of an environment to include. This has the same
 semantics as the `--reference <env-ref> --upstream` flag passed to many
 Flox commands. That is, Flox will include the referenced environment as
@@ -777,7 +777,7 @@ overridden with `flox activate --mode`.
 
 In “dev” mode a package, all of its development dependencies, and
 language specific environment variables are made available. As the name
-implies, this is useful at development time. However, this may causes
+implies, this is useful at development time. However, this may cause
 unexpected failures when layering environments or when activating an
 environment system-wide.
 

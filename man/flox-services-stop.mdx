@@ -25,7 +25,7 @@ displayed and the remaining services will be stopped.
 If any of the specified services do not exist, an error will be returned
 and no services will be stopped. If an error is encountered while
 stopping one of the specified services, the remaining services will
-still be stopped a warning will be displayed for the services that
+still be stopped, but a warning will be displayed for the services that
 failed to stop, and a non-zero exit code will be returned.
 
 ## OPTIONS
@@ -59,7 +59,7 @@ Increase logging verbosity. Invoke multiple times for increasing detail.
 `-q`, `--quiet`  
 Silence logs except for errors.
 
-## EXAMPLES:
+## EXAMPLES
 
 Stop a running service named ‘server’:
 

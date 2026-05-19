@@ -74,7 +74,7 @@ package.
 
 #### Metadata
 
-Specifying the `build.<package>.description>` and
+Specifying the `build.<package>.description` and
 `build.<package>.version` fields of the build provide extra metadata
 that can be used by `flox install`, `flox search`, and `flox show`
 commands if the build is later published.
@@ -94,7 +94,7 @@ attribute in the environment’s `manifest.toml`.
 
 `--stability <stability>`  
 Perform a nix expression build using a base package set of the given
-stability as tracked by the catalog server. Can not be used with
+stability as tracked by the catalog server. Cannot be used with
 manifest base builds.
 
 ### Environment Options
@@ -140,14 +140,14 @@ description = "Produces a file containing 'hello world'"
 version = "0.0.0"
 ```
 
-1. Build the package and verify its contents:
+2. Build the package and verify its contents:
 
 ```console
 $ flox build hello
 $ ls ./result-hello
 hello.txt
 $ cat ./result-hello/hello.txt
-hello, world
+hello world
 ```
 
 ### Building a simple multi-stage app
@@ -171,7 +171,7 @@ Assume a simple `nodejs` project
 flox init
 ```
 
-1. Install dependencies and add build instructions
+2. Install dependencies and add build instructions
 
 ```toml
 ## file: .flox/env/manifest.toml
@@ -199,7 +199,7 @@ mv dist $out/
 '''
 ```
 
-1. Verify the result
+3. Verify the result
 
 ```bash
 npx serve result-app
@@ -207,6 +207,6 @@ npx serve result-app
 
 ## SEE ALSO
 
-[`flox-build-clean(1)`](/man/flox-build-clean)
-[`flox-activate(1)`](/man/flox-activate)
-[`manifest.toml(5)`](/man/manifest.toml)
+[`flox-build-clean`(1)](/man/flox-build-clean),
+[`flox-activate`(1)](/man/flox-activate),
+[`manifest.toml`(5)](/man/manifest.toml)
