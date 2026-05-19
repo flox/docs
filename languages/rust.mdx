@@ -220,8 +220,8 @@ If `runtime-packages` is set for this package, `gcc` must be included in the lis
 
 ```toml title="manifest.toml"
 [build.myproject]
-…
-runtime-packages = [… "gcc"]
+# ... other build fields above ...
+runtime-packages = ["gcc"]   # plus any other packages your binary needs at runtime
 ```
 
 <Note>
@@ -277,7 +277,7 @@ rustPlatform.buildRustPackage {
   src = ../../../.;
 
   cargoLock = {
-    lockFile = src + "/Cargo.lock";
+    lockFile = ./Cargo.lock;
   };
 }
 ```

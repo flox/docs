@@ -36,7 +36,7 @@ command = '''
 
 Go adds metadata to compiled binaries that allows details from the build environment to leak through.
 For example, a compiled binary will contain absolute paths to source files.
-This can cause builds to fail as it interferes with Flox's ability to determine when a build depends on an artifact that aren't included in the build's closure, i.e. when a build has missing dependencies.
+This can cause builds to fail as it interferes with Flox's ability to determine when a build depends on an artifact that isn't included in the build's closure, i.e. when a build has missing dependencies.
 To address this you'll need to compile your programs with the `-trimpath` option.
 
 #### Go builds depend on iana, mailcap, tzdata
@@ -93,7 +93,7 @@ sandbox = "pure"
 
 To build a project using [`buildGoModule`](https://nixos.org/manual/nixpkgs/stable/#sec-language-go) which will import your existing dependency file, but you will need to [update the hash](/concepts/nix-expression-builds#generating-hashes):
 
-```go
+```nix
 { buildGoModule }:
 
 buildGoModule {

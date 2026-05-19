@@ -33,7 +33,7 @@ Once you've generated the key, you can configure Flox to sign the packages
 you publish with that (private) key:
 
 <Warning>
-  **The path to the private key must configured with an absolute path for security purposes.**
+  **The path to the private key must be configured with an absolute path for security purposes.**
 
 
 </Warning>
@@ -41,6 +41,10 @@ you publish with that (private) key:
 ```bash
 flox config --set publish.signing_private_key "/path/to/signing-key.key"
 ```
+
+<Tip>
+  The config key uses underscores (`signing_private_key`) while the CLI flag uses hyphens (`--signing-key`).
+</Tip>
 
 If you need to use a different signing key (for example, to publish to a different catalog), you can use the `--signing-key` option with the `flox publish` command.
 The private key is necessary for uploading artifacts, so anyone that needs that capability will need access to the key.

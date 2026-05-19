@@ -19,6 +19,7 @@ The core of building a Java artifact with Flox looks like this:
 
 ```toml
 [build.myproject]
+command = '''
   # Create the destination directories
   mkdir -p "$out"/{lib,bin}
   # Build a fat jar with gradle using the shadowJar plugin
@@ -35,6 +36,7 @@ The core of building a Java artifact with Flox looks like this:
 
   # Ensure that the script has the correct permissions
   chmod 755 $out/bin/myproject
+'''
 ```
 
 Since `$out` is not set at runtime, the script that calls `java -jar <path to jar>` needs to find the location of the JAR at runtime.
