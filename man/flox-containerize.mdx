@@ -151,9 +151,8 @@ MUST use the [annotation
 rules](https://github.com/opencontainers/image-spec/blob/main/annotations.md#rules).
 
 `stop-signal`  
-This field contains arbitrary metadata for the container. This property
-MUST use the [annotation
-rules](https://github.com/opencontainers/image-spec/blob/main/annotations.md#rules).
+The signal to send to the main process to stop the container (e.g.,
+`SIGTERM`). Must follow the container runtime's signal-name conventions.
 
 ## EXAMPLES
 
@@ -208,4 +207,4 @@ Hello, world!
 
 ## SEE ALSO
 
-[`flox-activate(1)`](/man/flox-activate) [`docker-load(1)`]
+[`flox-activate`(1)](/man/flox-activate), [`docker-load`(1)](https://docs.docker.com/reference/cli/docker/image/load/)

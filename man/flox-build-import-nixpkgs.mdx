@@ -26,9 +26,12 @@ The package definition is imported as a Nix expression file at
 `.flox/pkgs/<package>/default.nix`, where `<package>` is the attribute
 path of the package (e.g., `hello` for `nixpkgs#hello`).
 
-This is useful when you need to: - Modify a package’s build process -
-Apply patches or customizations - Debug package issues - Create variants
-of existing packages
+This is useful when you need to:
+
+- Modify a package’s build process
+- Apply patches or customizations
+- Debug package issues
+- Create variants of existing packages
 
 ### Installable format
 
@@ -124,6 +127,6 @@ This creates `.flox/pkgs/python310Packages/requests/default.nix`.
 
 ## SEE ALSO
 
-[`flox-build(1)`](/man/flox-build)
-[`flox-build-clean(1)`](/man/flox-build-clean)
-[`manifest.toml(5)`](/man/manifest.toml)
+[`flox-build`(1)](/man/flox-build),
+[`flox-build-clean`(1)](/man/flox-build-clean),
+[`manifest.toml`(5)](/man/manifest.toml)

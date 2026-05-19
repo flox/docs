@@ -17,7 +17,7 @@ flox [<general-options>] auth
 
 Authenticate with FloxHub so that you can push and pull environments.
 
-## OPTIONS
+## SUBCOMMANDS
 
 ### `login`
 
@@ -30,9 +30,9 @@ trusts your personal environments.
 Prompts you to enter a one-time code at a specified URL. If called
 interactively it can open the browser for you if you press `<enter>`.
 
-See also: [`flox-push(1)`](/man/flox-push),
-[`flox-pull(1)`](/man/flox-pull),
-[`flox-activate(1)`](/man/flox-activate)
+See also: [`flox-push`(1)](/man/flox-push),
+[`flox-pull`(1)](/man/flox-pull),
+[`flox-activate`(1)](/man/flox-activate)
 
 ### `logout`
 
@@ -40,4 +40,33 @@ Logs out from FloxHub.
 
 ### `status`
 
-Print your current login status
+Print your current login status.
+
+### `token`
+
+Print the current authentication token to stdout. Useful for scripting.
+
+<Info>
+This description should be verified against the `flox-auth` source.
+</Info>
+
+## OPTIONS
+
+### General Options
+
+`-h`, `--help`  
+Prints help information.
+
+The following options can be passed when running any `flox` subcommand
+but must be specified *before* the subcommand.
+
+`-v`, `--verbose`  
+Increase logging verbosity. Invoke multiple times for increasing detail.
+
+`-q`, `--quiet`  
+Silence logs except for errors.
+
+## SEE ALSO
+
+[`flox`(1)](/man/flox),
+[`flox-config`(1)](/man/flox-config)

@@ -59,7 +59,7 @@ you’re interested in this option.
 
 Finally, the package is uploaded to the default Catalog, which is named
 after your user, but you may specify the catalog to publish to via the
-`--catalog` option.
+`--org` option.
 
 ### After publishing
 
@@ -80,7 +80,7 @@ Store that it was published to.
 
 ### Sharing published packages
 
-a package published to an individual user’s Catalog may only be seen and
+A package published to an individual user’s Catalog may only be seen and
 installed by that user. In order to share packages with other users you
 must create an organization. See
 [the organizations concept page](/concepts/organizations) for more details on
@@ -105,7 +105,7 @@ Store not provided by Flox. Takes precedence over the value of
 
 `--stability <stability>`  
 Perform a nix expression build using a base package set of the given
-stability as tracked by the catalog server. Can not be used with
+stability as tracked by the catalog server. Cannot be used with
 manifest base builds.
 
 ### Environment Options
@@ -133,6 +133,6 @@ Silence logs except for errors.
 
 ## SEE ALSO
 
-[`flox-build(1)`](/man/flox-build)
-[`flox-activate(1)`](/man/flox-activate)
-[`manifest.toml(5)`](/man/manifest.toml)
+[`flox-build`(1)](/man/flox-build),
+[`flox-activate`(1)](/man/flox-activate),
+[`manifest.toml`(5)](/man/manifest.toml)
