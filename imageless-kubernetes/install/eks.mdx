@@ -188,7 +188,7 @@ Next, we'll create a `ClusterConfig` manifest that will be used to create the Fl
 
   See the [eksctl documentation](https://docs.aws.amazon.com/eks/latest/eksctl/nodegroup-managed.html) for guidance on additional parameters such as IAM configuration and autoscaler support.
 </Note>
-Apply the below `ClusterConfig` with `eksctl create nodegroup -f nodegroup.yaml`. You can also visualize the changes before deployment with `eksctl create --dry-run`.
+Apply the below `ClusterConfig` with `eksctl create nodegroup -f nodegroup.yaml`. You can also visualize the changes before deployment with `eksctl create nodegroup --dry-run -f nodegroup.yaml`.
 
 ```yaml title="nodegroup.yaml"
 apiVersion: eksctl.io/v1alpha5
@@ -228,8 +228,8 @@ managedNodeGroups:
             [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.flox.options]
               SystemdCgroup = true
 
- # required if cluster was not created with eksctl, see https://docs.aws.amazon.com/eks/latest/eksctl/unowned-clusters.html#create-nodegroup
- vpc:
+# required if cluster was not created with eksctl, see https://docs.aws.amazon.com/eks/latest/eksctl/unowned-clusters.html#create-nodegroup
+vpc:
   id: "vpc-12345"
   securityGroup: "sg-12345"    # this is the ControlPlaneSecurityGroup
   subnets:
