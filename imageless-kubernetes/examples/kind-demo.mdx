@@ -63,7 +63,7 @@ Just as with any container, you can specify a startup command, which is
 `["quotes-app-go", "-r", "redis:6379"]` in this case.
 
 When the container starts, the [`flox/quotes-app`](https://hub.flox.dev/flox/quotes-app) Flox environment is pulled from FloxHub and bind mounted into the container.
-This environment contains the [`flox/quotes-app-go`](https://hub.flox.dev/packages/flox/quotes-app-go) package, which is a simple web server published to FloxHub.
+This environment contains the [`flox/quotes-app-go`](https://hub.flox.dev/flox/quotes-app-go) package, which is a simple web server published to FloxHub.
 When the container starts, the environment is activated, and then `quotes-app-go` is run inside the activated environment.
 
 ### Redis environment
