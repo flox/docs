@@ -164,6 +164,7 @@
             "group": "Environments",
             "pages": [
               "man/flox-activate",
+              "man/flox-deactivate",
               "man/flox-edit",
               "man/flox-delete",
               "man/flox-envs"

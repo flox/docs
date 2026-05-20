@@ -75,6 +75,8 @@ When you activate this way your existing shell is paused and you're put into a
 new one configured by Flox.
 Once this shell exits (via `exit` or `Ctrl-D`, for example), your original shell
 is resumed and your are put back into it.
+Running [`flox deactivate`](/man/flox-deactivate) inside the subshell has the
+same effect.
 
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','noteBkgColor':'#e8eef6','noteTextColor':'#1f2937','noteBorderColor':'#7d96b8','actorBkg':'#e8eef6','actorBorder':'#7d96b8','actorTextColor':'#1f2937','actorLineColor':'#7d96b8','signalColor':'#1f2937','signalTextColor':'#1f2937','labelBoxBkgColor':'#e8eef6','labelBoxBorderColor':'#7d96b8','labelTextColor':'#1f2937','loopTextColor':'#1f2937','sequenceNumberColor':'#1f2937'},'sequence':{'mirrorActors':false}}}%%
@@ -357,6 +359,31 @@ sequenceDiagram
 If you edit your manifest and activate in a new shell,
 the whole activation process is run again and subsequent activations will
 attach to this new version of the environment.
+
+## Deactivating environments
+
+Activation is reversible.
+[`flox deactivate`](/man/flox-deactivate) tears down the most recently
+activated environment in your shell,
+restoring the environment variables and shell customizations that activation
+changed.
+If the manifest defines a `profile.deactivate.${shell}` script,
+it is sourced first so the environment can undo any modifications it made
+during activation.
+
+When several environments are layered,
+`flox deactivate` peels off the innermost (most recently activated) one.
+Running it again deactivates the next layer in, and so on.
+
+The same command works for all activation modes:
+
+- In a subshell (interactive `flox activate`), `flox deactivate` is shorthand
+  for `exit` — it leaves the subshell and restores the parent shell's
+  previously active environments.
+- For in-place activations, it reverts the activation diff in the current
+  shell.
+
+See [`flox deactivate`](/man/flox-deactivate) for the full command reference.
 
 ## Development vs. runtime mode
 
