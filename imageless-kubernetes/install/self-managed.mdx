@@ -74,11 +74,9 @@ This may be necessary for Kubernetes distributions like K3s that vendor `contain
 2. Create a symlink from the Flox environment to `/usr/local/bin`.
 
     ```sh
-    ln -s $PWD/.flox/run/x86_64-linux.containerd-shim-flox.run/bin/containerd-shim-flox-v2 /usr/local/bin/containerd-shim-flox-v2
+    ln -s $PWD/.flox/run/*-linux.containerd-shim-flox.run/bin/containerd-shim-flox-v2 /usr/local/bin/containerd-shim-flox-v2
 
     ```
-
-    On aarch64 nodes, substitute `aarch64-linux` in the path.
 
 3. Add the Flox runtime configuration to the `containerd` `config.toml`.
 Check the `version` line at the beginning of the file and use the matching configuration below.
