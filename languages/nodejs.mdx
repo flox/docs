@@ -25,7 +25,7 @@ npm ci
 npm run build
 # -> assuming this yields a `dist` directory
 
-# Install the build result to `out` # (1)!
+# Install the build result to `out`
 mkdir -p $out
 mv ./dist $out/
 
@@ -36,7 +36,7 @@ mv ./dist $out/
 # npm prune --include "prod"
 # cp -r ./node_modules $out
 
-# Create a run script # (2)!
+# Create a run script
 mkdir -p $out/bin
 echo "#!/usr/bin/env sh" > $out/bin/myproject
 echo 'exec node $out/dist/index.js "$@"' >> $out/bin/myproject
@@ -44,9 +44,9 @@ chmod 755 $out/bin/myproject
 '''
 ```
 
-1. If you expect to install multiple Node.js applications in the same environment, we recommend putting the `dist` (and optional `node_modules`) under an appropriate namespace, e.g. install them as `/libexec/myproject/dist`.
+When installing the build result, if you expect to install multiple Node.js applications in the same environment, we recommend putting the `dist` (and optional `node_modules`) under an appropriate namespace, e.g. install them as `/libexec/myproject/dist`.
 
-2. If your `npm build` already produces a binary that can be executed directly, you can also copy or link that to `$out/bin`. Note that only binaries in `$out/bin` are wrapped to ensure they run within a consistent environment.
+For the run script, if your `npm build` already produces a binary that can be executed directly, you can also copy or link that to `$out/bin`. Note that only binaries in `$out/bin` are wrapped to ensure they run within a consistent environment.
 
 #### Vendoring dependencies in pure builds
 

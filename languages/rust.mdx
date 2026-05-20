@@ -277,7 +277,7 @@ rustPlatform.buildRustPackage {
   src = ../../../.;
 
   cargoLock = {
-    lockFile = ./Cargo.lock;
+    lockFile = src + "/Cargo.lock";
   };
 }
 ```
