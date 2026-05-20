@@ -367,22 +367,6 @@ Activation is reversible.
 activated environment in your shell,
 restoring the environment variables and shell customizations that activation
 changed.
-If the manifest defines a `profile.deactivate.${shell}` script,
-it is sourced first so the environment can undo any modifications it made
-during activation.
-
-When several environments are layered,
-`flox deactivate` peels off the innermost (most recently activated) one.
-Running it again deactivates the next layer in, and so on.
-
-The same command works for all activation modes:
-
-- In a subshell (interactive `flox activate`), `flox deactivate` is shorthand
-  for `exit` — it leaves the subshell and restores the parent shell's
-  previously active environments.
-- For in-place activations, it reverts the activation diff in the current
-  shell.
-
 See [`flox deactivate`](/man/flox-deactivate) for the full command reference.
 
 ## Development vs. runtime mode
