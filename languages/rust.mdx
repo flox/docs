@@ -221,7 +221,7 @@ If `runtime-packages` is set for this package, `gcc` must be included in the lis
 ```toml title="manifest.toml"
 [build.myproject]
 # ... other build fields above ...
-runtime-packages = ["gcc"]   # plus any other packages your binary needs at runtime
+runtime-packages = ["gcc"]   # comma-delimited array; add any other packages your binary needs at runtime
 ```
 
 <Note>
