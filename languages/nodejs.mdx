@@ -44,7 +44,7 @@ chmod 755 $out/bin/myproject
 '''
 ```
 
-When installing the build result, if you expect to install multiple Node.js applications in the same environment, we recommend putting the `dist` (and optional `node_modules`) under an appropriate namespace, e.g. install them as `/libexec/myproject/dist`.
+If you expect to install multiple Node.js applications in the same environment, we recommend putting the `dist` (and optional `node_modules`) under an appropriate namespace, e.g. create `/libexec/myproject/dist` in your build.
 
 For the run script, if your `npm build` already produces a binary that can be executed directly, you can also copy or link that to `$out/bin`. Note that only binaries in `$out/bin` are wrapped to ensure they run within a consistent environment.
 
