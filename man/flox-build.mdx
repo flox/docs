@@ -167,43 +167,43 @@ Assume a simple `nodejs` project
 
 1. Initialize a Flox environment
 
-```bash
-flox init
-```
+    ```bash
+    flox init
+    ```
 
 2. Install dependencies and add build instructions
 
-```toml
-## file: .flox/env/manifest.toml
-version = 1
+    ```toml
+    ## file: .flox/env/manifest.toml
+    version = 1
 
-[install]
-nodejs.pkg-path = "nodejs"
-rsync.pkg-path = "rsync"
+    [install]
+    nodejs.pkg-path = "nodejs"
+    rsync.pkg-path = "rsync"
 
-## install node dependencies using npm
-## disable the sandbox to allow access to the network
-[build]
-deps.command = '''
-npm ci
-mkdir -p $out
-mv node_modules $out/node_modules
-'''
-deps.sandbox = "off"
+    ## install node dependencies using npm
+    ## disable the sandbox to allow access to the network
+    [build]
+    deps.command = '''
+    npm ci
+    mkdir -p $out
+    mv node_modules $out/node_modules
+    '''
+    deps.sandbox = "off"
 
-## build the application using previously fetched dependencies
-app.command = '''
-rsync -lr ${deps}/node_modules ./
-npm run build
-mv dist $out/
-'''
-```
+    ## build the application using previously fetched dependencies
+    app.command = '''
+    rsync -lr ${deps}/node_modules ./
+    npm run build
+    mv dist $out/
+    '''
+    ```
 
 3. Verify the result
 
-```bash
-npx serve result-app
-```
+    ```bash
+    npx serve result-app
+    ```
 
 ## SEE ALSO
 
