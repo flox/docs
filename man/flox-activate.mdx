@@ -13,7 +13,7 @@ flox [<general-options>] activate
      [-d=<path> | -r=<owner>/<name>]
      [-t]
      [--print-script]
-     [-s]
+     [--start-services | --no-start-services]
      [-m=(dev|run)]
      [-g=<generation>]
      [-c=<shell command> | -- <exec command>...]
@@ -101,14 +101,18 @@ environment. If no services are running, the services from the manifest
 will be started, otherwise a warning will be displayed and activation will
 continue.
 
-This flag is currently incompatible with “in-place” activations, but
-this feature will be added in the future.
+To start services by default without requiring `-s`, set
+`services.auto-start = true` in the manifest.
 
 The services started with this flag will be cleaned up once the last
 activation of this environment terminates.
 
 A remote environment can only have a single set of running services,
 regardless of how many times the environment is activated concurrently.
+
+`--no-start-services`  
+Don’t start services even if configured in the manifest with
+`auto-start = true`.
 
 `-m (dev|run)`, `--mode (dev|run)`  
 Activate the environment in either “dev” or “run” mode. Overrides the
@@ -130,6 +134,12 @@ Path containing a .flox/ directory.
 
 `-r`, `--reference`  
 A FloxHub environment, specified in the form `<owner>/<name>`.
+
+`-D`, `--default`  
+Use your default environment (`<your-user>/default`). When
+unauthenticated in an interactive context, you will be prompted to log
+in. In non-interactive contexts (e.g., scripts or CI), this flag will
+fail with an error when authentication is missing.
 
 ### General Options
 
