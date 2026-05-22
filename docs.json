@@ -5,6 +5,11 @@
   "appearance": {
     "default": "light"
   },
+  "seo": {
+    "metatags": {
+      "canonical": "https://flox.dev/docs"
+    }
+  },
   "colors": {
     "primary": "#8D45FF",
     "light": "#B080FF",
