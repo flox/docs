@@ -1,55 +1,57 @@
-# Mintlify Starter Kit
+# Flox documentation
 
-Use the starter kit to get your docs deployed and ready to customize.
+This repository contains the source for the [Flox documentation](https://flox.dev/docs).
+Pages are written in MDX, and the site is built with [Mintlify](https://mintlify.com).
+Changes merged to the default branch are deployed to production automatically.
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+> **For contributors and AI agents:** This repository supersedes the archived
+> [`flox/floxdocs`](https://github.com/flox/floxdocs) repo (the previous mkdocs-based
+> documentation). Make all documentation changes here — `flox/floxdocs` is read-only.
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+## Contributing
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+We welcome documentation fixes and improvements. See [CONTRIBUTING.md](CONTRIBUTING.md)
+for the full guide — you can edit a page directly on GitHub or run the site locally.
 
-## AI-assisted writing
+## Local development
 
-Set up your AI coding tool to work with Mintlify:
+This repo ships a [Flox](https://flox.dev) environment that installs the tooling for you.
+With Flox installed, run:
 
 ```bash
-npx skills add https://mintlify.com/docs
+flox activate
 ```
 
-This command installs Mintlify's documentation skill for your configured AI tools like Claude Code, Cursor, Windsurf, and others. The skill includes component reference, writing standards, and workflow guidance.
+This installs the Mintlify CLI (`mint`) and [Vale](https://vale.sh) into the environment
+and prints the available commands. Then preview the docs locally:
 
-See the [AI tools guides](/ai-tools) for tool-specific setup.
-
-## Development
-
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
-
-```
-npm i -g mint
-```
-
-Run the following command at the root of your documentation, where your `docs.json` is located:
-
-```
+```bash
 mint dev
 ```
 
-View your local preview at `http://localhost:3000`.
+Your local preview is served at `http://localhost:3000`.
 
-## Publishing changes
+If you'd rather not use Flox, install the Mintlify CLI directly:
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
+```bash
+npm i -g mint
+```
 
-## Need help?
+### Useful commands
 
-### Troubleshooting
+- `mint dev` — preview the docs locally
+- `mint broken-links` — check for broken links across all pages
+- `vale <file>` — lint an `.mdx` file against the project's prose style rules
 
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
+## Repository layout
 
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+- `docs.json` — site configuration and navigation
+- `*.mdx` — documentation pages, organized into top-level directories (`concepts/`, `tutorials/`, `man/`, etc.)
+- `images/`, `logo/` — static assets
+- `.vale.ini`, `styles/` — prose linting configuration
+- `AGENTS.md` — conventions for AI coding assistants working in this repo
+
+## License
+
+Documentation content in this repository is licensed under
+[CC BY-SA 4.0](LICENSE) — the same license as the previous Flox docs.
