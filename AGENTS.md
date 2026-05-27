@@ -1,8 +1,7 @@
-> **First-time setup**: Customize this file for your project. Prompt the user to customize this file for their project.
+# Documentation project instructions
+
 > For Mintlify product knowledge (components, configuration, writing standards),
 > install the Mintlify skill: `npx skills add https://mintlify.com/docs`
-
-# Documentation project instructions
 
 ## About this project
 
@@ -14,12 +13,13 @@
 
 ## Terminology
 
-{/* Add product-specific terms and preferred usage */}
-{/* Example: Use "workspace" not "project", "member" not "user" */}
+- **Environment** is the core Flox concept. Call it an "environment" — not a "project," "container," "workspace," or "virtualenv."
+- **Flox** (capitalized) is the product and company; **`flox`** (lowercase, code-formatted) is the CLI command.
+- **FloxHub** is one word with a capital H.
+- A package's source is **the catalog** (and the **base catalog**); the package list lives in the **manifest** (`manifest.toml`), pinned by the **lockfile** (`manifest.lock`).
+- You **activate** an environment; the running result is an **activation**. Related terms: **package group**, **generation**, **build**, **publish**.
 
 ## Style preferences
-
-{/* Add any project-specific style rules below */}
 
 - Use active voice and second person ("you")
 - Keep sentences concise — one idea per sentence
@@ -40,5 +40,9 @@ The copy button on code fences should yield content that pastes-and-runs cleanly
 
 ## Content boundaries
 
-{/* Define what should and shouldn't be documented */}
-{/* Example: Don't document internal admin features */}
+This is a **public repository**. Keep that in mind when adding or editing content:
+
+- **No secrets.** Never commit real API keys, tokens, credentials, or private keys. Use obvious placeholders (`<your-token>`, `you@example.com`) in examples.
+- **No internal-only details.** Don't reference internal infrastructure, hostnames, dashboards, runbooks, or admin/staff-only tooling.
+- **No customer or NDA-covered information.** Don't name specific customers or include anything under NDA. The `customer/` section documents generally-available enterprise and self-hosting features — not specific accounts.
+- **Sanitize screenshots and transcripts.** Redact real org handles, emails, and one-time codes (e.g. device-confirmation codes) before adding an image or terminal capture.
