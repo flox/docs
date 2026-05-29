@@ -57,7 +57,7 @@ The Flox CLI is free and open source, similar to how Docker's core engine is fre
 This is a real consideration for some teams. Research from Chainguard and Sysdig has noted that popular base images often ship with significant numbers of CVEs, and that a substantial portion of running containers contain high-risk vulnerabilities. Docker users typically address this through image scanning, patching, and using minimal or hardened base images (like Alpine, distroless, or Chainguard images). Flox's approach is to include only the packages explicitly declared in the manifest, which can reduce the attack surface.
 </Accordion>
 
-<Accordion title="What is the "two-world problem"?">
+<Accordion title="What is the 'two-world problem'?">
 
 This refers to the gap between your host machine (macOS, Windows, or Linux with native tools and IDEs) and the container's isolated Linux environment. Bridging the two can involve volume mounts, port forwarding, and using `docker exec` to access tools inside the container. Some teams find these as adding friction to daily workflows. Flox's native shell activation avoids this split by running directly on the host, which is a different approach with its own tradeoffs—notably, it doesn't provide the built-in isolation that containers do unless you use flox containerize or Flox’s kubernetes integration.
 </Accordion>
