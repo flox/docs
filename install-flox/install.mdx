@@ -47,9 +47,31 @@ export function FloxVersionedUrl({ base, children }) {
 export function FloxVersionOutput() {
   const version = useFloxVersion();
   return (
-    <pre style={{borderRadius:'0.375rem',padding:'1rem',fontSize:'0.875rem',lineHeight:'1.5',overflowX:'auto',marginBottom:'1rem'}}>
-      <code>{'$ flox --version\n'}{version}</code>
-    </pre>
+    <div style={{fontFamily:'ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace',background:'#f6f8fa',color:'#1f2328',borderRadius:'6px',padding:'16px',fontSize:'14px',lineHeight:'1.45',overflowX:'auto',marginBottom:'16px',whiteSpace:'pre'}}>
+      {'$ flox --version\n'}{version ?? ''}
+    </div>
+  );
+}
+
+export function MacPkgCards() {
+  const v = useFloxVersion();
+  return (
+    <CardGroup cols={2}>
+      <Card
+        title="Apple Silicon"
+        icon="apple"
+        href={v ? `https://downloads.flox.dev/by-env/stable/osx/flox-${v}.aarch64-darwin.pkg` : undefined}
+      >
+        aarch64-darwin
+      </Card>
+      <Card
+        title="Intel processors"
+        icon="microchip"
+        href={v ? `https://downloads.flox.dev/by-env/stable/osx/flox-${v}.x86_64-darwin.pkg` : undefined}
+      >
+        x86_64-darwin
+      </Card>
+    </CardGroup>
   );
 }
 
@@ -69,14 +91,7 @@ export function FloxVersionOutput() {
 
   1. Download installer for Macs with
 
-      <CardGroup cols={2}>
-        <Card title="Apple Silicon" icon="apple">
-          <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/osx/flox-{VERSION}.aarch64-darwin.pkg">aarch64-darwin</FloxVersionedUrl>
-        </Card>
-        <Card title="Intel processors" icon="microchip">
-          <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/osx/flox-{VERSION}.x86_64-darwin.pkg">x86_64-darwin</FloxVersionedUrl>
-        </Card>
-      </CardGroup>
+      <MacPkgCards />
 
   2. Double-click to install the downloaded file
   3. Open a terminal window to continue below
