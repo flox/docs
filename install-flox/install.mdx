@@ -44,6 +44,15 @@ export function FloxVersionedUrl({ base, children }) {
   return <a href={base.replace('{VERSION}', version)}>{children}</a>;
 }
 
+export function FloxVersionOutput() {
+  const version = useFloxVersion();
+  return (
+    <pre style={{borderRadius:'0.375rem',padding:'1rem',fontSize:'0.875rem',lineHeight:'1.5',overflowX:'auto',marginBottom:'1rem'}}>
+      <code>{'$ flox --version\n'}{version}</code>
+    </pre>
+  );
+}
+
 <Note>
   **Verify your download**
 
@@ -105,13 +114,7 @@ export function FloxVersionedUrl({ base, children }) {
   If the following command returns without error then you're ready to get
   started!
 
-  ```console
-  $ flox --version
-  1.12.0
-
-  ```
-
-  The version you see might be different.
+  <FloxVersionOutput />
 
   **Upgrades to existing Flox installation**
 
@@ -165,13 +168,7 @@ export function FloxVersionedUrl({ base, children }) {
   If the following command returns without error then you're ready to get
   started!
 
-  ```console
-  $ flox --version
-  1.12.0
-
-  ```
-
-  The version you see might be different.
+  <FloxVersionOutput />
 
   **Upgrade existing Flox installation**
 
@@ -234,13 +231,7 @@ export function FloxVersionedUrl({ base, children }) {
   If the following command returns without error then you're ready to get
   started!
 
-  ```console
-  $ flox --version
-  1.12.0
-
-  ```
-
-  The version you see might be different.
+  <FloxVersionOutput />
 
   **Upgrade existing Flox installation**
 
@@ -306,13 +297,7 @@ export function FloxVersionedUrl({ base, children }) {
   If the following command returns without error then you're ready to get
   started!
 
-  ```console
-  $ flox --version
-  1.12.0
-
-  ```
-
-  The version you see might be different.
+  <FloxVersionOutput />
 
   **Upgrade existing Flox installation**
 
@@ -488,13 +473,7 @@ export function FloxVersionedUrl({ base, children }) {
   If the following command returns without error then you're ready to get
   started!
 
-  ```console
-  $ flox --version
-  1.12.0
-
-  ```
-
-  The version you see might be different.
+  <FloxVersionOutput />
 
 
   **Upgrade existing Flox installation**
@@ -579,13 +558,7 @@ export function FloxVersionedUrl({ base, children }) {
   If the following command returns without error then you're ready to get
   started!
 
-  ```console
-  $ flox --version
-  1.12.0
-
-  ```
-
-  The version you see might be different.
+  <FloxVersionOutput />
   </Tab>
   <Tab title="Container">
 
@@ -603,13 +576,7 @@ export function FloxVersionedUrl({ base, children }) {
   If the following command returns without error then you're ready to get
   started!
 
-  ```console
-  $ flox --version
-  1.12.0
-
-  ```
-
-  The version you see might be different.
+  <FloxVersionOutput />
   </Tab>
   <Tab title="WSL 2">
 
@@ -747,13 +714,7 @@ export function FloxVersionedUrl({ base, children }) {
   If the following command returns without error then you're ready to get
   started!
 
-  ```console
-  $ flox --version
-  1.12.0
-
-  ```
-
-  The version you see might be different.
+  <FloxVersionOutput />
 
   **Upgrade existing Flox installation**
 
