@@ -3,13 +3,38 @@ title: "Install Flox"
 description: "How to install or upgrade the Flox CLI"
 ---
 
+import { fetchVersion, FloxVersion, FloxVersionedUrl } from '/snippets/FloxVersion';
+
+export async function MacPkgCards() {
+  const v = await fetchVersion();
+  return (
+    <CardGroup cols={2}>
+      <Card
+        title="Apple Silicon"
+        icon="apple"
+        href={v ? `https://downloads.flox.dev/by-env/stable/osx/flox-${v}.aarch64-darwin.pkg` : undefined}
+      >
+        aarch64-darwin
+      </Card>
+      <Card
+        title="Intel processors"
+        icon="microchip"
+        href={v ? `https://downloads.flox.dev/by-env/stable/osx/flox-${v}.x86_64-darwin.pkg` : undefined}
+      >
+        x86_64-darwin
+      </Card>
+    </CardGroup>
+  );
+}
+
 <Note>
   **Verify your download**
 
-  You can find the
-  [SHA256 checksums](https://downloads.flox.dev/by-env/stable/flox-1.12.0.SHA256SUMS) and
-  [SHA512 checksums](https://downloads.flox.dev/by-env/stable/flox-1.12.0.SHA512SUMS) for
-  Flox 1.12.0 online.
+  You can find the{' '}
+  <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/flox-{VERSION}.SHA256SUMS">SHA256 checksums</FloxVersionedUrl>{' '}
+  and{' '}
+  <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/flox-{VERSION}.SHA512SUMS">SHA512 checksums</FloxVersionedUrl>{' '}
+  for Flox <FloxVersion /> online.
 </Note>
 <Tabs>
   <Tab title="MacOS (Pkg)">
@@ -18,14 +43,7 @@ description: "How to install or upgrade the Flox CLI"
 
   1. Download installer for Macs with
 
-      <CardGroup cols={2}>
-        <Card title="Apple Silicon" icon="apple" href="https://downloads.flox.dev/by-env/stable/osx/flox-1.12.0.aarch64-darwin.pkg">
-          aarch64-darwin
-        </Card>
-        <Card title="Intel processors" icon="microchip" href="https://downloads.flox.dev/by-env/stable/osx/flox-1.12.0.x86_64-darwin.pkg">
-          x86_64-darwin
-        </Card>
-      </CardGroup>
+      <MacPkgCards />
 
   2. Double-click to install the downloaded file
   3. Open a terminal window to continue below
@@ -150,8 +168,8 @@ description: "How to install or upgrade the Flox CLI"
 
   1. Download flox.deb for your system architecture:
 
-       [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.0.x86_64-linux.deb)
-       [64-bit ARM](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.0.aarch64-linux.deb)
+       <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.x86_64-linux.deb">64-bit Intel/AMD</FloxVersionedUrl>
+       <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.aarch64-linux.deb">64-bit ARM</FloxVersionedUrl>
 
   1. Install the downloaded file
 
@@ -221,8 +239,8 @@ description: "How to install or upgrade the Flox CLI"
 
   1. Download flox.rpm for your system architecture:
 
-       [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/rpm/flox-1.12.0.x86_64-linux.rpm)
-       [64-bit ARM](https://downloads.flox.dev/by-env/stable/rpm/flox-1.12.0.aarch64-linux.rpm)
+       <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/rpm/flox-{VERSION}.x86_64-linux.rpm">64-bit Intel/AMD</FloxVersionedUrl>
+       <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/rpm/flox-{VERSION}.aarch64-linux.rpm">64-bit ARM</FloxVersionedUrl>
 
   1. Install the downloaded file
 
@@ -612,8 +630,8 @@ description: "How to install or upgrade the Flox CLI"
 
     1. Download flox.deb for your system architecture:
 
-         [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.0.x86_64-linux.deb)
-         [64-bit ARM](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.0.aarch64-linux.deb)
+         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.x86_64-linux.deb">64-bit Intel/AMD</FloxVersionedUrl>
+         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.aarch64-linux.deb">64-bit ARM</FloxVersionedUrl>
 
     1. Install the downloaded file
 
@@ -633,8 +651,8 @@ description: "How to install or upgrade the Flox CLI"
 
     1. Download flox.deb for your system architecture:
 
-         [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.0.x86_64-linux.deb)
-         [64-bit ARM](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.0.aarch64-linux.deb)
+         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.x86_64-linux.deb">64-bit Intel/AMD</FloxVersionedUrl>
+         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.aarch64-linux.deb">64-bit ARM</FloxVersionedUrl>
 
     1. Install the downloaded file
 
@@ -654,8 +672,8 @@ description: "How to install or upgrade the Flox CLI"
 
     1. Download flox.rpm for your system architecture:
 
-         [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/rpm/flox-1.12.0.x86_64-linux.rpm)
-         [64-bit ARM](https://downloads.flox.dev/by-env/stable/rpm/flox-1.12.0.aarch64-linux.rpm)
+         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/rpm/flox-{VERSION}.x86_64-linux.rpm">64-bit Intel/AMD</FloxVersionedUrl>
+         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/rpm/flox-{VERSION}.aarch64-linux.rpm">64-bit ARM</FloxVersionedUrl>
 
     1. Install the downloaded file
 
