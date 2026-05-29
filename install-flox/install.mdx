@@ -3,10 +3,10 @@ title: "Install Flox"
 description: "How to install or upgrade the Flox CLI"
 ---
 
-import { fetchVersion, FloxVersion, FloxVersionedUrl } from '/snippets/FloxVersion';
+import { useFloxVersion, FloxVersion, FloxVersionedUrl } from '/snippets/FloxVersion';
 
-export async function MacPkgCards() {
-  const v = await fetchVersion();
+export function MacPkgCards() {
+  const v = useFloxVersion();
   return (
     <CardGroup cols={2}>
       <Card

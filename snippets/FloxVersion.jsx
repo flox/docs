@@ -1,26 +1,58 @@
-const VERSION_URL = 'https://downloads.flox.dev/by-env/stable/LATEST_VERSION';
+'use client';
 
-export async function fetchVersion() {
-  try {
-    const res = await fetch(VERSION_URL, { next: { revalidate: 21600 } }); // 6-hour ISR
-    if (!res.ok) return null;
-    return (await res.text()).trim();
-  } catch {
-    return null;
-  }
+import { useState, useEffect } from 'react';
+
+const VERSION_URL = 'https://downloads.flox.dev/by-env/stable/LATEST_VERSION';
+const CACHE_KEY = 'flox_latest_version';
+const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+
+export function useFloxVersion() {
+  const [version, setVersion] = useState(null);
+
+  useEffect(() => {
+    try {
+      const item = localStorage.getItem(CACHE_KEY);
+      if (item) {
+        const { value, ts } = JSON.parse(item);
+        if (Date.now() - ts < CACHE_TTL) {
+          setVersion(value);
+          return;
+        }
+      }
+    } catch {}
+
+    fetch(VERSION_URL)
+      .then(r => r.text())
+      .then(text => {
+        const v = text.trim();
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify({ value: v, ts: Date.now() }));
+        } catch {}
+        setVersion(v);
+      })
+      .catch(() => {
+        // On failure, serve stale cache rather than showing nothing.
+        try {
+          const item = localStorage.getItem(CACHE_KEY);
+          if (item) setVersion(JSON.parse(item).value);
+        } catch {}
+      });
+  }, []);
+
+  return version;
 }
 
 /** Renders the current Flox version string inline. */
-export async function FloxVersion() {
-  return (await fetchVersion()) ?? null;
+export function FloxVersion() {
+  return useFloxVersion() ?? null;
 }
 
 /**
  * Renders an <a> tag where {VERSION} in `base` is replaced with the live version.
- * Falls back to plain text if the fetch fails.
+ * Falls back to plain text while loading.
  */
-export async function FloxVersionedUrl({ base, children }) {
-  const version = await fetchVersion();
+export function FloxVersionedUrl({ base, children }) {
+  const version = useFloxVersion();
   if (!version) return children ? <>{children}</> : null;
   const href = base.replace('{VERSION}', version);
   return <a href={href}>{children ?? href}</a>;
