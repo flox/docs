@@ -3,29 +3,7 @@ title: "Install Flox"
 description: "How to install or upgrade the Flox CLI"
 ---
 
-import { useFloxVersion, FloxVersion, FloxVersionedUrl } from '/snippets/FloxVersion';
-
-export function MacPkgCards() {
-  const v = useFloxVersion();
-  return (
-    <CardGroup cols={2}>
-      <Card
-        title="Apple Silicon"
-        icon="apple"
-        href={v ? `https://downloads.flox.dev/by-env/stable/osx/flox-${v}.aarch64-darwin.pkg` : undefined}
-      >
-        aarch64-darwin
-      </Card>
-      <Card
-        title="Intel processors"
-        icon="microchip"
-        href={v ? `https://downloads.flox.dev/by-env/stable/osx/flox-${v}.x86_64-darwin.pkg` : undefined}
-      >
-        x86_64-darwin
-      </Card>
-    </CardGroup>
-  );
-}
+import { FloxVersion, FloxVersionedUrl } from '/snippets/FloxVersion.mdx';
 
 <Note>
   **Verify your download**
@@ -43,7 +21,14 @@ export function MacPkgCards() {
 
   1. Download installer for Macs with
 
-      <MacPkgCards />
+      <CardGroup cols={2}>
+        <Card title="Apple Silicon" icon="apple">
+          <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/osx/flox-{VERSION}.aarch64-darwin.pkg">aarch64-darwin</FloxVersionedUrl>
+        </Card>
+        <Card title="Intel processors" icon="microchip">
+          <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/osx/flox-{VERSION}.x86_64-darwin.pkg">x86_64-darwin</FloxVersionedUrl>
+        </Card>
+      </CardGroup>
 
   2. Double-click to install the downloaded file
   3. Open a terminal window to continue below
