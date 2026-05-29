@@ -46,7 +46,6 @@ Containerization solves isolation and deployment portability well, and Flox does
 Ease of learning is part of the picture, but it isn't the main differentiator. Flox has a smaller command surface (roughly `flox init`, `flox install`, `flox activate`, `flox push`, `flox pull`), which can help with adoption. The more substantive differences are the reproducibility model (Nix's content-addressed store), the security model (minimal dependencies rather than full base images), native shell execution, and centralized environment management via FloxHub. Docker has its own significant advantages, including a mature ecosystem, broad industry familiarity, and extensive tooling. The right choice depends on which set of strengths matters more for your use case.
 </Accordion>
 
-<details>
 <Accordion title="Is Flox free? Does it charge for storing images or for the software itself?">
 
 The Flox CLI is free and open source, similar to how Docker's core engine is free. There's no charge for the software itself or for using the public Flox Catalog of packages. FloxHub is free for individuals and open-source projects, with paid plans for organizations that want private catalogs, team governance, and enterprise features, roughly analogous to how Docker Hub charges for private repositories and Docker Desktop has paid tiers for larger organizations. The pricing models are comparable in structure.
