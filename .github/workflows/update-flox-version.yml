@@ -8,6 +8,8 @@ on:
 jobs:
   update-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -15,6 +17,7 @@ jobs:
         id: latest
         run: |
           version=$(curl -sf https://downloads.flox.dev/by-env/stable/LATEST_VERSION | xargs)
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "unexpected version: '$version'"; exit 1; }
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Read current version
