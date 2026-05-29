@@ -3,7 +3,46 @@ title: "Install Flox"
 description: "How to install or upgrade the Flox CLI"
 ---
 
-import { FloxVersion, FloxVersionedUrl } from '/snippets/FloxVersion.mdx';
+import { useState, useEffect } from 'react';
+
+export function useFloxVersion() {
+  const [version, setVersion] = useState(null);
+  useEffect(() => {
+    const KEY = 'flox_latest_version';
+    const TTL = 6 * 60 * 60 * 1000;
+    try {
+      const item = localStorage.getItem(KEY);
+      if (item) {
+        const { value, ts } = JSON.parse(item);
+        if (Date.now() - ts < TTL) { setVersion(value); return; }
+      }
+    } catch {}
+    fetch('https://downloads.flox.dev/by-env/stable/LATEST_VERSION')
+      .then(r => r.text())
+      .then(text => {
+        const v = text.trim();
+        try { localStorage.setItem(KEY, JSON.stringify({ value: v, ts: Date.now() })); } catch {}
+        setVersion(v);
+      })
+      .catch(() => {
+        try {
+          const item = localStorage.getItem(KEY);
+          if (item) setVersion(JSON.parse(item).value);
+        } catch {}
+      });
+  }, []);
+  return version;
+}
+
+export function FloxVersion() {
+  return useFloxVersion() ?? null;
+}
+
+export function FloxVersionedUrl({ base, children }) {
+  const version = useFloxVersion();
+  if (!version) return children ? <>{children}</> : null;
+  return <a href={base.replace('{VERSION}', version)}>{children}</a>;
+}
 
 <Note>
   **Verify your download**
