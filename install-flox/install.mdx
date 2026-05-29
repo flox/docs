@@ -3,86 +3,13 @@ title: "Install Flox"
 description: "How to install or upgrade the Flox CLI"
 ---
 
-import { useState, useEffect } from 'react';
-
-export function useFloxVersion() {
-  const [version, setVersion] = useState(null);
-  useEffect(() => {
-    const KEY = 'flox_latest_version';
-    const TTL = 6 * 60 * 60 * 1000;
-    try {
-      const item = localStorage.getItem(KEY);
-      if (item) {
-        const { value, ts } = JSON.parse(item);
-        if (Date.now() - ts < TTL) { setVersion(value); return; }
-      }
-    } catch {}
-    fetch('https://downloads.flox.dev/by-env/stable/LATEST_VERSION')
-      .then(r => r.text())
-      .then(text => {
-        const v = text.trim();
-        try { localStorage.setItem(KEY, JSON.stringify({ value: v, ts: Date.now() })); } catch {}
-        setVersion(v);
-      })
-      .catch(() => {
-        try {
-          const item = localStorage.getItem(KEY);
-          if (item) setVersion(JSON.parse(item).value);
-        } catch {}
-      });
-  }, []);
-  return version;
-}
-
-export function FloxVersion() {
-  return useFloxVersion() ?? null;
-}
-
-export function FloxVersionedUrl({ base, children }) {
-  const version = useFloxVersion();
-  if (!version) return children ? <>{children}</> : null;
-  return <a href={base.replace('{VERSION}', version)}>{children}</a>;
-}
-
-export function FloxVersionOutput() {
-  const version = useFloxVersion();
-  return (
-    <div style={{fontFamily:'ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace',background:'#f6f8fa',color:'#1f2328',borderRadius:'6px',padding:'16px',fontSize:'14px',lineHeight:'1.45',overflowX:'auto',marginBottom:'16px',whiteSpace:'pre'}}>
-      {'$ flox --version\n'}{version ?? ''}
-    </div>
-  );
-}
-
-export function MacPkgCards() {
-  const v = useFloxVersion();
-  return (
-    <CardGroup cols={2}>
-      <Card
-        title="Apple Silicon"
-        icon="apple"
-        href={v ? `https://downloads.flox.dev/by-env/stable/osx/flox-${v}.aarch64-darwin.pkg` : undefined}
-      >
-        aarch64-darwin
-      </Card>
-      <Card
-        title="Intel processors"
-        icon="microchip"
-        href={v ? `https://downloads.flox.dev/by-env/stable/osx/flox-${v}.x86_64-darwin.pkg` : undefined}
-      >
-        x86_64-darwin
-      </Card>
-    </CardGroup>
-  );
-}
-
 <Note>
   **Verify your download**
 
-  You can find the{' '}
-  <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/flox-{VERSION}.SHA256SUMS">SHA256 checksums</FloxVersionedUrl>{' '}
-  and{' '}
-  <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/flox-{VERSION}.SHA512SUMS">SHA512 checksums</FloxVersionedUrl>{' '}
-  for Flox <FloxVersion /> online.
+  You can find the
+  [SHA256 checksums](https://downloads.flox.dev/by-env/stable/flox-1.12.1.SHA256SUMS) and
+  [SHA512 checksums](https://downloads.flox.dev/by-env/stable/flox-1.12.1.SHA512SUMS) for
+  Flox 1.12.1 online.
 </Note>
 <Tabs>
   <Tab title="MacOS (Pkg)">
@@ -91,7 +18,14 @@ export function MacPkgCards() {
 
   1. Download installer for Macs with
 
-      <MacPkgCards />
+      <CardGroup cols={2}>
+        <Card title="Apple Silicon" icon="apple" href="https://downloads.flox.dev/by-env/stable/osx/flox-1.12.1.aarch64-darwin.pkg">
+          aarch64-darwin
+        </Card>
+        <Card title="Intel processors" icon="microchip" href="https://downloads.flox.dev/by-env/stable/osx/flox-1.12.1.x86_64-darwin.pkg">
+          x86_64-darwin
+        </Card>
+      </CardGroup>
 
   2. Double-click to install the downloaded file
   3. Open a terminal window to continue below
@@ -129,7 +63,13 @@ export function MacPkgCards() {
   If the following command returns without error then you're ready to get
   started!
 
-  <FloxVersionOutput />
+  ```console
+  $ flox --version
+  1.12.1
+
+  ```
+
+  The version you see might be different.
 
   **Upgrades to existing Flox installation**
 
@@ -183,7 +123,13 @@ export function MacPkgCards() {
   If the following command returns without error then you're ready to get
   started!
 
-  <FloxVersionOutput />
+  ```console
+  $ flox --version
+  1.12.1
+
+  ```
+
+  The version you see might be different.
 
   **Upgrade existing Flox installation**
 
@@ -204,8 +150,8 @@ export function MacPkgCards() {
 
   1. Download flox.deb for your system architecture:
 
-       <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.x86_64-linux.deb">64-bit Intel/AMD</FloxVersionedUrl>
-       <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.aarch64-linux.deb">64-bit ARM</FloxVersionedUrl>
+       [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.1.x86_64-linux.deb)
+       [64-bit ARM](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.1.aarch64-linux.deb)
 
   1. Install the downloaded file
 
@@ -246,7 +192,13 @@ export function MacPkgCards() {
   If the following command returns without error then you're ready to get
   started!
 
-  <FloxVersionOutput />
+  ```console
+  $ flox --version
+  1.12.1
+
+  ```
+
+  The version you see might be different.
 
   **Upgrade existing Flox installation**
 
@@ -269,8 +221,8 @@ export function MacPkgCards() {
 
   1. Download flox.rpm for your system architecture:
 
-       <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/rpm/flox-{VERSION}.x86_64-linux.rpm">64-bit Intel/AMD</FloxVersionedUrl>
-       <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/rpm/flox-{VERSION}.aarch64-linux.rpm">64-bit ARM</FloxVersionedUrl>
+       [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/rpm/flox-1.12.1.x86_64-linux.rpm)
+       [64-bit ARM](https://downloads.flox.dev/by-env/stable/rpm/flox-1.12.1.aarch64-linux.rpm)
 
   1. Install the downloaded file
 
@@ -312,7 +264,13 @@ export function MacPkgCards() {
   If the following command returns without error then you're ready to get
   started!
 
-  <FloxVersionOutput />
+  ```console
+  $ flox --version
+  1.12.1
+
+  ```
+
+  The version you see might be different.
 
   **Upgrade existing Flox installation**
 
@@ -488,7 +446,13 @@ export function MacPkgCards() {
   If the following command returns without error then you're ready to get
   started!
 
-  <FloxVersionOutput />
+  ```console
+  $ flox --version
+  1.12.1
+
+  ```
+
+  The version you see might be different.
 
 
   **Upgrade existing Flox installation**
@@ -573,7 +537,13 @@ export function MacPkgCards() {
   If the following command returns without error then you're ready to get
   started!
 
-  <FloxVersionOutput />
+  ```console
+  $ flox --version
+  1.12.1
+
+  ```
+
+  The version you see might be different.
   </Tab>
   <Tab title="Container">
 
@@ -591,7 +561,13 @@ export function MacPkgCards() {
   If the following command returns without error then you're ready to get
   started!
 
-  <FloxVersionOutput />
+  ```console
+  $ flox --version
+  1.12.1
+
+  ```
+
+  The version you see might be different.
   </Tab>
   <Tab title="WSL 2">
 
@@ -636,8 +612,8 @@ export function MacPkgCards() {
 
     1. Download flox.deb for your system architecture:
 
-         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.x86_64-linux.deb">64-bit Intel/AMD</FloxVersionedUrl>
-         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.aarch64-linux.deb">64-bit ARM</FloxVersionedUrl>
+         [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.1.x86_64-linux.deb)
+         [64-bit ARM](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.1.aarch64-linux.deb)
 
     1. Install the downloaded file
 
@@ -657,8 +633,8 @@ export function MacPkgCards() {
 
     1. Download flox.deb for your system architecture:
 
-         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.x86_64-linux.deb">64-bit Intel/AMD</FloxVersionedUrl>
-         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/deb/flox-{VERSION}.aarch64-linux.deb">64-bit ARM</FloxVersionedUrl>
+         [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.1.x86_64-linux.deb)
+         [64-bit ARM](https://downloads.flox.dev/by-env/stable/deb/flox-1.12.1.aarch64-linux.deb)
 
     1. Install the downloaded file
 
@@ -678,8 +654,8 @@ export function MacPkgCards() {
 
     1. Download flox.rpm for your system architecture:
 
-         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/rpm/flox-{VERSION}.x86_64-linux.rpm">64-bit Intel/AMD</FloxVersionedUrl>
-         <FloxVersionedUrl base="https://downloads.flox.dev/by-env/stable/rpm/flox-{VERSION}.aarch64-linux.rpm">64-bit ARM</FloxVersionedUrl>
+         [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/rpm/flox-1.12.1.x86_64-linux.rpm)
+         [64-bit ARM](https://downloads.flox.dev/by-env/stable/rpm/flox-1.12.1.aarch64-linux.rpm)
 
     1. Install the downloaded file
 
@@ -729,7 +705,13 @@ export function MacPkgCards() {
   If the following command returns without error then you're ready to get
   started!
 
-  <FloxVersionOutput />
+  ```console
+  $ flox --version
+  1.12.1
+
+  ```
+
+  The version you see might be different.
 
   **Upgrade existing Flox installation**
 
