@@ -24,6 +24,14 @@
     }
   },
   "favicon": "/favicon.ico",
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
+  },
   "navigation": {
     "tabs": [
       {
