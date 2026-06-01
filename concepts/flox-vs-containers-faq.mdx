@@ -53,7 +53,7 @@ The Flox CLI is free and open source, similar to how Docker's core engine is fre
 
 <Accordion title="What about Docker's base image vulnerabilities?">
 
-This is a real consideration for some teams. Research from Chainguard and Sysdig has noted that popular base images often ship with significant numbers of CVEs, and that a substantial portion of running containers contain high-risk vulnerabilities. Docker users typically address this through image scanning, patching, and using minimal or hardened base images (like Alpine, distroless, or Chainguard images). Flox's approach is to include only the packages explicitly declared in the manifest, which can reduce the attack surface.
+This is a real consideration for some teams. Research from [Chainguard](https://get.chainguard.dev/hubfs/Collateral/Reports_and_Whitepapers/ChainguardHardenedImagesReport.pdf) and [Sysdig](https://sysdig.com/press-releases/sysdig-2023-usage-report) has noted that popular base images often ship with significant numbers of CVEs, and that a substantial portion of running containers contain high-risk vulnerabilities. Docker users typically address this through image scanning, patching, and using minimal or hardened base images (like Alpine, distroless, or Chainguard images). Flox's approach is to include only the packages explicitly declared in the manifest, which can reduce the attack surface.
 </Accordion>
 
 <Accordion title="What is the 'two-world problem'?">
