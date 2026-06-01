@@ -10,6 +10,12 @@ developer gets the same environment.
 Flox gives you these same benefits without many of the papercuts,
 but the workflow is slightly different so it's worth exploring.
 
+The simplest way to explain the difference between Flox and Containers is that
+Flox believes that software packaging should be distinct from the chosen type of isolation.
+With containers, packaging and isolation are mixed together. With Flox, packaging is
+distinct from isolation. Flox environments work the same on bare metal, in VMs, in containers,
+in agent sandboxes. See our [Comparison FAQ](concepts/flox-vs-containers.mdx) for more information.
+
 ## Create a new development environment
 
 Let's say you've created a new directory for your project,
