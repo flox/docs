@@ -19,7 +19,7 @@ flox [<general options>] (uninstall|rm)
 Uninstall packages from an environment.
 
 Just like package installation, package uninstallation is transactional.
-See [`flox-install(1)`](/man/flox-install) for more details on
+See [`flox-install`](/man/flox-install) for more details on
 transactions. Requesting to uninstall multiple packages where at least
 one of them was not previously installed will cause the transaction to
 fail and no packages will be uninstalled.
@@ -47,6 +47,12 @@ Path containing a .flox/ directory.
 `-r`, `--reference`  
 A FloxHub environment, specified in the form `<owner>/<name>`.
 
+`-D`, `--default`  
+Use your default environment (`<your-user>/default`). When
+unauthenticated in an interactive context, you will be prompted to log
+in. In non-interactive contexts (e.g., scripts or CI), this flag will
+fail with an error when authentication is missing.
+
 ### General Options
 
 `-h`, `--help`  
@@ -63,4 +69,4 @@ Silence logs except for errors.
 
 ## SEE ALSO
 
-[`flox-install(1)`](/man/flox-install)
+[`flox-install`](/man/flox-install)

@@ -154,7 +154,8 @@
             "group": "Overview",
             "pages": [
               "man/flox",
-              "man/manifest.toml"
+              "man/manifest.toml",
+              "man/nix-builds.toml"
             ]
           },
           {
@@ -198,6 +199,7 @@
               "man/flox-build",
               "man/flox-build-clean",
               "man/flox-build-import-nixpkgs",
+              "man/flox-build-update-catalogs",
               "man/flox-containerize",
               "man/flox-publish"
             ]

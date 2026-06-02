@@ -42,6 +42,12 @@ Path containing a .flox/ directory.
 `-r`, `--reference`  
 A FloxHub environment, specified in the form `<owner>/<name>`.
 
+`-D`, `--default`  
+Use your default environment (`<your-user>/default`). When
+unauthenticated in an interactive context, you will be prompted to log
+in. In non-interactive contexts (e.g., scripts or CI), this flag will
+fail with an error when authentication is missing.
+
 ### General Options
 
 `-h`, `--help`  
@@ -77,5 +83,5 @@ myservice  Running         12345
 
 ## SEE ALSO
 
-[`flox-activate(1)`](/man/flox-activate)
-[`flox-services-start(1)`](/man/flox-services-start)
+[`flox-activate`](/man/flox-activate)
+[`flox-services-start`](/man/flox-services-start)

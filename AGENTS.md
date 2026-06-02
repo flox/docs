@@ -38,6 +38,24 @@ The copy button on code fences should yield content that pastes-and-runs cleanly
 - **Borderline blocks stay `console`.** When a fence resists mechanical paste-and-run conversion (inline narrative comments, `<placeholder>` notation, mixed command + output), prefer leaving it as `console` over restructuring the surrounding prose. The right fix is upstream with the author.
 - **Do not `&&`-chain cleanup or uninstall sequences.** Cleanup is typically a sequence of best-effort no-ops, not a dependency chain. `&&` short-circuits on the first idempotent failure (e.g., service already stopped, file already removed), leaving later steps such as `daemon-reload` unrun. Use newline-separated commands for teardown blocks; reserve `&&` for setup/install where each step genuinely depends on the previous one.
 
+## Man pages are generated — do not edit directly
+
+Everything under `man/` is generated from the man page sources in the
+[flox/flox](https://github.com/flox/flox) repo (`cli/flox/doc/*.md`).
+
+- **Do not edit `man/*.mdx` directly** — changes will be overwritten by the
+  next sync.
+- To fix or update a man page, edit the source in flox/flox
+  (`cli/flox/doc/`), then regenerate:
+
+  ```bash
+  ./scripts/sync-man-pages.sh <path-to-flox-repo> ./man
+  ```
+
+  The script requires `pandoc` (e.g. `flox install pandoc`).
+- New pages also need a navigation entry in `docs.json` under the
+  "CLI reference" tab.
+
 ## Content boundaries
 
 This is a **public repository**. Keep that in mind when adding or editing content:

@@ -22,9 +22,9 @@ manifest and lockfile to the state of the previous generation, sets it
 as the live generation, and adds an entry to generation history.
 
 The previously live generation isn’t always N-1. If you’ve previously
-rolled back from generation 3 -> 2 then rolling back again will take
-you from generation 2 -> 3. Similarly if you’ve switched from
-generation 3 -> 1 then rolling back will take you from generation 1 ->
+rolled back from generation 3 -\> 2 then rolling back again will take
+you from generation 2 -\> 3. Similarly if you’ve switched from
+generation 3 -\> 1 then rolling back will take you from generation 1 -\>
 3.
 
 Generations don’t always have a linear history. If you create generation
@@ -48,6 +48,12 @@ Path containing a .flox/ directory.
 
 `-r`, `--reference`  
 A FloxHub environment, specified in the form `<owner>/<name>`.
+
+`-D`, `--default`  
+Use your default environment (`<your-user>/default`). When
+unauthenticated in an interactive context, you will be prompted to log
+in. In non-interactive contexts (e.g., scripts or CI), this flag will
+fail with an error when authentication is missing.
 
 ### General Options
 

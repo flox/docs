@@ -19,8 +19,8 @@ flox [<general-options>] generations switch
 Switch to the provided generation of the environment.
 
 Generation numbers can be found with
-[`flox-generations-history(1)`](/man/flox-generations-history) or
-[`flox-generations-list(1)`](/man/flox-generations-list).
+[`flox-generations-history`](/man/flox-generations-history) or
+[`flox-generations-list`](/man/flox-generations-list).
 
 Switching generation restores the environment’s manifest and lockfile to
 the state of the specified generation, sets it as the live generation,
@@ -47,6 +47,12 @@ Path containing a .flox/ directory.
 
 `-r`, `--reference`  
 A FloxHub environment, specified in the form `<owner>/<name>`.
+
+`-D`, `--default`  
+Use your default environment (`<your-user>/default`). When
+unauthenticated in an interactive context, you will be prompted to log
+in. In non-interactive contexts (e.g., scripts or CI), this flag will
+fail with an error when authentication is missing.
 
 ### General Options
 

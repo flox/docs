@@ -45,12 +45,12 @@ The name of a package as it exists in the manifest is referred to as the
 shorthand for packages with long names such as `python310Packages.pip`.
 Install IDs also provide a way to give packages more semantically
 meaningful, convenient, or aesthetically pleasing names in the manifest
-(e.g. `node21` instead of `nodejs_21`). When not explicitly provided,
+(e.g. `node21` instead of `nodejs_21`). When not explicitly provided,
 the install ID is inferred based on the pkg-path. For pkg-paths that
-consist of a single attribute (e.g. `ripgrep`) the install ID is set to
+consist of a single attribute (e.g. `ripgrep`) the install ID is set to
 that attribute. For pkg-paths that consist of multiple attributes
-(e.g. `python310Packages.pip`) the install ID is set to the last
-attribute in the pkg-path (e.g. `pip`).
+(e.g. `python310Packages.pip`) the install ID is set to the last
+attribute in the pkg-path (e.g. `pip`).
 
 As an advanced feature, a Nix flake installable may be specified instead
 of a pkg-path, and in this case the install ID is inferred from the
@@ -60,8 +60,8 @@ install ID is inferred from the flake reference.
 ### Package names
 
 Packages are organized in a hierarchical structure such that certain
-packages are found at the top level (e.g. `ripgrep`), and other packages
-are found under package sets (e.g. `python310Packages.pip`). We call
+packages are found at the top level (e.g. `ripgrep`), and other packages
+are found under package sets (e.g. `python310Packages.pip`). We call
 this location within the catalog the “pkg-path”.
 
 The pkg-path is searched when you execute a `flox search` command. The
@@ -105,6 +105,12 @@ Path containing a .flox/ directory.
 `-r`, `--reference`  
 A FloxHub environment, specified in the form `<owner>/<name>`.
 
+`-D`, `--default`  
+Use your default environment (`<your-user>/default`). When
+unauthenticated in an interactive context, you will be prompted to log
+in. In non-interactive contexts (e.g., scripts or CI), this flag will
+fail with an error when authentication is missing.
+
 ### General Options
 
 `-h`, `--help`  
@@ -119,7 +125,7 @@ Increase logging verbosity. Invoke multiple times for increasing detail.
 `-q`, `--quiet`  
 Silence logs except for errors.
 
-## SEE ALSO
+### SEE ALSO
 
 [`flox-uninstall`](/man/flox-uninstall),
 [`flox-edit`](/man/flox-edit),
