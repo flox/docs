@@ -24,15 +24,15 @@ options with their computed value.
 Config values are read from the following sources in order of descending
 priority:
 
-1. Environment variables. All config options may be set by prefixing
-   with `FLOX_` and using `SCREAMING_SNAKE_CASE`. For example,
-   `disable_metrics` may be set with `FLOX_DISABLE_METRICS=true`.
-2. User customizations from `$FLOX_CONFIG_DIR/flox.toml` if set,
-   otherwise `flox/flox.toml` in `$XDG_CONFIG_HOME` or any of
-   `$XDG_CONFIG_DIRS`, wherever it is found first.
-3. System settings from `/etc/flox.toml` or
-   `FLOX_SYSTEM_CONFIG_DIR/flox.toml`.
-4. `flox` provided defaults.
+1.  Environment variables. All config options may be set by prefixing
+    with `FLOX_` and using `SCREAMING_SNAKE_CASE`. For example,
+    `disable_metrics` may be set with `FLOX_DISABLE_METRICS=true`.
+2.  User customizations from `$FLOX_CONFIG_DIR/flox.toml` if set,
+    otherwise `flox/flox.toml` in `$XDG_CONFIG_HOME` or any of
+    `$XDG_CONFIG_DIRS`, wherever it is found first.
+3.  System settings from `/etc/flox.toml` or
+    `FLOX_SYSTEM_CONFIG_DIR/flox.toml`.
+4.  `flox` provided defaults.
 
 `flox config` commands that mutate configuration always write to the
 user config file determined in step 2.
@@ -118,12 +118,13 @@ and `hide_default_prompt`. Possible values are:
 
 - `show-all`: shows all active environments
 - `hide-all`: disables the modification of the shell prompt
-- `hide-default`: filters out environments named `default` from the shell prompt
+- `hide-default`: filters out environments named `default` from the
+  shell prompt
 
 `state_dir`  
 Directory where Flox should store data that’s not critical but also
 shouldn’t be able to be freely deleted like data in the cache directory.
-(default: `$XDG_STATE_HOME/flox` e.g. `~/.local/state/flox`)
+(default: `$XDG_STATE_HOME/flox` e.g. `~/.local/state/flox`)
 
 `trusted_environments`  
 Remote environments that are trusted for activation. Contains keys of
@@ -139,6 +140,12 @@ Use 'flox upgrade --dry-run' for details.
 ```
 
 (default: true)
+
+`keep_tempdir`  
+Flox creates a single tempdir for each process in  
+`$FLOX_CACHE_HOME/process`.  
+Flox will delete this tempdir upon conclusion of the process unless
+`keep_tempdir == true` AND verbose logs are enabled.
 
 ## ENVIRONMENT VARIABLES
 

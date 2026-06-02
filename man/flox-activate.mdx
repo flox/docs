@@ -43,7 +43,7 @@ Configures a shell with everything defined by the environment:
   Execs `CMD` directly after performing all parts of activation except
   for running scripts in `[profile]`.
 - in-place: `flox activate` when invoked from a non-interactive shell
-  with its `stdout` redirected e.g. `eval "$(flox activate)"`  
+  with its `stdout` redirected e.g. `eval "$(flox activate)"`  
   Produces commands to be sourced by the parent shell. Flox will
   determine the parent shell from `$FLOX_SHELL` or otherwise
   automatically determine the parent shell and fall back to `$SHELL`.
@@ -64,7 +64,7 @@ environment that they come from. This means that for each shell hook
 various environment variables such as `PATH`, `MANPATH`,
 `PKG_CONFIG_PATH`, `PYTHONPATH`, etc, are set to the appropriate values
 for the environment in which the shell hook was defined. See
-[`manifest.toml(5)`](/man/manifest.toml) for more details on shell
+[`manifest.toml`](/man/manifest.toml) for more details on shell
 hooks.
 
 ## OPTIONS
@@ -98,8 +98,8 @@ this command is just a debugging aid for users.
 `-s`, `--start-services`  
 Start the services listed in the manifest when activating the
 environment. If no services are running, the services from the manifest
-will be started, otherwise a warning will be displayed and activation will
-continue.
+will be started, otherwise a warning will be displayed and activation
+will continue.
 
 To start services by default without requiring `-s`, set
 `services.auto-start = true` in the manifest.
@@ -117,7 +117,7 @@ Don’t start services even if configured in the manifest with
 `-m (dev|run)`, `--mode (dev|run)`  
 Activate the environment in either “dev” or “run” mode. Overrides the
 `options.activate.mode` setting in the manifest. See
-[`manifest.toml(5)`](/man/manifest.toml) for more details on activation
+[`manifest.toml`](/man/manifest.toml) for more details on activation
 modes.
 
 `-g <generation>`, `--generation <generation>`  
@@ -166,7 +166,7 @@ environment.
 
 `$FLOX_PROMPT_ENVIRONMENTS`  
 Contains a space-delimited list of the active environments,
-e.g. `owner1/foo owner2/bar local_env`. If `hide_default_prompt` is set
+e.g. `owner1/foo owner2/bar local_env`. If `hide_default_prompt` is set
 to `true`, environments named `default` are excluded.
 
 `$FLOX_ENV_CACHE`  
@@ -241,7 +241,7 @@ flox activate -- cmd --some-arg arg1 arg2
 ```
 
 Activate `default` Flox environment only within the current shell (add
-to the relevant “rc” file, e.g. `~/.bashrc` or `~/.zprofile`):
+to the relevant “rc” file, e.g. `~/.bashrc` or `~/.zprofile`):
 
 ```bash
 eval "$(flox activate)"
@@ -249,5 +249,5 @@ eval "$(flox activate)"
 
 ## SEE ALSO
 
-[`flox-push(1)`](/man/flox-push), [`flox-pull(1)`](/man/flox-pull),
-[`flox-edit(1)`](/man/flox-edit), [`flox-delete(1)`](/man/flox-delete)
+[`flox-push`](/man/flox-push), [`flox-pull`](/man/flox-pull),
+[`flox-edit`](/man/flox-edit), [`flox-delete`](/man/flox-delete)

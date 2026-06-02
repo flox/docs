@@ -78,12 +78,17 @@ their personal Catalog, the package would appear in `flox search` as
 When installing the package, it is downloaded directly from the Catalog
 Store that it was published to.
 
+Published packages on FloxHub are also available as catalog imports for
+Nix expression builds. Other environments can declare a FloxHub catalog
+in [`nix-builds.toml`](/man/nix-builds.toml) and reference the
+published packages directly from `.nix` expressions under `.flox/pkgs/`.
+
 ### Sharing published packages
 
 A package published to an individual user’s Catalog may only be seen and
 installed by that user. In order to share packages with other users you
-must create an organization. See
-[the organizations concept page](/concepts/organizations) for more details on
+must create an organization. See [the organizations concept
+page](https://flox.dev/docs/concepts/organizations/) for more details on
 organizations and how to create them. Note that this is a paid feature
 available with Flox for Teams.
 
@@ -105,8 +110,12 @@ Store not provided by Flox. Takes precedence over the value of
 
 `--stability <stability>`  
 Perform a nix expression build using a base package set of the given
-stability as tracked by the catalog server. Cannot be used with
-manifest base builds.
+stability as tracked by the catalog server. A stability (e.g.,
+`"stable"`) identifies a curated nixpkgs revision managed by the catalog
+server. When omitted, the base package set is derived from the
+environment’s `toplevel` group; if no `toplevel` group exists, the
+`"stable"` stability is used by default. An explicit `--stability` value
+overrides both of these defaults. Cannot be used with manifest builds.
 
 ### Environment Options
 
@@ -133,6 +142,8 @@ Silence logs except for errors.
 
 ## SEE ALSO
 
-[`flox-build`](/man/flox-build),
-[`flox-activate`](/man/flox-activate),
+[`flox-build`](/man/flox-build)
+[`flox-build-update-catalogs`](/man/flox-build-update-catalogs)
+[`flox-activate`](/man/flox-activate)
 [`manifest.toml`](/man/manifest.toml)
+[`nix-builds.toml`](/man/nix-builds.toml)

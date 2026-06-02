@@ -67,6 +67,12 @@ Path containing a .flox/ directory.
 `-r`, `--reference`  
 A FloxHub environment, specified in the form `<owner>/<name>`.
 
+`-D`, `--default`  
+Use your default environment (`<your-user>/default`). When
+unauthenticated in an interactive context, you will be prompted to log
+in. In non-interactive contexts (e.g., scripts or CI), this flag will
+fail with an error when authentication is missing.
+
 ### General Options
 
 `-h`, `--help`  
@@ -152,7 +158,7 @@ rules](https://github.com/opencontainers/image-spec/blob/main/annotations.md#rul
 
 `stop-signal`  
 The signal to send to the main process to stop the container (e.g.,
-`SIGTERM`). Must follow the container runtime's signal-name conventions.
+`SIGTERM`). Must follow the container runtime’s signal-name conventions.
 
 ## EXAMPLES
 
@@ -207,4 +213,5 @@ Hello, world!
 
 ## SEE ALSO
 
-[`flox-activate`](/man/flox-activate), [`docker-load`](https://docs.docker.com/reference/cli/docker/image/load/)
+[`flox-activate`](/man/flox-activate),
+[`docker-load`](https://docs.docker.com/reference/cli/docker/image/load/)

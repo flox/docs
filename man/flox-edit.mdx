@@ -23,7 +23,7 @@ user to interactively edit. The editor is found by querying `$EDITOR`,
 `$VISUAL`, and then by looking for common editors in `$PATH`. The
 manifest of an environment on FloxHub or in a different directory can be
 edited via the `-r` or `-d` flags respectively. See
-[`manifest.toml(5)`](/man/manifest.toml) for more details on the
+[`manifest.toml`](/man/manifest.toml) for more details on the
 manifest format.
 
 Once the editor is closed the environment is built in order to validate
@@ -79,6 +79,12 @@ Path containing a .flox/ directory.
 `-r`, `--reference`  
 A FloxHub environment, specified in the form `<owner>/<name>`.
 
+`-D`, `--default`  
+Use your default environment (`<your-user>/default`). When
+unauthenticated in an interactive context, you will be prompted to log
+in. In non-interactive contexts (e.g., scripts or CI), this flag will
+fail with an error when authentication is missing.
+
 ### General Options
 
 `-h`, `--help`  
@@ -101,5 +107,5 @@ commit messages.
 
 ## SEE ALSO
 
-[`flox-push(1)`](/man/flox-push), [`flox-pull(1)`](/man/flox-pull),
-[`flox-activate(1)`](/man/flox-activate)
+[`flox-push`](/man/flox-push), [`flox-pull`](/man/flox-pull),
+[`flox-activate`](/man/flox-activate)

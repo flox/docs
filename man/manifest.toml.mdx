@@ -29,8 +29,8 @@ that are represented as TOML tables:
 - [`[include]`](#include)
 - [`[build]`](#build)
 - [`[options]`](#options)
-- [`containerize`] - see
-  [`flox-containerize(1)`](/man/flox-containerize)
+- \[`containerize`\] - see
+  [`flox-containerize`](/man/flox-containerize)
 
 ### `schema-version`
 
@@ -45,10 +45,11 @@ Valid string values are:
 
 - `1.10.0`: introduced package outputs
 - `1.11.0`: introduced `minimum-cli-version`
+- `1.12.0`: introduced services `auto-start`
 
 Existing manifest schemas, including the older `version = 1` format, are
 automatically forward-migrated when using features that require a newer
-schema (e.g. `flox install` with package outputs).
+schema (e.g. `flox install` with package outputs).
 
 ### `minimum-cli-version`
 
@@ -56,14 +57,14 @@ schema (e.g. `flox install` with package outputs).
 version of the Flox CLI required to use the environment. Using an older
 version will emit a warning but not block the command. This is useful
 when an environment depends on behavior introduced in a specific release
-(e.g. a bugfix or feature that isn’t schema related).
+(e.g. a bugfix or feature that isn’t schema related).
 
 ```toml
 minimum-cli-version = "1.11.0"
 ```
 
 The value must be a valid [semantic version](https://semver.org/) string
-(e.g. `"1.11.0"`). Invalid values cause the manifest to be rejected.
+(e.g. `"1.11.0"`). Invalid values cause the manifest to be rejected.
 
 An optional `reason` can be provided using the table form which will be
 included in the emitted warning message:
@@ -110,8 +111,8 @@ manifest.
 #### Package names
 
 Packages are organized in a hierarchical structure such that certain
-packages are found at the top level (e.g. `ripgrep`), and other packages
-are found under package sets (e.g. `python310Packages.pip`). We call
+packages are found at the top level (e.g. `ripgrep`), and other packages
+are found under package sets (e.g. `python310Packages.pip`). We call
 this location within the catalog the “pkg-path”.
 
 The pkg-path is searched when you execute a `flox search` command. The
@@ -127,12 +128,12 @@ pip.pkg-path = "python310Packages.pip"
 #### Package descriptors
 
 Each entry in the `[install]` table is a key-value pair. The key in the
-key-value pair (e.g. `ripgrep`, `pip`) is referred to as an “install
+key-value pair (e.g. `ripgrep`, `pip`) is referred to as an “install
 ID”, and represents the name by which you will refer to a particular
 package e.g. if you wanted to uninstall or upgrade the package. Install
 IDs are inferred from the last attribute in the pkg-path, but may also
 be specified either at install-time via the `-i` option or interactively
-via [`flox-edit(1)`](/man/flox-edit).
+via [`flox-edit`](/man/flox-edit).
 
 The value in the key-value pair is called a “package descriptor”. A
 package is specified by a number of available options which are separate
@@ -190,7 +191,7 @@ pkg-group specified belong to the same group.
 Multiple pkg-groups may resolve to the same version of the catalog.
 Pkg-groups are upgraded as a unit, ensuring that the packages within the
 pkg-group continue to work together. See
-[`flox-upgrade(1)`](/man/flox-upgrade) for more details on how
+[`flox-upgrade`](/man/flox-upgrade) for more details on how
 pkg-groups and packages interact during upgrades.
 
 `version`  
@@ -247,7 +248,7 @@ The outputs of existing packages can be inspected with `flox list -a`
 and new packages can be inspected with `flox show`.
 
 When omitted, the package’s default outputs are installed. When set to
-an array of strings (e.g. `["bin", "man"]`), only those specific outputs
+an array of strings (e.g. `["bin", "man"]`), only those specific outputs
 are installed. When set to the string `"all"`, all available outputs of
 the package are installed.
 
@@ -303,7 +304,7 @@ above for catalog descriptors and flake installables, and `store-path`
 is described below:
 
 `store-path`  
-Specifies a nix store path, i.e. a nix built package in `/nix/store`.
+Specifies a nix store path, i.e. a nix built package in `/nix/store`.
 This can be the result of a native Nix operations such as `nix build`,
 `nix copy`, etc. The store path has to be available on the current
 system in order to build the environment. The environment will fail to
@@ -435,7 +436,7 @@ a parent shell with an already active environment.
 ### `[services]`
 
 The `[services]` section of the manifest allows you to describe the
-services you would like to run as part of your environment e.g. a web
+services you would like to run as part of your environment e.g. a web
 server or a database. The services you define here use the packages
 provided by the `[install]` section and any variables you’ve defined in
 the `[vars]` section or `hook.on-activate` script.
@@ -458,7 +459,13 @@ vars.PGPORT = "9001"
 This would define a service called `database` that configures and starts
 a PostgreSQL database.
 
-The full set of options is shown below:
+Top-level options for the `[services]` block are:
+
+`auto-start`  
+Whether to start all services automatically on `flox activate`. Can be
+suppressed with `--no-start-services`.
+
+The full set of options for an individual service descriptor is:
 
 ```text
 ServiceDescriptor ::= {
@@ -504,7 +511,7 @@ allow the daemon to continue running even after running
 `shutdown.command`  
 A command to run to shut down the service instead of delivering the
 SIGTERM signal to the process. Some programs require special handling to
-shut down properly e.g. a program that spawns a server process and uses
+shut down properly e.g. a program that spawns a server process and uses
 a client to tell the server to shut down. Sending a SIGTERM to a client
 in that case may not shut down the server. In those cases you may
 provide a specific shutdown command to run instead of relying on the
@@ -641,7 +648,7 @@ priority and low priority manifests.
 The `options` section is also deep merged, meaning that individual
 fields of the `options` section are merged rather than being completely
 overwritten. All of the fields in the `options` section are individually
-overwritten by higher priority manifests e.g. `options.allow.broken` is
+overwritten by higher priority manifests e.g. `options.allow.broken` is
 individually overwritten by a higher priority manifest, as is
 `options.allow.licenses`, etc.
 
@@ -717,9 +724,9 @@ control. Consequently, `"pure"` builds require your project to be under
 The version to attach to this build artifact. This may be specified in
 one of the following ways:
 
-1. **as a string**: `version = "0.0.1"`
-2. **as read from a file**: `version.file = "<path>"`
-3. **as returned by a command**: `version.command = "<cmd> <args>"`
+1.  **as a string**: `version = "0.0.1"`
+2.  **as read from a file**: `version.file = "<path>"`
+3.  **as returned by a command**: `version.command = "<cmd> <args>"`
 
 `description`  
 The description string to attach to this build artifact.
@@ -769,7 +776,7 @@ are `x86_64-linux`, `aarch64-linux`, `x86_64-darwin`, and
 this list with the current system type. A user that attempts to pull an
 environment from FloxHub when their environment isn’t explicitly
 supported will be prompted whether to automatically add their system to
-this list. See [`flox-pull(1)`](/man/flox-pull) for more details.
+this list. See [`flox-pull`](/man/flox-pull) for more details.
 
 `activate.mode`  
 Whether to activate in “dev” (default) or “run” mode. This value can be
@@ -812,6 +819,6 @@ Nvidia device and attempt to locate `libcuda` in well-known paths.
 
 ## SEE ALSO
 
-[`flox-init(1)`](/man/flox-init),
-[`flox-install(1)`](/man/flox-install), [`flox-edit(1)`](/man/flox-edit)
-[`flox-build(1)`](/man/flox-build)
+[`flox-init`](/man/flox-init),
+[`flox-install`](/man/flox-install), [`flox-edit`](/man/flox-edit)
+[`flox-build`](/man/flox-build)
