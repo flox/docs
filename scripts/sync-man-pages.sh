@@ -45,10 +45,13 @@ sync_man_pages() {
       # - include-files.lua expands the shared ./include/*.md snippets
       # - --shift-heading-level-by=1 demotes '# NAME' -> '## NAME'
       #   (the page title comes from frontmatter in Mintlify)
+      # - --strip-comments drops source HTML comments (maintainer notes that
+      #   live in cli/flox/doc/*.md); MDX cannot parse them
       ( cd "$src_doc_dir" &&
           pandoc --from markdown --to gfm \
             --lua-filter "$lua_filter" \
             --shift-heading-level-by=1 \
+            --strip-comments \
             "./$name.md" ) |
         # Rewrite cross-references: (./flox-push.md) -> (/man/flox-push)
         sed -E -e 's|\(\./([A-Za-z0-9._-]+)\.md\)|(/man/\1)|g' \
