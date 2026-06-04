@@ -69,19 +69,23 @@ sync_man_pages() {
     echo "  $name.md -> $out"
   done
 
-  # Warn about constructs Mintlify/MDX may not render. Indented lines that
-  # are list-item continuations are fine; indented CODE (from an untagged
-  # source fence) is not. We can't reliably tell them apart here, so this is
-  # informational only — `mint broken-links` / `mint dev` is the real check.
-  local suspect
-  suspect="$(grep -rln '^    [^ ]' "$docs_man_pages_dir"/*.mdx || true)"
-  if [ -n "$suspect" ]; then
+  # Validate the generated pages. `mint broken-links` is the real check (it
+  # parses every MDX file and resolves links), but it needs Node LTS plus
+  # network and runs against the whole docs site via docs.json. So run it only
+  # when both `mint` and a sibling docs.json are present (e.g. a real sync into
+  # the docs repo), and skip it for scratch output dirs. CI remains the hard
+  # gate either way.
+  local docs_root
+  docs_root="$(cd "$docs_man_pages_dir/.." && pwd)"
+  if command -v mint > /dev/null && [ -f "$docs_root/docs.json" ]; then
     echo
-    echo "note: 4-space-indented lines found in the pages below. If these are" >&2
-    echo "list continuations they're fine; if they're code blocks, add a" >&2
-    echo "language tag (\`\`\`text, \`\`\`bash, ...) to the source fence." >&2
-    echo "Verify rendering with 'mint dev' or 'mint broken-links'." >&2
-    echo "$suspect" | sed -e "s|$docs_man_pages_dir/||" -e 's|^|  |' >&2
+    echo "validating with 'mint broken-links'..."
+    ( cd "$docs_root" && mint broken-links ) \
+      || echo "warning: 'mint broken-links' reported problems (see above)." >&2
+  else
+    echo
+    echo "note: skipping 'mint broken-links' (mint or docs.json not found here)." >&2
+    echo "Run 'mint broken-links' from the docs repo root to validate rendering." >&2
   fi
 
   echo
