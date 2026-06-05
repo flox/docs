@@ -56,7 +56,8 @@ sync_man_pages() {
         # Rewrite cross-references: (./flox-push.md) -> (/man/flox-push)
         sed -E -e 's|\(\./([A-Za-z0-9._-]+)\.md\)|(/man/\1)|g' \
           -e 's|\[`([A-Za-z0-9._-]+)\([0-9]\)`\]|[`\1`]|g' \
-          -e 's|^``` ([A-Za-z0-9_+-]+)$|```\1|' |
+          -e 's|^``` ([A-Za-z0-9_+-]+)$|```\1|' \
+          -e 's/^, /  /' |
         # Drop pandoc's '<!-- -->' block separators (MDX cannot parse HTML
         # comments) along with the blank line that follows each one
         awk '{
