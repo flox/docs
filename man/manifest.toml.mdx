@@ -154,11 +154,11 @@ The full list of catalog descriptor options is:
 ```text
 Descriptor ::= {
   pkg-group          = null | <STRING>
-, version            = null | <STRING>
-, systems            = null | [<STRING>, ...]
-, pkg-path           = <STRING>
-, priority           = null | <INT>
-, outputs            = null | "all" | [<STRING>, ...]
+  version            = null | <STRING>
+  systems            = null | [<STRING>, ...]
+  pkg-path           = <STRING>
+  priority           = null | <INT>
+  outputs            = null | "all" | [<STRING>, ...]
 }
 ```
 
@@ -261,9 +261,9 @@ The full list of flake descriptor options is:
 ```text
 Descriptor ::= {
   flake              = <STRING>
-, systems            = null | [<STRING>, ...]
-, priority           = null | <INT>
-, outputs            = null | "all" | [<STRING>, ...]
+  systems            = null | [<STRING>, ...]
+  priority           = null | <INT>
+  outputs            = null | "all" | [<STRING>, ...]
 }
 ```
 
@@ -294,8 +294,8 @@ The full list of store path descriptor options is:
 ```text
 Descriptor ::= {
   store-path         = STRING
-, systems            = null | [<STRING>, ...]
-, priority           = null | <INT>
+  systems            = null | [<STRING>, ...]
+  priority           = null | <INT>
 }
 ```
 
@@ -470,10 +470,10 @@ The full set of options for an individual service descriptor is:
 ```text
 ServiceDescriptor ::= {
   command    = STRING
-, vars       = null | Map[STRING, STRING]
-, is-daemon  = null | BOOL
-, shutdown   = null | Shutdown
-, systems    = null | [<STRING>, ...]
+  vars       = null | Map[STRING, STRING]
+  is-daemon  = null | BOOL
+  shutdown   = null | Shutdown
+  systems    = null | [<STRING>, ...]
 }
 
 Shutdown ::= {
@@ -560,18 +560,18 @@ IncludeDescriptor ::= LocalIncludeDescriptor
 
 LocalIncludeDescriptor ::= {
   dir  = STRING
-, name = null | STRING
+  name = null | STRING
 }
 
 FloxHubIncludeDescriptor ::= {
   remote = STRING
-, name   = null | STRING
+  name   = null | STRING
 }
 
 # Deprecated, will be removed in a future release
 RemoteIncludeDescriptor ::= {
   remote = STRING
-, name   = null | STRING
+  name   = null | STRING
 }
 ```
 
@@ -691,10 +691,10 @@ The full set of options is shown below:
 ```text
 BuildDescriptor ::= {
   command          = STRING
-, sandbox          = null | ("off" | "pure")
-, version          = null | STRING | VersionFile | VersionCommand
-, description      = null | STRING
-, runtime-packages = null | [<STRING>, ...]
+  sandbox          = null | ("off" | "pure")
+  version          = null | STRING | VersionFile | VersionCommand
+  description      = null | STRING
+  runtime-packages = null | [<STRING>, ...]
 }
 
 VersionFile ::= {
@@ -748,10 +748,10 @@ The full set of options are listed below:
 ```text
 Options ::= {
   systems                   = null | [<STRING>, ...]
-, activate                  = null | Activate
-, allow                     = null | Allows
-, semver                    = null | Semver
-, cuda-detection            = null | <BOOL>
+  activate                  = null | Activate
+  allow                     = null | Allows
+  semver                    = null | Semver
+  cuda-detection            = null | <BOOL>
 }
 
 Activate ::= {
@@ -760,8 +760,8 @@ Activate ::= {
 
 Allows ::= {
   unfree   = null | <BOOL>
-, broken   = null | <BOOL>
-, licenses = null | [<STRING>, ...]
+  broken   = null | <BOOL>
+  licenses = null | [<STRING>, ...]
 }
 
 Semver ::= {
