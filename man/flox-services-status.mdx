@@ -13,27 +13,54 @@ flox [<general-options>] services status
      [-d=<path> | -r=<owner/name>]
      [--json]
      [<name>] ...
-```text
+```
 
-# DESCRIPTION
+## DESCRIPTION
 
 Displays the status of one or more services.
 
 If no services are specified, then all services will be displayed. If no
-services have been started for this environment, an error will be displayed.
-An error will also be displayed if one of the specified services
-does not exist.
+services have been started for this environment, an error will be
+displayed. An error will also be displayed if one of the specified
+services does not exist.
 
-# OPTIONS
+## OPTIONS
 
-`--json`
-:   Print statuses formatted as JSON. Each service is printed as a single JSON
-    object on its own line.
+`--json`  
+Print statuses formatted as JSON. Each service is printed as a single
+JSON object on its own line.
 
-```{.include}
-./include/environment-options.md
-./include/general-options.md
-```
+### Environment Options
+
+If no environment is specified for an environment command, the
+environment in the current directory or the active environment that was
+last activated is used.
+
+`-d`, `--dir`  
+Path containing a .flox/ directory.
+
+`-r`, `--reference`  
+A FloxHub environment, specified in the form `<owner>/<name>`.
+
+`-D`, `--default`  
+Use your default environment (`<your-user>/default`). When
+unauthenticated in an interactive context, you will be prompted to log
+in. In non-interactive contexts (e.g., scripts or CI), this flag will
+fail with an error when authentication is missing.
+
+### General Options
+
+`-h`, `--help`  
+Prints help information.
+
+The following options can be passed when running any `flox` subcommand
+but must be specified *before* the subcommand.
+
+`-v`, `--verbose`  
+Increase logging verbosity. Invoke multiple times for increasing detail.
+
+`-q`, `--quiet`  
+Silence logs except for errors.
 
 ## EXAMPLES
 

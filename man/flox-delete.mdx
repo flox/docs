@@ -12,42 +12,47 @@ flox-delete - delete an environment
 flox [<general options>] delete
      [-f]
      [-d=<path>]
-```text
+```
 
-# DESCRIPTION
+## DESCRIPTION
 
-Deletes all data pertaining to an environment.
-By default, only the environment in the current directory is deleted,
-but environments in other directories may be deleted via the `-d` flag.
+Deletes all data pertaining to an environment. By default, only the
+environment in the current directory is deleted, but environments in
+other directories may be deleted via the `-d` flag.
 
 By default, you will be prompted for a confirmation before deleting the
-environment.
-The `-f` flag skips the confirmation dialog and is required for non-interactive
-use.
+environment. The `-f` flag skips the confirmation dialog and is required
+for non-interactive use.
 
-# OPTIONS
+## OPTIONS
 
-## Delete Options
+### Delete Options
 
-`-f`, `--force`
-:   Delete the environment without confirmation.
+`-f`, `--force`  
+Delete the environment without confirmation.
 
-<!-- Copied from ./include/environment-options.md
-     `flox delete` does not currently handle remote environments
-     Replace with an include once support is added.
- -->
-## Environment Options
+### Environment Options
 
-If no environment is specified for an environment command,
-the environment in the current directory
-or the active environment that was last activated is used.
+If no environment is specified for an environment command, the
+environment in the current directory or the active environment that was
+last activated is used.
 
-`-d`, `--dir`
-:   Path containing a .flox/ directory.
+`-d`, `--dir`  
+Path containing a .flox/ directory.
 
-```{.include}
-./include/general-options.md
-```
+### General Options
+
+`-h`, `--help`  
+Prints help information.
+
+The following options can be passed when running any `flox` subcommand
+but must be specified *before* the subcommand.
+
+`-v`, `--verbose`  
+Increase logging verbosity. Invoke multiple times for increasing detail.
+
+`-q`, `--quiet`  
+Silence logs except for errors.
 
 ## SEE ALSO
 
