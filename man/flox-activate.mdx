@@ -67,6 +67,10 @@ for the environment in which the shell hook was defined. See
 [`manifest.toml`](/man/manifest.toml) for more details on shell
 hooks.
 
+To reverse activation, run [`flox-deactivate`](/man/flox-deactivate).
+Inside a `flox activate` subshell, `flox deactivate` is equivalent to
+`exit`.
+
 ## OPTIONS
 
 ### Activate Options
@@ -249,5 +253,6 @@ eval "$(flox activate)"
 
 ## SEE ALSO
 
+[`flox-deactivate`](/man/flox-deactivate),
 [`flox-push`](/man/flox-push), [`flox-pull`](/man/flox-pull),
 [`flox-edit`](/man/flox-edit), [`flox-delete`](/man/flox-delete)
