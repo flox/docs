@@ -9,6 +9,7 @@ schema-version = "1.12.0"
 [install]
 nodejs.pkg-path = "nodejs"
 vale.pkg-path = "vale"
+pandoc.pkg-path = "pandoc"
 # gum.pkg-path = "gum"
 # gum.version = "^0.14.5"
 
