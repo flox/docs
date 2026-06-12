@@ -13,13 +13,13 @@ flox [<general-options>] build import-nixpkgs
      [-d=<path>]
      [--force]
      <installable>
-```
+```text
 
-## DESCRIPTION
+# DESCRIPTION
 
 Import a package definition from nixpkgs for use in the environment.
 This command copies the source code of a package from nixpkgs into the
-environment’s `.flox/pkgs/` directory, allowing you to modify and build
+environment's `.flox/pkgs/` directory, allowing you to modify and build
 the package locally.
 
 The package definition is imported as a Nix expression file at
@@ -28,54 +28,35 @@ path of the package (e.g., `hello` for `nixpkgs#hello`).
 
 This is useful when you need to:
 
-- Modify a package’s build process
+- Modify a package's build process
 - Apply patches or customizations
 - Debug package issues
 - Create variants of existing packages
 
-### Installable format
+## Installable format
 
-The `<installable>` parameter can be specified in one of the following
-formats:
+The `<installable>` parameter can be specified in one of the following formats:
 
-1.  **Attribute path only**: `hello` (defaults to `nixpkgs#hello`)
-2.  **Flake reference with attribute**: `nixpkgs#hello`
-3.  **Full flake reference**: `github:nixos/nixpkgs#hello`
+1. **Attribute path only**: `hello` (defaults to `nixpkgs#hello`)
+2. **Flake reference with attribute**: `nixpkgs#hello`
+3. **Full flake reference**: `github:nixos/nixpkgs#hello`
 
-## OPTIONS
+# OPTIONS
 
-`<installable>`  
-The package to import from nixpkgs. Can be specified as an attribute
-path (e.g., `hello`) or as a flake reference with attribute path (e.g.,
-`nixpkgs#hello`).
+`<installable>`
+:   The package to import from nixpkgs.
+    Can be specified as an attribute path (e.g., `hello`) or as a flake
+    reference with attribute path (e.g., `nixpkgs#hello`).
 
-`--force`  
-Overwrite existing package file if it already exists. Without this flag,
-the command will fail if the package file already exists in the
-environment.
+`--force`
+:   Overwrite existing package file if it already exists.
+    Without this flag, the command will fail if the package file
+    already exists in the environment.
 
-### Environment Options
-
-If no environment is specified for an environment command, the
-environment in the current directory or the active environment that was
-last activated is used.
-
-`-d`, `--dir`  
-Path containing a .flox/ directory.
-
-### General Options
-
-`-h`, `--help`  
-Prints help information.
-
-The following options can be passed when running any `flox` subcommand
-but must be specified *before* the subcommand.
-
-`-v`, `--verbose`  
-Increase logging verbosity. Invoke multiple times for increasing detail.
-
-`-q`, `--quiet`  
-Silence logs except for errors.
+```{.include}
+./include/dir-environment-options.md
+./include/general-options.md
+```
 
 ## EXAMPLES
 
