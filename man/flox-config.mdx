@@ -14,30 +14,30 @@ flox [<general-options>] config
       -r |
       --set <key> <string> |
       --delete=<key>]
-```
+```text
 
-## DESCRIPTION
+# DESCRIPTION
 
-Without any flags or when `-l` is passed, `flox config` shows all
-options with their computed value.
+Without any flags or when `-l` is passed, `flox config` shows all options with
+their computed value.
 
-Config values are read from the following sources in order of descending
-priority:
+Config values are read from the following sources in order of descending priority:
 
-1.  Environment variables. All config options may be set by prefixing
-    with `FLOX_` and using `SCREAMING_SNAKE_CASE`. For example,
-    `disable_metrics` may be set with `FLOX_DISABLE_METRICS=true`.
-2.  User customizations from `$FLOX_CONFIG_DIR/flox.toml` if set,
-    otherwise `flox/flox.toml` in `$XDG_CONFIG_HOME` or any of
-    `$XDG_CONFIG_DIRS`, wherever it is found first.
-3.  System settings from `/etc/flox.toml` or
-    `FLOX_SYSTEM_CONFIG_DIR/flox.toml`.
-4.  `flox` provided defaults.
+1. Environment variables.
+   All config options may be set by prefixing with `FLOX_` and using
+   `SCREAMING_SNAKE_CASE`.
+   For example, `disable_metrics` may be set with `FLOX_DISABLE_METRICS=true`.
+2. User customizations from `$FLOX_CONFIG_DIR/flox.toml` if set,
+   otherwise `flox/flox.toml` in `$XDG_CONFIG_HOME` or any of `$XDG_CONFIG_DIRS`,
+   wherever it is found first.
+3. System settings from `/etc/flox.toml` or `FLOX_SYSTEM_CONFIG_DIR/flox.toml`.
+4. `flox` provided defaults.
 
-`flox config` commands that mutate configuration always write to the
-user config file determined in step 2.
+`flox config` commands that mutate configuration always write to the user config file
+determined in step 2.
 
-### Key Format
+
+## Key Format
 
 `<key>` supports dot-separated queries for nested values, for example:
 
@@ -89,6 +89,10 @@ Directory where Flox should store ephemeral data (default:
 `data_dir`  
 Directory where Flox should store persistent data (default:
 `$XDG_DATA_HOME/flox`).
+
+`disable_hook`  
+Don’t set up the Flox prompt hook as part of activation. The prompt hook
+is required for `flox deactivate` to take effect (default: false).
 
 `disable_metrics`  
 Disable collecting and sending usage metrics.

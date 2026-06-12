@@ -12,36 +12,26 @@ flox - developer environments you can take with you
 flox [<general options>] <command>
      [<command options>]
      [<args>] ...
-```
+```text
 
-## DESCRIPTION
+# DESCRIPTION
 
 Flox is a virtual environment and package manager all in one.
 
-With Flox you create environments that layer and provide dependencies
-just where it matters, making them portable across the full software
-lifecycle.
+With Flox you create environments that layer and provide dependencies just
+where it matters,
+making them portable across the full software lifecycle.
 
-### Command Line Completions
+## Command Line Completions
 
 Flox ships with command line completions for `bash`, `fish` and `zsh`.
 These completions are installed alongside Flox.
 
-## OPTIONS
+# OPTIONS
 
-### General Options
-
-`-h`, `--help`  
-Prints help information.
-
-The following options can be passed when running any `flox` subcommand
-but must be specified *before* the subcommand.
-
-`-v`, `--verbose`  
-Increase logging verbosity. Invoke multiple times for increasing detail.
-
-`-q`, `--quiet`  
-Silence logs except for errors.
+```{.include}
+./include/general-options.md
+```
 
 ### Flox Options
 
@@ -59,7 +49,10 @@ development, sharing environments, and administration.
 Create an environment in the current directory.
 
 `activate`  
-Enter the environment, type `exit` to leave.
+Enter the environment, run `flox deactivate` to leave.
+
+`deactivate`  
+Deactivate the current environment.
 
 `search`  
 Search for system or library packages to install.

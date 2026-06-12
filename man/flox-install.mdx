@@ -13,65 +13,55 @@ flox [<general options>] install
      [-i <id>] <package>[@<version>]
      [-i <id>] <package>[^<outputs>]
      [[-i <id>] <package>] ...
-```
+```text
 
-## DESCRIPTION
+# DESCRIPTION
 
 Install packages to an environment.
 
-Package installation is transactional. During an installation attempt
-the environment is built in order to validate that the environment isn’t
-broken (for example, in rare cases packages may provide files that
-conflict). If building the environment fails, including any of the
-constituent packages, the attempt is discarded and the environment is
-unmodified. If the build succeeds, the environment is atomically
-updated.
+Package installation is transactional.
+During an installation attempt the environment is built in order to validate
+that the environment isn't broken
+(for example, in rare cases packages may provide files that conflict).
+If building the environment fails,
+including any of the constituent packages,
+the attempt is discarded and the environment is unmodified.
+If the build succeeds, the environment is atomically updated.
 
-If a requested package is already installed, nothing is done. If
-multiple packages are requested and some of them are already installed,
-only the new packages are installed and the transaction will still
-succeed as long as the build succeeds.
+If a requested package is already installed, nothing is done.
+If multiple packages are requested and some of them are already installed,
+only the new packages are installed and the transaction will still succeed as
+long as the build succeeds.
 
 You may also specify packages to be installed via
-[`flox-edit`](/man/flox-edit), which allows specifying a variety of
-options for package installation. See
-[`manifest.toml`](/man/manifest.toml) for more details on the
-available options.
+[`flox-edit`](/man/flox-edit),
+which allows specifying a variety of options for package installation.
+See [`manifest.toml`](/man/manifest.toml) for more details on the available
+options.
 
-### Install ID
+## Install ID
 
 The name of a package as it exists in the manifest is referred to as the
-“install ID”. This ID is separate from the pkg-path and provides a
-shorthand for packages with long names such as `python310Packages.pip`.
-Install IDs also provide a way to give packages more semantically
-meaningful, convenient, or aesthetically pleasing names in the manifest
-(e.g. `node21` instead of `nodejs_21`). When not explicitly provided,
-the install ID is inferred based on the pkg-path. For pkg-paths that
-consist of a single attribute (e.g. `ripgrep`) the install ID is set to
-that attribute. For pkg-paths that consist of multiple attributes
-(e.g. `python310Packages.pip`) the install ID is set to the last
-attribute in the pkg-path (e.g. `pip`).
+"install ID".
+This ID is separate from the pkg-path and provides a shorthand for packages
+with long names such as `python310Packages.pip`.
+Install IDs also provide a way to give packages more semantically meaningful,
+convenient, or aesthetically pleasing names in the manifest
+(e.g. `node21` instead of `nodejs_21`).
+When not explicitly provided, the install ID is inferred based on the pkg-path.
+For pkg-paths that consist of a single attribute (e.g. `ripgrep`) the install
+ID is set to that attribute.
+For pkg-paths that consist of multiple attributes (e.g. `python310Packages.pip`)
+the install ID is set to the last attribute in the pkg-path (e.g. `pip`).
 
-As an advanced feature, a Nix flake installable may be specified instead
-of a pkg-path, and in this case the install ID is inferred from the
-attribute path specified, or if no attribute path is provided, the
-install ID is inferred from the flake reference.
+As an advanced feature, a Nix flake installable may be specified instead of a
+pkg-path,
+and in this case the install ID is inferred from the attribute path specified,
+or if no attribute path is provided, the install ID is inferred from the flake
+reference.
 
-### Package names
-
-Packages are organized in a hierarchical structure such that certain
-packages are found at the top level (e.g. `ripgrep`), and other packages
-are found under package sets (e.g. `python310Packages.pip`). We call
-this location within the catalog the “pkg-path”.
-
-The pkg-path is searched when you execute a `flox search` command. The
-pkg-path is what’s shown by `flox show`. Finally, the pkg-path appears
-in your manifest after a `flox install`.
-
-```toml
-[install]
-ripgrep.pkg-path = "ripgrep"
-pip.pkg-path = "python310Packages.pip"
+```{.include}
+./include/package-names.md
 ```
 
 ## OPTIONS

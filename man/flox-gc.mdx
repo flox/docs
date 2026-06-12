@@ -10,30 +10,19 @@ flox-gc - Garbage collection
 
 ```text
 flox [<general options>] gc
-```
+```text
 
-## DESCRIPTION
+# DESCRIPTION
 
 Garbage collects any data for deleted environments.
 
-This both deletes data managed by Flox and runs garbage collection on
-the Nix store.
+This both deletes data managed by Flox and runs garbage collection on the Nix store.
 
-## OPTIONS
+# OPTIONS
 
-### General Options
-
-`-h`, `--help`  
-Prints help information.
-
-The following options can be passed when running any `flox` subcommand
-but must be specified *before* the subcommand.
-
-`-v`, `--verbose`  
-Increase logging verbosity. Invoke multiple times for increasing detail.
-
-`-q`, `--quiet`  
-Silence logs except for errors.
+```{.include}
+./include/general-options.md
+```
 
 ## SEE ALSO
 

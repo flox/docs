@@ -17,43 +17,43 @@ flox [<general-options>] activate
      [-m=(dev|run)]
      [-g=<generation>]
      [-c=<shell command> | -- <exec command>...]
-```
+```text
 
-## DESCRIPTION
+# DESCRIPTION
 
 Configures a shell with everything defined by the environment:
 
-- Downloads packages and adds their `bin` directories to your `$PATH`.
-- Sets environment variables and aliases.
-- Runs hooks.
-- Starts services (if `--start-services` is specified).
+* Downloads packages and adds their `bin` directories to your `$PATH`.
+* Sets environment variables and aliases.
+* Runs hooks.
+* Starts services (if `--start-services` is specified).
 
 `flox activate` may run in one of four modes:
 
-- interactive: `flox activate` when invoked from an interactive shell  
-  Launches an interactive sub-shell. The shell to be launched is
-  determined by `$FLOX_SHELL` or `$SHELL`.
-- shell command: `flox activate -c CMD`  
-  Runs `CMD` in the same environment as if run inside an interactive
-  shell produced by an interactive `flox activate`. The shell `CMD` is
-  run by is determined by `$FLOX_SHELL` or `$SHELL`. Because `CMD` is
-  passed to a shell, shell features like running multiple commands with
-  `&&` can be used.
-- exec command: `flox activate -- CMD`  
-  Execs `CMD` directly after performing all parts of activation except
-  for running scripts in `[profile]`.
-- in-place: `flox activate` when invoked from a non-interactive shell
-  with its `stdout` redirected e.g. `eval "$(flox activate)"`  
-  Produces commands to be sourced by the parent shell. Flox will
-  determine the parent shell from `$FLOX_SHELL` or otherwise
+* interactive: `flox activate` when invoked from an interactive shell\
+  Launches an interactive sub-shell.
+  The shell to be launched is determined by `$FLOX_SHELL` or `$SHELL`.
+* shell command: `flox activate -c CMD`\
+  Runs `CMD` in the same environment as if run inside an interactive shell
+  produced by an interactive `flox activate`.
+  The shell `CMD` is run by is determined by `$FLOX_SHELL` or `$SHELL`.
+  Because `CMD` is passed to a shell, shell features like running multiple
+  commands with `&&` can be used.
+* exec command: `flox activate -- CMD`\
+  Execs `CMD` directly after performing all parts of activation except for
+  running scripts in `[profile]`.
+* in-place: `flox activate` when invoked from a non-interactive shell
+  with its `stdout` redirected e.g. `eval "$(flox activate)"`\
+  Produces commands to be sourced by the parent shell.
+  Flox will determine the parent shell from `$FLOX_SHELL` or otherwise
   automatically determine the parent shell and fall back to `$SHELL`.
 
-`flox activate` currently supports `bash`, `fish`, `tcsh`, and `zsh`
-shells for any of the detection mechanisms described above.
+`flox activate` currently supports `bash`, `fish`, `tcsh`, and `zsh` shells
+for any of the detection mechanisms described above.
 
-When invoked interactively, the shell prompt will be modified to display
-the active environments, as shown below:
-
+When invoked interactively,
+the shell prompt will be modified to display the active environments,
+as shown below:
 ```text
 flox [env1 env2 env3] <normal prompt>
 ```
@@ -66,6 +66,10 @@ various environment variables such as `PATH`, `MANPATH`,
 for the environment in which the shell hook was defined. See
 [`manifest.toml`](/man/manifest.toml) for more details on shell
 hooks.
+
+To reverse activation, run [`flox-deactivate`](/man/flox-deactivate).
+Inside a `flox activate` subshell, `flox deactivate` is equivalent to
+`exit`.
 
 ## OPTIONS
 
@@ -249,5 +253,6 @@ eval "$(flox activate)"
 
 ## SEE ALSO
 
+[`flox-deactivate`](/man/flox-deactivate),
 [`flox-push`](/man/flox-push), [`flox-pull`](/man/flox-pull),
 [`flox-edit`](/man/flox-edit), [`flox-delete`](/man/flox-delete)
