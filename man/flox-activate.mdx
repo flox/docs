@@ -30,20 +30,20 @@ Configures a shell with everything defined by the environment:
 
 `flox activate` may run in one of four modes:
 
-- interactive: `flox activate` when invoked from an interactive shell  
+- interactive: `flox activate` when invoked from an interactive shell\
   Launches an interactive sub-shell. The shell to be launched is
   determined by `$FLOX_SHELL` or `$SHELL`.
-- shell command: `flox activate -c CMD`  
+- shell command: `flox activate -c CMD`\
   Runs `CMD` in the same environment as if run inside an interactive
   shell produced by an interactive `flox activate`. The shell `CMD` is
   run by is determined by `$FLOX_SHELL` or `$SHELL`. Because `CMD` is
   passed to a shell, shell features like running multiple commands with
   `&&` can be used.
-- exec command: `flox activate -- CMD`  
+- exec command: `flox activate -- CMD`\
   Execs `CMD` directly after performing all parts of activation except
   for running scripts in `[profile]`.
 - in-place: `flox activate` when invoked from a non-interactive shell
-  with its `stdout` redirected e.g. `eval "$(flox activate)"`  
+  with its `stdout` redirected e.g. `eval "$(flox activate)"`\
   Produces commands to be sourced by the parent shell. Flox will
   determine the parent shell from `$FLOX_SHELL` or otherwise
   automatically determine the parent shell and fall back to `$SHELL`.
@@ -70,6 +70,78 @@ hooks.
 To reverse activation, run [`flox-deactivate`](/man/flox-deactivate).
 Inside a `flox activate` subshell, `flox deactivate` is equivalent to
 `exit`.
+
+## AUTO-ACTIVATION
+
+> **Experimental:** Auto-activation is experimental and behind a feature
+> flag, and its behavior is subject to change. Enable it by setting
+> `FLOX_FEATURES_AUTO_ACTIVATE=true` in your environment, or by running
+> `flox config --set features.auto_activate true`. See the
+> *AUTO-ACTIVATION* section of *flox-activate(1)* for details.
+
+Auto-activation activates an environment automatically when you enter a
+directory that contains it, and deactivates it when you leave, so you do
+not have to run `flox activate` by hand.
+
+### Enabling auto-activation
+
+Two things are required:
+
+1.  The Flox prompt hook must be installed in your shell. The hook is
+    installed by any in-place activation, so add a line such as
+    `eval "$(flox activate -D)"` to your shell’s startup file (for
+    example `~/.bashrc`, `~/.zshrc`, `~/.config/fish/config.fish`, or
+    `~/.tcshrc`). If you already activate a default or other environment
+    in-place at startup, the hook is already installed. The hook ships
+    with Flox and stays dormant until the feature flag below is set. Set
+    `disable_hook = true` to opt out of the hook entirely.
+2.  The `auto_activate` feature flag must be enabled, either with
+    `FLOX_FEATURES_AUTO_ACTIVATE=true` in your environment or with
+    `flox config --set features.auto_activate true`.
+
+`bash`, `zsh`, `fish`, and `tcsh` are supported.
+
+### How it works
+
+On each prompt the hook looks for `.flox` environments at or above the
+current directory. An environment is auto-activated only if you have
+allowed it. Allowed environments are activated outermost-first; when you
+leave their directory they are deactivated again. Services are not
+started unless `services.auto-start = true` is set in the manifest.
+
+### Allowing and denying environments
+
+The first time you enter a directory with an environment that you have
+neither allowed nor denied, and `auto_activate` is set to `prompt` (the
+default), Flox asks before activating it:
+
+```text
+Auto-activate the environment in '/path/to/project'? [y/N]
+```
+
+Answering `y` allows the environment and activates it immediately, and
+records the choice so you are not asked again. Answering `N` (or
+pressing Enter) skips the environment for the current shell session
+only; you are asked again in a new shell or when you re-enter the
+directory. To stop being asked for a directory, run
+[`flox-activate-deny`](/man/flox-activate-deny):
+
+```bash
+flox activate deny --dir /path/to/project
+```
+
+Set the `auto_activate` config option to `allowed` to skip the prompt
+entirely and auto-activate only environments you have already allowed.
+
+Manage these decisions ahead of time with the
+[`flox-activate-allow`](/man/flox-activate-allow) and
+[`flox-activate-deny`](/man/flox-activate-deny) subcommands.
+Decisions are stored in the user config file under
+`auto_activate_environments`.
+
+See [`flox-config`](/man/flox-config) for the `auto_activate`,
+`auto_activate_environments`, `auto_activate_fish_mode`, and
+`disable_hook` options.
 
 ## OPTIONS
 
@@ -206,13 +278,15 @@ emit commands to configure an already-running (parent) shell. In both of
 these cases Flox needs to know which shell to use, and these variables
 are used to control the selection process.
 
-- interactive and command modes: When launching a sub-shell Flox will
-  invoke the shell specified in `$FLOX_SHELL` if set or fall back to
-  invoke `$SHELL` by default.
-- in-place mode: When performing an “in place” activation Flox will
-  attempt to detect its parent shell type unless overridden by the
-  `$FLOX_SHELL` variable, and if it cannot detect its parent shell type
-  then will produce a script with syntax determined by `$SHELL`.
+    * interactive and command modes: When launching a sub-shell
+      Flox will invoke
+      the shell specified in `$FLOX_SHELL` if set
+      or fall back to invoke `$SHELL` by default.
+    * in-place mode: When performing an "in place" activation
+      Flox will attempt to detect its parent shell type unless overridden by
+      the `$FLOX_SHELL` variable,
+      and if it cannot detect its parent shell type then will
+      produce a script with syntax determined by `$SHELL`.
 
 `$FLOX_PROMPT_COLOR_{1,2}`  
 Flox adds text to the beginning of the shell prompt to indicate which
@@ -254,5 +328,8 @@ eval "$(flox activate)"
 ## SEE ALSO
 
 [`flox-deactivate`](/man/flox-deactivate),
-[`flox-push`](/man/flox-push), [`flox-pull`](/man/flox-pull),
-[`flox-edit`](/man/flox-edit), [`flox-delete`](/man/flox-delete)
+[`flox-activate-allow`](/man/flox-activate-allow),
+[`flox-activate-deny`](/man/flox-activate-deny),
+[`flox-config`](/man/flox-config), [`flox-push`](/man/flox-push),
+[`flox-pull`](/man/flox-pull), [`flox-edit`](/man/flox-edit),
+[`flox-delete`](/man/flox-delete)

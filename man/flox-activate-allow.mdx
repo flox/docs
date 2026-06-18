@@ -1,0 +1,95 @@
+---
+title: "flox activate allow"
+---
+
+## NAME
+
+flox-activate-allow - allow auto-activation for an environment
+
+## SYNOPSIS
+
+```text
+flox [<general-options>] activate allow
+     [-d=<path> | -r=<owner>/<name> | -D]
+```
+
+## DESCRIPTION
+
+> **Experimental:** Auto-activation is experimental and behind a feature
+> flag, and its behavior is subject to change. Enable it by setting
+> `FLOX_FEATURES_AUTO_ACTIVATE=true` in your environment, or by running
+> `flox config --set features.auto_activate true`. See the
+> *AUTO-ACTIVATION* section of *flox-activate(1)* for details.
+
+Records that the selected environment may be auto-activated.
+
+Once an environment is allowed, the Flox prompt hook activates it
+automatically whenever you enter a directory containing it, without
+prompting. The preference is stored in the user config file under
+`auto_activate_environments`, keyed by the absolute path of the
+directory that contains the `.flox` directory.
+
+By default `flox activate allow` targets the environment in the current
+directory. Use the environment options below to target a different
+environment.
+
+To stop an environment from being auto-activated, run
+[`flox-activate-deny`](/man/flox-activate-deny).
+
+See the *AUTO-ACTIVATION* section of
+[`flox-activate`](/man/flox-activate) for the full picture, including
+the consent prompt and how to enable the feature.
+
+## OPTIONS
+
+### Environment Options
+
+If no environment is specified for an environment command, the
+environment in the current directory or the active environment that was
+last activated is used.
+
+`-d`, `--dir`  
+Path containing a .flox/ directory.
+
+`-r`, `--reference`  
+A FloxHub environment, specified in the form `<owner>/<name>`.
+
+`-D`, `--default`  
+Use your default environment (`<your-user>/default`). When
+unauthenticated in an interactive context, you will be prompted to log
+in. In non-interactive contexts (e.g., scripts or CI), this flag will
+fail with an error when authentication is missing.
+
+### General Options
+
+`-h`, `--help`  
+Prints help information.
+
+The following options can be passed when running any `flox` subcommand
+but must be specified *before* the subcommand.
+
+`-v`, `--verbose`  
+Increase logging verbosity. Invoke multiple times for increasing detail.
+
+`-q`, `--quiet`  
+Silence logs except for errors.
+
+## EXAMPLES
+
+Allow auto-activation for the environment in the current directory:
+
+```bash
+flox activate allow
+```
+
+Allow auto-activation for an environment in another directory:
+
+```bash
+flox activate allow -d /path/to/project
+```
+
+## SEE ALSO
+
+[`flox-activate`](/man/flox-activate),
+[`flox-activate-deny`](/man/flox-activate-deny),
+[`flox-config`](/man/flox-config)
