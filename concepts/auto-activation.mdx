@@ -218,7 +218,7 @@ environment variables, and hooks — but differ in a few ways:
 | --- | --- | --- |
 | **Trigger** | Explicit `flox activate` command | Automatic on `cd` into a `.flox` directory |
 | **Gate** | None — you chose to activate | Requires the feature flag and an allowed environment |
-| **Deactivation** | `flox deactivate` or `exit` (subshell) | `flox deactivate` |
+| **Deactivation** | `flox deactivate` or `exit` (subshell) | `flox deactivate` (all auto-activated environments are in-place activations) |
 | **Failure** | Activation aborts on failure | A failed activation aborts; other layers still activate |
 
 See [Activating environments](/concepts/activation) for how activation works in
