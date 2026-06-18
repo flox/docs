@@ -30,20 +30,20 @@ Configures a shell with everything defined by the environment:
 
 `flox activate` may run in one of four modes:
 
-- interactive: `flox activate` when invoked from an interactive shell  
+- interactive: `flox activate` when invoked from an interactive shell\
   Launches an interactive sub-shell. The shell to be launched is
   determined by `$FLOX_SHELL` or `$SHELL`.
-- shell command: `flox activate -c CMD`  
+- shell command: `flox activate -c CMD`\
   Runs `CMD` in the same environment as if run inside an interactive
   shell produced by an interactive `flox activate`. The shell `CMD` is
   run by is determined by `$FLOX_SHELL` or `$SHELL`. Because `CMD` is
   passed to a shell, shell features like running multiple commands with
   `&&` can be used.
-- exec command: `flox activate -- CMD`  
+- exec command: `flox activate -- CMD`\
   Execs `CMD` directly after performing all parts of activation except
   for running scripts in `[profile]`.
 - in-place: `flox activate` when invoked from a non-interactive shell
-  with its `stdout` redirected e.g. `eval "$(flox activate)"`  
+  with its `stdout` redirected e.g. `eval "$(flox activate)"`\
   Produces commands to be sourced by the parent shell. Flox will
   determine the parent shell from `$FLOX_SHELL` or otherwise
   automatically determine the parent shell and fall back to `$SHELL`.
@@ -278,13 +278,15 @@ emit commands to configure an already-running (parent) shell. In both of
 these cases Flox needs to know which shell to use, and these variables
 are used to control the selection process.
 
-- interactive and command modes: When launching a sub-shell Flox will
-  invoke the shell specified in `$FLOX_SHELL` if set or fall back to
-  invoke `$SHELL` by default.
-- in-place mode: When performing an “in place” activation Flox will
-  attempt to detect its parent shell type unless overridden by the
-  `$FLOX_SHELL` variable, and if it cannot detect its parent shell type
-  then will produce a script with syntax determined by `$SHELL`.
+    * interactive and command modes: When launching a sub-shell
+      Flox will invoke
+      the shell specified in `$FLOX_SHELL` if set
+      or fall back to invoke `$SHELL` by default.
+    * in-place mode: When performing an "in place" activation
+      Flox will attempt to detect its parent shell type unless overridden by
+      the `$FLOX_SHELL` variable,
+      and if it cannot detect its parent shell type then will
+      produce a script with syntax determined by `$SHELL`.
 
 `$FLOX_PROMPT_COLOR_{1,2}`  
 Flox adds text to the beginning of the shell prompt to indicate which
