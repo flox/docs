@@ -179,8 +179,6 @@
             "group": "Environments",
             "pages": [
               "man/flox-activate",
-              "man/flox-activate-allow",
-              "man/flox-activate-deny",
               "man/flox-edit",
               "man/flox-delete",
               "man/flox-envs"
