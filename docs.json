@@ -114,6 +114,7 @@
             "pages": [
               "concepts/environments",
               "concepts/activation",
+              "concepts/auto-activation",
               "concepts/compatibility",
               "concepts/floxhub",
               "concepts/floxhub-environments",
@@ -178,6 +179,8 @@
             "group": "Environments",
             "pages": [
               "man/flox-activate",
+              "man/flox-activate-allow",
+              "man/flox-activate-deny",
               "man/flox-edit",
               "man/flox-delete",
               "man/flox-envs"
