@@ -114,6 +114,7 @@
             "pages": [
               "concepts/environments",
               "concepts/activation",
+              "concepts/auto-activation",
               "concepts/compatibility",
               "concepts/floxhub",
               "concepts/floxhub-environments",
