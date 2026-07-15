@@ -1,0 +1,22 @@
+name: Check man page nav coverage
+
+# docs.json nav entries are maintained by hand while man/*.mdx is synced
+# from flox/flox, so a new command's page can ship without a sidebar link.
+# Fail PRs that add a man page (or touch the nav) without a docs.json entry.
+on:
+  pull_request:
+    paths:
+      - 'man/**'
+      - 'docs.json'
+      - 'scripts/check-man-nav.sh'
+  workflow_dispatch:
+
+jobs:
+  check-man-nav:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout docs
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Check nav coverage
+        run: ./scripts/check-man-nav.sh

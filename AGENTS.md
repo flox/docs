@@ -54,7 +54,10 @@ Everything under `man/` is generated from the man page sources in the
 
   The script requires `pandoc` (e.g. `flox install pandoc`).
 - New pages also need a navigation entry in `docs.json` under the
-  "CLI reference" tab.
+  "CLI reference" tab. `scripts/check-man-nav.sh` enforces this (it runs
+  as a warning during the sync and as a failing check on PRs that touch
+  `man/` or `docs.json`); pages deliberately left out of the sidebar go
+  in that script's `ALLOWLIST`.
 
 ## Content boundaries
 

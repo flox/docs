@@ -88,6 +88,14 @@ sync_man_pages() {
     echo "Run 'mint broken-links' from the docs repo root to validate rendering." >&2
   fi
 
+  # Nav coverage: docs.json is hand-curated, so a newly synced page has no
+  # sidebar entry until someone adds one (see AGENTS.md). Warn here so local
+  # syncs surface it; the check-man-nav workflow is the hard gate on PRs.
+  if [ -f "$docs_root/docs.json" ]; then
+    "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/check-man-nav.sh" "$docs_root" \
+      || echo "warning: add the pages above to the docs.json nav before merging." >&2
+  fi
+
   echo
   echo "synced $(find "$docs_man_pages_dir" -name '*.mdx' | wc -l | tr -d ' ') pages to $docs_man_pages_dir"
 }
