@@ -44,9 +44,5 @@ jobs:
           title: "chore(man): sync man pages from flox/flox"
           body: "This PR was automatically created by the [Sync man pages workflow](https://github.com/flox/docs/actions/workflows/sync-man-pages.yml). `man/*.mdx` is generated from flox/flox `cli/flox/doc` — please spot-check the rendered pages before merging."
           # Routing is via the label, matching the sibling
-          # update-flox-version.yml workflow. A `team-reviewers`
-          # request fails the whole step unless the team is a
-          # collaborator on this repo (it is not today), so it is
-          # intentionally omitted. Re-add it if cli-team is granted
-          # repo access.
+          # update-flox-version.yml workflow.
           labels: "team-developer-support"
