@@ -119,16 +119,9 @@ default), Flox asks before activating it:
 Auto-activate the environment in '/path/to/project'? [y/N]
 ```
 
-Answering `y` allows the environment and activates it immediately, and
-records the choice so you are not asked again. Answering `N` (or
-pressing Enter) skips the environment for the current shell session
-only; you are asked again in a new shell or when you re-enter the
-directory. To stop being asked for this directory, run
-[`flox-activate-deny`](/man/flox-activate-deny):
-
-```bash
-flox activate deny
-```
+The decision is persisted, but to change it run either
+[`flox-activate-allow`](/man/flox-activate-allow) or
+[`flox-activate-deny`](/man/flox-activate-deny).
 
 Set the `auto_activate` config option to `allowed` to skip the prompt
 entirely and auto-activate only environments you have already allowed.
@@ -326,5 +319,8 @@ eval "$(flox activate)"
 ## SEE ALSO
 
 [`flox-deactivate`](/man/flox-deactivate),
-[`flox-push`](/man/flox-push), [`flox-pull`](/man/flox-pull),
-[`flox-edit`](/man/flox-edit), [`flox-delete`](/man/flox-delete)
+[`flox-activate-allow`](/man/flox-activate-allow),
+[`flox-activate-deny`](/man/flox-activate-deny),
+[`flox-config`](/man/flox-config), [`flox-push`](/man/flox-push),
+[`flox-pull`](/man/flox-pull), [`flox-edit`](/man/flox-edit),
+[`flox-delete`](/man/flox-delete)
