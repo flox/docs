@@ -179,6 +179,7 @@
             "group": "Environments",
             "pages": [
               "man/flox-activate",
+              "man/flox-deactivate",
               "man/flox-edit",
               "man/flox-delete",
               "man/flox-envs"
@@ -189,6 +190,7 @@
             "pages": [
               "man/flox-search",
               "man/flox-show",
+              "man/flox-run",
               "man/flox-install",
               "man/flox-uninstall",
               "man/flox-upgrade",
