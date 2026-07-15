@@ -1,0 +1,42 @@
+name: Sync man pages
+
+on:
+  schedule:
+    - cron: '0 7 * * *'  # daily at 07:00 UTC (offset from the 06:00 version-update job)
+  workflow_dispatch:
+
+jobs:
+  sync-man-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout docs
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Checkout flox source
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          repository: flox/flox
+          path: flox-src
+
+      - name: Install Flox
+        uses: flox/install-flox-action@3b80351ae97bbe063f264dc88fbd505507054963 # v2.5.3
+
+      - name: Sync man pages
+        run: |
+          flox activate -- ./scripts/sync-man-pages.sh "$GITHUB_WORKSPACE/flox-src" ./man
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
+        with:
+          token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
+          add-paths: |
+            man
+          commit-message: "chore(man): sync man pages from flox/flox"
+          committer: "FloxBot <bot@flox.dev>"
+          author: "FloxBot <bot@flox.dev>"
+          branch: "chore-sync-man-pages"
+          delete-branch: true
+          title: "chore(man): sync man pages from flox/flox"
+          body: "This PR was automatically created by the [Sync man pages workflow](https://github.com/flox/docs/actions/workflows/sync-man-pages.yml). `man/*.mdx` is generated from flox/flox `cli/flox/doc` — please spot-check the rendered pages before merging."
+          labels: "team-developer-support"
+          team-reviewers: "cli-team"
