@@ -208,7 +208,7 @@ This will extract the expression for the `hello` package in `nixpkgs` and save t
 
 ## Catalog imports
 
-Nix expression builds can depend on packages provided by external catalogs: remote repositories or FloxHub users that publish reusable packages. Rather than vendoring dependencies or using Nix flake inputs directly, you declare catalogs in `.flox/nix-builds.toml` and access their packages via the `catalogs` argument in your expressions.
+Nix expression builds can depend on packages published to FloxHub catalogs. Rather than vendoring dependencies or using Nix flake inputs directly, you reference a catalog package via the `catalogs` argument in your expressions. Flox resolves and locks these references automatically during `flox build` and `flox publish`.
 
 See [Catalog imports](/concepts/catalog-imports) for full documentation and examples.
 
