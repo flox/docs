@@ -45,6 +45,7 @@
           },
           {
             "group": "Install Flox",
+            "root": "install-flox/install",
             "pages": [
               "install-flox/install",
               "install-flox/uninstall",
