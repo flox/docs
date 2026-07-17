@@ -22,10 +22,11 @@ and you can integrate them directly with your environment.
 ## Defining services
 
 Services are defined in the `[services]` section of the manifest.
-Services have a very simple schema consisting of a `command` to run to start
-the service,
-any `vars` you want set specifically for the service,
-and whether the service spawns a background process.
+A service needs a `command` to run to start it.
+It can also set `vars` that apply only to that service,
+declare whether it spawns a background process,
+control how it is shut down,
+and name other services that must start or finish first.
 See [`manifest-toml(1)`](/man/manifest.toml) for
 more details on the exact format of the `[services]` section of the manifest.
 
@@ -43,6 +44,8 @@ vars.PGPORT = "9001"
 This definition creates a service called `database` that starts a PostgreSQL
 database and configures some of its properties through environment variables.
 
+### Daemons
+
 Some services cannot be shut down by the default mechanism (sending the spawned process a `SIGTERM`).
 Most often this is because the spawned process itself spawns another process (typically a daemon) and then terminates. In this case you need to provide your own command for shutting down the service. You do this by setting `is-daemon = true` for the service and providing a `shutdown.command`. Below is an example that uses `pg_ctl` (the daemon-spawning launcher) instead of `exec postgres`, which launches postgres in the foreground. It demonstrates the `is-daemon = true` + `shutdown.command` pattern for programs that background themselves. Together these fields allow the service manager to shut down services that background themselves.
 
@@ -57,7 +60,99 @@ vars.PGDATABASE = "mydb"
 vars.PGPORT = "9001"
 ```
 
-You can define a `shutdown.command` for any service, including services that do not run as daemons. Note that this pattern can have unpredictable effects in practice: it replaces the Flox service manager’s controlled `SIGTERM` → grace → `SIGKILL` shutdown path, which tracks the service’s PID, with the command that you define. And if your shutdown command fails to locate and kill the process for any reason, there's no fallback; the service never receives any signal and keeps running.
+### Shutdown behavior
+
+By default the service manager stops a service by sending `SIGTERM` to the
+service's process and waiting for it to exit.
+It does not escalate to `SIGKILL` on its own,
+so a process that ignores `SIGTERM`, for example a server paused in a
+debugger, keeps running after `flox services stop`
+and shows as `Terminating` in `flox services status`.
+
+Set `shutdown.timeout-seconds` to give the service a deadline.
+`flox services stop` then waits that many seconds for the process to exit
+and sends `SIGKILL` if it is still running:
+
+```toml
+[services.server]
+command = "bin/rails server"
+shutdown.timeout-seconds = 10
+```
+
+Set `shutdown.signal` to send a signal other than `SIGTERM`,
+for example `2` for `SIGINT`.
+Signal numbers above `15` mean different things on Linux and macOS,
+so stay within `1`-`15` in an environment shared across systems.
+
+You can define a `shutdown.command` for any service,
+including services that do not run as daemons.
+The service manager runs the command instead of sending a signal,
+so `shutdown.signal` cannot be combined with it.
+The command gets 10 seconds to finish,
+or `shutdown.timeout-seconds` if set,
+after which the service manager sends `SIGKILL` to the process it is
+tracking.
+Some shutdown commands need longer than 10 seconds,
+for example a command that stops a collection of containers:
+
+```toml
+[services.supabase]
+command = "supabase start"
+is-daemon = true
+shutdown.command = "supabase stop"
+shutdown.timeout-seconds = 30
+```
+
+Note that a shutdown command has no fallback.
+If it exits successfully but leaves the service's process running,
+the service never receives any signal and keeps running.
+
+`shutdown.timeout-seconds` must be greater than zero.
+Both it and `shutdown.signal` require manifest
+`schema-version = "1.16.0"` or later.
+Flox updates the schema version when you save a manifest that uses them,
+after which versions of Flox older than 1.16.0 can no longer read the
+environment.
+
+### Start order
+
+By default all services start at once.
+Use `depends-on` to hold a service back until another service reaches a
+given state.
+Each entry names another service and a `condition`:
+
+- `process_started`: the other service's process has started.
+- `process_completed`: the other service's process has exited, with any
+  status.
+- `process_completed_successfully`: the other service's process has exited
+  with status `0`.
+
+For example, to start `web` only after `migrations` has finished successfully:
+
+```toml
+[services.migrations]
+command = "run-migrations"
+
+[services.web]
+command = "run-web"
+depends-on.migrations = { condition = "process_completed_successfully" }
+```
+
+Dependencies apply when services start together:
+at activation with `--start-services` or `auto-start`,
+or with `flox services start` and no service names.
+While a service waits for its dependencies,
+`flox services status` shows it as `Disabled`.
+Starting a service by name starts only that service.
+A dependency that is not already running is neither started nor waited for.
+
+Flox does not yet support health checks,
+so a dependency can wait for a process to start or exit,
+but not for it to become ready to serve requests.
+A dependency on a service that is excluded from the current system by
+`systems` is ignored on that system.
+Like the shutdown fields above,
+`depends-on` requires manifest `schema-version = "1.16.0"` or later.
 
 ## Starting services
 
@@ -109,6 +204,11 @@ You can also specify individual service names,
 in which case only those services will be restarted.
 If you accidentally provide a service name that doesn't exist,
 you'll get an error and no services will be restarted.
+When services are already running,
+`flox services restart` restarts each service in turn and does not apply
+`depends-on` ordering.
+To bring a set of dependent services back up in order,
+run `flox services stop` followed by `flox services start`.
 
 ## Handling environment edits
 
