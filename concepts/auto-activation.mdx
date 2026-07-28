@@ -10,33 +10,12 @@ directory that contains a `.flox` subdirectory, and deactivates it when you leav
 Your packages, environment variables, and hooks are ready without any manual
 step.
 
-<Note>
-  Auto-activation is **experimental** and ships behind a feature flag.
-  Its behavior is subject to change.
-  Follow the steps under [Enabling auto-activation](#enabling-auto-activation)
-  to turn it on.
-</Note>
-
 ## Enabling auto-activation
 
-Two things are required: the feature flag, and the Flox prompt hook installed in
-your shell.
+Auto-activation is on by default and only requires the Flox prompt hook
+installed in your shell.
 
-### 1. Turn on the feature flag
-
-Enable the `auto_activate` feature flag, either with an environment variable:
-
-```bash
-export FLOX_FEATURES_AUTO_ACTIVATE=true
-```
-
-or in your Flox config (`~/.config/flox/flox.toml`):
-
-```bash
-flox config --set features.auto_activate true
-```
-
-### 2. Install the prompt hook
+### Install the prompt hook
 
 The prompt hook drives auto-activation, and it is installed by any **in-place**
 activation.
@@ -78,16 +57,17 @@ file:
 <Note>
   Any in-place `flox activate` installs the hook — not just `-D`.
   If you already activate an environment in-place at startup (for example
-  `eval "$(flox activate -r owner/default)"`), the hook is already installed and
-  you only need to enable the feature flag.
-  The hook ships with Flox and stays dormant until the feature flag is set, so
-  enabling and disabling the flag is enough to turn auto-activation on and off.
+  `eval "$(flox activate -r owner/default)"`), the hook is already installed
+  and auto-activation is already active.
+  Run `flox config --set disable_hook true` to opt out of the hook entirely,
+  which disables auto-activation along with other features like
+  `flox deactivate`.
 </Note>
 
 ## How it works
 
-Once the hook is installed and the feature flag is on, the hook runs on every
-prompt (or directory change, depending on your shell):
+Once the hook is installed, it runs on every prompt (or directory change,
+depending on your shell):
 
 1. **Discovery** — The hook walks from your current directory up to the
    filesystem root, collecting every directory that contains a `.flox`
@@ -218,7 +198,7 @@ environment variables, and hooks — but differ in a few ways:
 | --- | --- | --- |
 | **Trigger** | Explicit `flox activate` command | Automatic on `cd` into a `.flox` directory |
 | **Scope** | Activates one environment per command | Activates a whole hierarchy of nested environments at once |
-| **Gate** | None — you chose to activate | Requires the feature flag and an allowed environment |
+| **Gate** | None — you chose to activate | Requires an allowed environment |
 | **Deactivation** | `flox deactivate` or `exit` (subshell) | `flox deactivate` (all auto-activated environments are in-place activations) |
 | **Failure** | Activation aborts on failure | A failed activation aborts; other layers still activate |
 
