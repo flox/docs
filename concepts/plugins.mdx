@@ -74,11 +74,11 @@ your manifest.
 </Warning>
 
 Add a `[plugins.<name>]` table without installing a matching plugin, and
-nothing happens — Flox doesn't cross-reference the two. Install a plugin
-but skip its configuration, and activation fails: the plugin's script
-calls `flox_plugin_data`, finds no table for its name, and exits non-zero.
-This is by design — a plugin that depends on its configuration should fail
-loudly rather than silently run with defaults it was never given.
+nothing happens — Flox doesn't cross-reference the two. What happens if
+you install a plugin but skip its configuration is up to the plugin: a
+script that lets `flox_plugin_data`'s failure propagate aborts activation;
+one that checks for it explicitly can warn and continue instead. See
+[Writing a plugin](#writing-a-plugin) for both patterns.
 
 ## Writing a plugin
 
@@ -89,15 +89,25 @@ reads its own manifest data:
 _data="$(flox_plugin_data vault-secrets)"   # {"GH_TOKEN":"secret/github-work",...}
 
 while IFS= read -r name; do
-  path="$(jq -r --arg n "$name" '.[$n]' <<< "$_data")"
+  path="$("${_jq:-jq}" -r --arg n "$name" '.[$n]' <<< "$_data")"
   export "$name=$(vault kv get -field=value "secret/$path")"
-done < <(jq -r 'keys[]' <<< "$_data")
+done < <("${_jq:-jq}" -r 'keys[]' <<< "$_data")
 ```
 
 `flox_plugin_data <plugin-name>` prints the `[plugins.<plugin-name>]` table
 from the locked manifest as compact JSON, or fails if the table is
-missing — which aborts activation, since `profile.d` scripts run under
-`set -e`. Parse the JSON however you like; `jq` is the obvious choice.
+missing. Parse the JSON however you like — `${_jq:-jq}` reaches for the
+`jq` that Flox's own activation helpers already resolved into `$_jq`
+before falling back to a `jq` on `PATH`, so your script doesn't need to
+depend on one itself.
+
+The script above fails hard: `_data="$(flox_plugin_data vault-secrets)"`
+is a plain assignment, and `profile.d` scripts run under `set -e`, so a
+missing table aborts activation. That's a choice, not something Flox
+enforces — wrap the call and check its exit status yourself to degrade
+gracefully instead, for example printing a warning and leaving a variable
+unset when a secret is optional. Fail hard for a plugin the environment
+can't run without; fail soft for one it can.
 
 A few conventions to follow when naming and scoping a plugin:
 
