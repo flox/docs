@@ -1,0 +1,170 @@
+---
+title: "Plugins"
+description: "Package reusable, manifest-configured behavior as an installable component"
+---
+
+[Secrets management](/concepts/secrets-management) shows a pattern: an
+`on-activate` hook calls out to a secret store and exports the result as an
+environment variable. That pattern works, but every environment that uses it
+hand-writes the same retrieval script.
+
+**Plugins** let you package that script once, as a regular installable
+package, and configure it per environment through a dedicated `[plugins]`
+section of the manifest. Anyone who installs the package gets the retrieval
+logic; they only need to supply the configuration.
+
+Secrets retrieval is the use case that motivated plugins, and this page
+anchors on it. But `[plugins]` itself is general-purpose: Flox stores
+whatever data you put there without interpreting it, so a plugin can use
+it for anything. See [Beyond secrets](#beyond-secrets) for other examples.
+
+<Note>
+  Plugins are **experimental** and under active development. Their behavior
+  may change. They require `schema-version = "1.14.0"` in the manifest.
+</Note>
+
+## How plugins work
+
+A plugin has two halves:
+
+- **Configuration** lives in the manifest, under `[plugins.<plugin-name>]`.
+  Flox treats it as opaque data — any keys, any values — and stores it
+  without validating its shape.
+- **Behavior** lives in a package. It ships a script in its output's
+  `etc/profile.d/` directory — the standard way packages hook into shell
+  setup — and Flox sources every installed package's `profile.d` scripts
+  before running your manifest's `hook.on-activate`. See [Activating
+  environments](/concepts/activation#activation-flow) for where this fits
+  in the activation timeline.
+
+A plugin's `profile.d` script reads its own configuration with the
+`flox_plugin_data` shell function, which Flox provides during activation.
+Nothing else ties a package to a plugin — it's a naming convention, not a
+manifest field that marks a package as one.
+
+## Installing and configuring a plugin
+
+Installing a plugin is the same as installing any package, plus one step:
+adding its configuration table.
+
+Suppose a `vault-secrets` package provides a plugin that wraps HashiCorp
+Vault. Install it, then add a `[plugins.vault-secrets]` table following
+the convention its author documented — here, a flat map of environment
+variable name to secret path:
+
+```toml
+[install]
+vault-secrets.pkg-path = "vault-secrets"
+
+[plugins.vault-secrets]
+GH_TOKEN = "secret/github-work"
+DB_PASSWORD = "secret/prod-db"
+```
+
+Run `flox activate`, and `GH_TOKEN` and `DB_PASSWORD` are exported, fetched
+fresh from Vault — the same result as a hand-written `on-activate` hook,
+except the retrieval logic now ships with the package instead of living in
+your manifest.
+
+<Warning>
+  Flox doesn't check that an installed package actually provides the
+  plugin named in `[plugins.<name>]`, and a plugin's script can read your
+  entire manifest, not just its own table. Trust plugin packages the way
+  you'd trust any package that runs code during activation.
+</Warning>
+
+Add a `[plugins.<name>]` table without installing a matching plugin, and
+nothing happens — Flox doesn't cross-reference the two. Install a plugin
+but skip its configuration, and activation fails: the plugin's script
+calls `flox_plugin_data`, finds no table for its name, and exits non-zero.
+This is by design — a plugin that depends on its configuration should fail
+loudly rather than silently run with defaults it was never given.
+
+## Writing a plugin
+
+Any package can be a plugin. What makes it one is a `profile.d` script that
+reads its own manifest data:
+
+```bash title="etc/profile.d/0900_vault-secrets.sh"
+_data="$(flox_plugin_data vault-secrets)"   # {"GH_TOKEN":"secret/github-work",...}
+
+while IFS= read -r name; do
+  path="$(jq -r --arg n "$name" '.[$n]' <<< "$_data")"
+  export "$name=$(vault kv get -field=value "secret/$path")"
+done < <(jq -r 'keys[]' <<< "$_data")
+```
+
+`flox_plugin_data <plugin-name>` prints the `[plugins.<plugin-name>]` table
+from the locked manifest as compact JSON, or fails if the table is
+missing — which aborts activation, since `profile.d` scripts run under
+`set -e`. Parse the JSON however you like; `jq` is the obvious choice.
+
+A few conventions to follow when naming and scoping a plugin:
+
+- **Name it after your package.** The plugin name doesn't have to match the
+  package's install ID or `pkg-path`, but matching `pkg-path` makes the
+  connection obvious to anyone reading the manifest.
+- **Read only your own table.** Nothing stops a script from reading the
+  whole manifest, but Flox won't enforce that boundary for you — stick to
+  `[plugins.<your-plugin-name>]`.
+- **Order your script deliberately.** `profile.d` scripts run in filename
+  order. Flox's own setup scripts currently top out around `0800`; a
+  `0900` prefix runs after them, and after any other plugin your logic
+  depends on.
+
+The same script runs during `flox build` too, so `[build]` commands can
+read your plugin's exported variables — not just interactive and
+`flox activate -- <cmd>` sessions.
+
+## Plugin data in composed environments
+
+When one environment [includes](/concepts/composition) another, and both
+configure the same plugin, the including environment's table wins
+outright — Flox doesn't merge the two tables key by key:
+
+```toml
+# included environment
+[plugins.vault-secrets]
+GH_TOKEN = "secret/github-work"
+DB_PASSWORD = "secret/staging-db"
+
+# including environment
+[plugins.vault-secrets]
+DB_PASSWORD = "secret/prod-db"
+```
+
+The composed environment ends up with only `DB_PASSWORD`, not `GH_TOKEN`
+plus an overridden `DB_PASSWORD`. Flox warns when this happens — a
+partial, key-by-key merge could hand a plugin a table its author never
+intended. If you compose environments that share a plugin, restate every
+key you want to keep in the including environment's table.
+
+## Beyond secrets
+
+Secrets retrieval fits `[plugins]` well because "environment variable name
+→ secret path" is exactly the kind of per-environment configuration
+shared logic needs. That shape isn't unique to secrets — a plugin could
+equally:
+
+- Standardize the config for a linter or formatter across every
+  environment that installs it, instead of copying the same `[vars]` or
+  `[hook]` entries into each manifest.
+- Toggle a package's optional behavior — verbose logging, a feature flag,
+  a telemetry opt-out — per environment.
+- Inject build-time metadata, like a license key or an internal registry
+  URL, that a package needs to configure itself correctly.
+
+Flox doesn't distinguish these from a secrets plugin. `[plugins]` is
+free-form storage plus a convention for reading it; what a given plugin
+does with its table is entirely up to its author.
+
+## Further reading
+
+- [`manifest.toml` reference](/man/manifest.toml#plugins) — `[plugins]`
+  section
+- [Secrets management](/concepts/secrets-management) — the hand-written
+  pattern a secrets plugin packages up
+- [Activating environments](/concepts/activation) — where `profile.d`
+  scripts run relative to `hook` and `profile`
+- [Composing environments](/concepts/composition) — how `include` merges
+  manifests
