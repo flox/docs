@@ -67,17 +67,22 @@ for the environment in which the shell hook was defined. See
 [`manifest.toml`](/man/manifest.toml) for more details on shell
 hooks.
 
+### Package-provided startup scripts
+
+Some packages ship startup scripts in their `etc/profile.d` directory.
+When such a package is installed to an environment, those scripts are
+linked into the environment’s `etc/profile.d` directory, and activation
+sources every `*.sh` script found there in lexical order, alongside the
+startup scripts provided by Flox itself. These scripts run before the
+environment’s `[hook]` and `[profile]` scripts. Activations in “run”
+mode source only the startup scripts provided by Flox, not those
+provided by packages.
+
 To reverse activation, run [`flox-deactivate`](/man/flox-deactivate).
 Inside a `flox activate` subshell, `flox deactivate` is equivalent to
 `exit`.
 
 ## AUTO-ACTIVATION
-
-> **Experimental:** Auto-activation is experimental and behind a feature
-> flag, and its behavior is subject to change. Enable it by setting
-> `FLOX_FEATURES_AUTO_ACTIVATE=true` in your environment, or by running
-> `flox config --set features.auto_activate true`. See the
-> *AUTO-ACTIVATION* section of *flox-activate(1)* for details.
 
 Auto-activation activates an environment automatically when you enter a
 directory that contains it, and deactivates it when you leave, so you do
@@ -85,20 +90,19 @@ not have to run `flox activate` or `flox deactivate` by hand.
 
 ### Enabling auto-activation
 
-Two things are required:
+Auto-activation is on by default and only requires the Flox prompt hook
+to be installed in your shell. The hook is installed by any in-place
+activation, so add a line such as `eval "$(flox activate -D)"` to your
+shell’s startup file (for example `~/.bashrc`, `~/.zshrc`,
+`~/.config/fish/config.fish`, or `~/.tcshrc`). If you already activate a
+default or other environment in-place at startup, the hook is already
+installed.
 
-1.  The Flox prompt hook must be installed in your shell. The hook is
-    installed by any in-place activation, so add a line such as
-    `eval "$(flox activate -D)"` to your shell’s startup file (for
-    example `~/.bashrc`, `~/.zshrc`, `~/.config/fish/config.fish`, or
-    `~/.tcshrc`). If you already activate a default or other environment
-    in-place at startup, the hook is already installed. The hook ships
-    with Flox and stays dormant until the feature flag below is set. Run
-    `flox config --set disable_hook true` to opt out of the hook
-    entirely.
-2.  The `auto_activate` feature flag must be enabled, either with
-    `FLOX_FEATURES_AUTO_ACTIVATE=true` in your environment or with
-    `flox config --set features.auto_activate true`.
+Run `flox config --set disable_hook true` to opt out of the hook
+entirely, which both disables auto-activation and other features like
+`flox deactivate`. To keep the hook but stop auto-activating
+environments you have not explicitly allowed, set `auto_activate` to
+`allowlist`.
 
 ### How it works
 
@@ -123,8 +127,9 @@ The decision is persisted, but to change it run either
 [`flox-activate-allow`](/man/flox-activate-allow) or
 [`flox-activate-deny`](/man/flox-activate-deny).
 
-Set the `auto_activate` config option to `allowed` to skip the prompt
+Set the `auto_activate` config option to `allowlist` to skip the prompt
 entirely and auto-activate only environments you have already allowed.
+Set it to `disabled` to turn auto-activation off entirely.
 
 Manage these decisions ahead of time with the
 [`flox-activate-allow`](/man/flox-activate-allow) and
@@ -156,7 +161,9 @@ environment. Environments owned by the current user and Flox are always
 trusted. You may set certain environments to always be trusted using the
 config key `trusted_environments."<owner/name>" = (trust | deny)`, or
 via the following command:
-`flox config --set trusted_environments.\"<owner/name>\" trust`.
+`flox config --set trusted_environments.\"<owner/name>\" trust`. To
+trust all environments from an organization, use a wildcard key:
+`flox config --set 'trusted_environments."<owner>/*"' trust`.
 
 `--print-script`  
 Prints an activation script to `stdout` that’s suitable for sourcing in

@@ -79,9 +79,10 @@ When installing the package, it is downloaded directly from the Catalog
 Store that it was published to.
 
 Published packages on FloxHub are also available as catalog imports for
-Nix expression builds. Other environments can declare a FloxHub catalog
-in [`nix-builds.toml`](/man/nix-builds.toml) and reference the
-published packages directly from `.nix` expressions under `.flox/pkgs/`.
+Nix expression builds. Other environments reference the published
+packages as `catalogs.<catalog>.<package>` in `.nix` expressions under
+`.flox/pkgs/`. These references are resolved and locked automatically
+during `flox build` and `flox publish`.
 
 ### Sharing published packages
 
@@ -143,7 +144,5 @@ Silence logs except for errors.
 ## SEE ALSO
 
 [`flox-build`](/man/flox-build)
-[`flox-build-update-catalogs`](/man/flox-build-update-catalogs)
 [`flox-activate`](/man/flox-activate)
 [`manifest.toml`](/man/manifest.toml)
-[`nix-builds.toml`](/man/nix-builds.toml)
