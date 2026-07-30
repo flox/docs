@@ -478,6 +478,24 @@ description: "How to install or upgrade the Flox CLI"
 
   Or, if you've declared Flox using a flake, run `nix flake update`.
   </Tab>
+  <Tab title="Nix (Determinate)">
+
+  <Note>
+    Flox hasn't been tested alongside [Determinate
+    Nix](https://docs.determinate.systems/determinate-nix/), which installs
+    its own `nix-daemon` fork. The supported path is to uninstall
+    Determinate Nix first, then install Flox fresh using one of the other methods on this page.
+  </Note>
+
+  **Uninstall Determinate Nix**
+
+  ```bash
+  /nix/nix-installer uninstall
+  ```
+
+  Then pick the tab above for your OS (or [Nix (Generic)](#nix-generic) if
+  you'd rather install upstream Nix yourself first).
+  </Tab>
   <Tab title="Nix (NixOS)">
 
   **Configure Substituters**
