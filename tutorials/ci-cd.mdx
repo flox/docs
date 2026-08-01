@@ -11,6 +11,36 @@ This means that you can spend less time debugging your CI/CD pipeline and more t
 Let's look at how you can use Flox with a variety of CI/CD platforms.
 For the following examples assume that you have a repository that contains a Flox environment, and assume that you've installed some Node.js dependencies for your project.
 
+## Authenticating with FloxHub
+
+A pipeline that only uses an environment committed to the repository needs no credentials at all.
+You need to authenticate when the pipeline pulls a [FloxHub environment](/concepts/floxhub-environments), installs packages from a private catalog, or publishes.
+
+Give the pipeline its own identity rather than a person's.
+Create a [service account](/concepts/service-accounts) in your organization, issue it a token, and store that token as a secret on your CI platform.
+Set it in the `FLOX_FLOXHUB_TOKEN` environment variable, which the Flox CLI reads without a separate login step.
+Here that variable is filled from a GitHub Actions repository secret:
+
+```yaml title=".github/workflows/ci.yml"
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    env:
+      FLOX_FLOXHUB_TOKEN: ${{ secrets.FLOX_SERVICE_TOKEN }}
+    steps:
+      - uses: "flox/install-flox-action@v2"
+      - uses: "flox/activate-action@v1"
+        with:
+          environment: my-org/my-env
+          command: npm run build
+```
+
+The same variable works on any platform. In CircleCI set it as a project environment variable, and in GitLab set it as a masked CI/CD variable.
+
+A read-only service account can pull environments and install packages but cannot push or publish, so a leaked CI token cannot be used to change what the rest of the team installs.
+
+If you are running CI under your own identity, on a personal project for example, a [personal access token](/concepts/personal-access-tokens) works the same way. Note that it carries your full access, and revoking it also ends your own CLI sessions.
+
 ## GitHub Actions
 
 Flox provides two different actions that you can use in a GitHub Actions workflow:

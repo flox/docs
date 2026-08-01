@@ -125,6 +125,8 @@
               "concepts/services",
               "concepts/composition",
               "concepts/organizations",
+              "concepts/service-accounts",
+              "concepts/personal-access-tokens",
               "concepts/builds",
               "concepts/manifest-builds",
               "concepts/nix-expression-builds",
