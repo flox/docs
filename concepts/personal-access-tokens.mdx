@@ -1,0 +1,78 @@
+---
+title: "Personal access tokens"
+description: "Authenticate the Flox CLI as yourself without an interactive browser login."
+---
+
+A **personal access token** signs the Flox CLI in as you, carrying the same
+access your FloxHub account has. Use one wherever the usual
+[`flox auth login`](/man/flox-auth) browser flow cannot run: over SSH, inside a
+container, or on any machine without a browser. Personal access tokens begin
+with `flox_pat_` and are available on every plan.
+
+<Note>
+  Personal access tokens require **Flox CLI 1.14.0 or newer**. Earlier releases
+  do not recognize the token format.
+
+  A personal access token acts as you. For automation that should belong to a
+  team rather than to a person, use a
+  [service account](/concepts/service-accounts) instead.
+</Note>
+
+## Creating a token
+
+Personal access tokens are created in FloxHub, and only there.
+
+1. Sign in to [FloxHub](https://hub.flox.dev)
+2. Open your **profile** page
+3. Under **Personal access tokens**, select **Generate new token**
+4. Give the token a name and choose how long it should last: **30 days** (the
+   default), **90 days**, **1 year**, or **No expiration**
+5. Copy the token
+
+The name is a label to help you recognize the token later, usually the machine
+or the task it is for. It has no effect on what the token can do, since every
+token you create carries your full account access.
+
+<Warning>
+  The token is shown once and cannot be retrieved afterwards. Copy it into a
+  password manager or secret store before closing the dialog.
+</Warning>
+
+## Using a token
+
+Write the token to a file and pass that file to
+[`flox auth login`](/man/flox-auth):
+
+```bash
+flox auth login --token-file ./token
+```
+
+Pass `-` in place of the path to read the token from stdin. Either way the
+token is validated and stored, with no browser or prompt involved.
+
+You can also set the token in the `FLOX_FLOXHUB_TOKEN` environment variable,
+which the Flox CLI reads without a login step:
+
+```bash
+export FLOX_FLOXHUB_TOKEN="flox_pat_..."
+flox activate -r my-org/my-env
+```
+
+Once authenticated, the CLI behaves exactly as it does after an interactive
+login, and the token can reach anything you can.
+
+## Viewing and revoking tokens
+
+Your profile page lists every token you have created, showing when each one was
+created, when it expires, and when it was last used. **Last used** is how you
+tell whether a token is still in service before you retire it.
+
+When a token is no longer needed, revoke it from that same page:
+
+1. Find the token under **Personal access tokens**
+2. Select the delete icon next to it
+3. Confirm
+
+Revocation takes effect on the next request, so a job still running on that
+token fails at its next call to FloxHub rather than finishing on access it no
+longer has. Your other tokens and your interactive CLI sessions are unaffected.
