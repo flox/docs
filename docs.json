@@ -8,7 +8,8 @@
   "seo": {
     "metatags": {
       "canonical": "https://flox.dev/docs"
-    }
+    },
+    "indexing": "all"
   },
   "colors": {
     "primary": "#8D45FF",
@@ -269,5 +270,12 @@
     "playground": {
       "proxy": false
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/docs/api-reference/openapi.json",
+      "destination": "/docs",
+      "permanent": true
+    }
+  ]
 }
