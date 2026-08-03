@@ -15,6 +15,29 @@ Here's how to **completely remove `flox` from your system**.
 
 
 <Tabs>
+  <Tab title="Install Script">
+
+  The install script installs Flox with your system package manager, or
+  through Nix if Nix was already present. Uninstall with the method that
+  matches how the script installed Flox:
+
+  * On MacOS, follow the [MacOS (Pkg)](#macos-pkg) tab.
+  * On Debian- and Ubuntu-family systems, follow the [Debian](#debian) tab.
+  * On Fedora- and RHEL-family systems, follow the [RPM](#rpm) tab.
+  * If Flox was installed through an existing Nix, remove it from your Nix
+    profile:
+
+    ```bash
+    nix profile remove flox
+    ```
+
+    If that reports no matching entry, run `nix profile list` to find the
+    right name (on older Nix, remove by index or with
+    `nix profile remove github:flox/flox/latest`).
+    To also remove the cache configuration the script added,
+    delete the lines under `# Added by the Flox installer (get.flox.dev)`
+    in `/etc/nix/nix.conf` (or `~/.config/nix/nix.conf`).
+  </Tab>
   <Tab title="MacOS (Pkg)">
 
   <Warning>

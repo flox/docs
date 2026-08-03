@@ -12,6 +12,126 @@ description: "How to install or upgrade the Flox CLI"
   Flox 1.15.0 online.
 </Note>
 <Tabs>
+  <Tab title="Install Script">
+
+  **Install with one command**
+
+  The install script detects your OS and CPU architecture and installs Flox
+  with the best method available on your machine. It supports MacOS and
+  Debian- and Red Hat-based Linux distributions, on `x86_64` and `aarch64`.
+
+  ```bash
+  curl -fsSL https://get.flox.dev | sh
+  ```
+
+  The script picks an install method in this order:
+
+  1. If Nix is already installed, the script installs Flox through your
+      existing Nix with `nix profile install` — it does not replace your
+      Nix, it only adds the Flox cache to `nix.conf`.
+  1. On MacOS, it downloads and runs the `.pkg` installer.
+  1. On Debian- and Ubuntu-family systems, it installs the `.deb` package
+      with `apt`.
+  1. On Fedora- and RHEL-family systems, it installs the `.rpm` package
+      with `dnf` or `yum`.
+
+  If Flox is already installed, the script makes no changes and instead
+  prints the upgrade command for your package manager.
+
+  <Note>
+    **Privileged commands are shown before they run**
+
+    Before using `sudo`, the script prints the exact commands it is about
+    to run with elevated privileges, so you know what you are agreeing to.
+    You may be prompted for your `sudo` password.
+  </Note>
+
+  Here is what an install looks like on Ubuntu:
+
+  ```console
+  $ curl -fsSL https://get.flox.dev | sh
+  ==> Resolving the latest Flox version (stable channel)...
+  ==> Installing Flox 1.14.0 for x86_64-linux
+  ==> Downloading https://downloads.flox.dev/by-env/stable/deb/flox-1.14.0.x86_64-linux.deb
+  ==> The following commands will be run with sudo:
+      sudo apt-get install -y /tmp/flox-install.XXXXXX/flox-1.14.0.x86_64-linux.deb
+  ==> Installing the .deb package with apt
+  ...
+  ```
+
+  <Accordion title="If Nix is already installed on your system">
+
+    The script does **not** replace or reconfigure an existing Nix
+    installation. Instead it installs Flox into your Nix profile:
+
+    1. Adds the Flox cache (`https://cache.flox.dev`) and its public
+        signing key to `nix.conf` — system-wide when `sudo` is available,
+        otherwise user-level — and restarts `nix-daemon` if one is running.
+    1. Installs Flox with `nix profile install github:flox/flox/latest`.
+
+    ```console
+    $ curl -fsSL https://get.flox.dev | sh
+    ==> Adding the Flox cache (https://cache.flox.dev) to /etc/nix/nix.conf
+    ==> The following commands will be run with sudo:
+        sudo mkdir -p /etc/nix
+        sudo tee -a /etc/nix/nix.conf
+    ==> The following commands will be run with sudo:
+        sudo systemctl restart nix-daemon
+    ==> Nix detected — installing Flox via nix profile install (github:flox/flox/latest)
+    ...
+    ```
+
+    If you would rather configure Nix yourself, see the
+    [Nix (Generic)](#nix-generic) instructions.
+  </Accordion>
+  <Info>
+    **Unsupported systems**
+
+    The script refuses to run on systems where the native packages are
+    untested: immutable (ostree-based) distributions such as Fedora
+    Silverblue or CoreOS, openSUSE/SLES, and RPM-family systems without
+    `dnf` or `yum`. On those systems, install Nix first and then follow the
+    [Nix (Generic)](#nix-generic) instructions.
+  </Info>
+
+  **Pin a channel or version**
+
+  The script honors two environment variables:
+
+  ```console
+  $ curl -fsSL https://get.flox.dev | FLOX_CHANNEL=<channel> sh
+  $ curl -fsSL https://get.flox.dev | FLOX_VERSION=<version> sh
+  ```
+
+  `FLOX_CHANNEL` (default `stable`) selects the release channel.
+  `FLOX_VERSION` pins an exact version instead of the channel's latest.
+  When Flox is installed through an existing Nix, `FLOX_CHANNEL` is
+  ignored: the script installs `github:flox/flox/latest`, or
+  `github:flox/flox/v<version>` when `FLOX_VERSION` is set.
+
+  **Verify Flox installation**
+
+  If the following command returns without error then you're ready to get
+  started!
+
+  ```console
+  $ flox --version
+  1.14.0
+
+  ```
+
+  The version you see might be different.
+
+  **Upgrade existing Flox installation**
+
+  The script does not upgrade an existing installation. Re-running it on a
+  system that already has Flox prints the upgrade command for your package
+  manager, for example:
+
+  ```bash
+  sudo apt-get update && sudo apt-get install --only-upgrade flox
+  ```
+  </Tab>
   <Tab title="MacOS">
 
   Install Flox with the standalone [`.pkg` installer](#pkg-installer) or
