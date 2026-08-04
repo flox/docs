@@ -280,8 +280,10 @@ you activate an environment.
 As part of this activation script,
 Flox runs some initial setup, then sources every installed package's
 `profile.d` scripts — this is how [plugins](/concepts/plugins) hook into
-activation. Next, it sets the variables you've provided in the
-[[vars] section of your manifest](/man/manifest.toml#vars) — these aren't yet
+activation. This only happens in `dev` (the default) and `build` modes;
+`run` mode deliberately skips package `profile.d` scripts. Next, it sets
+the variables you've provided in the
+[[vars] section of your manifest](/man/manifest.toml#vars) — these aren't
 visible to profile.d scripts, only to what runs after them.
 Next, the script _sources_ the `hook.on-activate` script that you've provided
 in the [[hook] section of your manifest](/man/manifest.toml#hook).
