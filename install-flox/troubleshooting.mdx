@@ -79,20 +79,11 @@ If you have a partial Flox installation, you can run Flox uninstallation.
 <Tabs>
   <Tab title="Install Script">
 
-  The install script installs Flox with your system package manager, or
-  through Nix if Nix was already present. Follow the tab that matches how
-  the script installed Flox: [MacOS (Pkg)](#macos-pkg) on MacOS,
+  The install script installs Flox with your system package manager.
+  Follow the tab that matches how the script installed Flox:
+  [MacOS (Pkg)](#macos-pkg) on MacOS,
   [Debian](#debian) on Debian- and Ubuntu-family systems, or
-  [RPM](#rpm) on Fedora- and RHEL-family systems. If Flox was installed
-  through an existing Nix, remove it with:
-
-  ```bash
-  nix profile remove flox
-  ```
-
-  If that reports no matching entry, run `nix profile list` to find the
-  right name (on older Nix, remove by index or with
-  `nix profile remove github:flox/flox/latest`).
+  [RPM](#rpm) on Fedora- and RHEL-family systems.
   </Tab>
   <Tab title="MacOS (Pkg)">
 

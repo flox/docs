@@ -24,15 +24,12 @@ description: "How to install or upgrade the Flox CLI"
   curl -fsSL https://get.flox.dev | sh
   ```
 
-  The script picks an install method in this order:
+  The script picks the install method that matches your platform:
 
-  1. If Nix is already installed, the script installs Flox through your
-      existing Nix with `nix profile install` — it does not replace your
-      Nix, it only adds the Flox cache to `nix.conf`.
-  1. On MacOS, it downloads and runs the `.pkg` installer.
-  1. On Debian- and Ubuntu-family systems, it installs the `.deb` package
+  * On MacOS, it downloads and runs the `.pkg` installer.
+  * On Debian- and Ubuntu-family systems, it installs the `.deb` package
       with `apt`.
-  1. On Fedora- and RHEL-family systems, it installs the `.rpm` package
+  * On Fedora- and RHEL-family systems, it installs the `.rpm` package
       with `dnf` or `yum`.
 
   If Flox is already installed, the script makes no changes and instead
@@ -59,31 +56,14 @@ description: "How to install or upgrade the Flox CLI"
   ...
   ```
 
-  <Accordion title="If Nix is already installed on your system">
+  <Info>
+    **If Nix is already installed on your system**
 
-    The script does **not** replace or reconfigure an existing Nix
-    installation. Instead it installs Flox into your Nix profile:
-
-    1. Adds the Flox cache (`https://cache.flox.dev`) and its public
-        signing key to `nix.conf` — system-wide when `sudo` is available,
-        otherwise user-level — and restarts `nix-daemon` if one is running.
-    1. Installs Flox with `nix profile install github:flox/flox/latest`.
-
-    ```console
-    $ curl -fsSL https://get.flox.dev | sh
-    ==> Adding the Flox cache (https://cache.flox.dev) to /etc/nix/nix.conf
-    ==> The following commands will be run with sudo:
-        sudo mkdir -p /etc/nix
-        sudo tee -a /etc/nix/nix.conf
-    ==> The following commands will be run with sudo:
-        sudo systemctl restart nix-daemon
-    ==> Nix detected — installing Flox via nix profile install (github:flox/flox/latest)
-    ...
-    ```
-
-    If you would rather configure Nix yourself, see the
-    [Nix (Generic)](#nix-generic) instructions.
-  </Accordion>
+    The script does not install Flox through Nix, and it will not modify
+    your existing Nix installation. When it detects Nix (the `nix` command
+    or a populated `/nix/store`), it stops and points you to the
+    [Nix](#nix) tab, which covers installing Flox with an existing Nix.
+  </Info>
   <Info>
     **Unsupported systems**
 
@@ -91,7 +71,7 @@ description: "How to install or upgrade the Flox CLI"
     untested: immutable (ostree-based) distributions such as Fedora
     Silverblue or CoreOS, openSUSE/SLES, and RPM-family systems without
     `dnf` or `yum`. On those systems, install Nix first and then follow the
-    [Nix (Generic)](#nix-generic) instructions.
+    [Nix](#nix) tab instructions.
   </Info>
 
   **Pin a channel or version**
@@ -105,9 +85,6 @@ description: "How to install or upgrade the Flox CLI"
 
   `FLOX_CHANNEL` (default `stable`) selects the release channel.
   `FLOX_VERSION` pins an exact version instead of the channel's latest.
-  When Flox is installed through an existing Nix, `FLOX_CHANNEL` is
-  ignored: the script installs `github:flox/flox/latest`, or
-  `github:flox/flox/v<version>` when `FLOX_VERSION` is set.
 
   **Verify Flox installation**
 
