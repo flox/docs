@@ -271,5 +271,12 @@
     "playground": {
       "proxy": false
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/api-reference/openapi.json",
+      "destination": "/",
+      "permanent": true
+    }
+  ]
 }
