@@ -8,6 +8,9 @@
 #
 # Fails when a page under man/ is not referenced anywhere in the docs.json
 # `navigation` tree, unless it is deliberately excluded via ALLOWLIST below.
+# Also fails in the reverse direction: a `man/...` nav entry with no .mdx
+# file ships a 404 — the sync deletes pages retired upstream, but docs.json
+# is maintained by hand (this happened with nix-builds.toml).
 # Also warns when an ALLOWLIST entry is stale (file gone, or page now in nav).
 #
 # Usage:
@@ -74,6 +77,11 @@ for page in "$man_dir"/*.mdx; do
   in_nav "$name" || missing+=("$name")
 done
 
+dangling=()
+while IFS= read -r entry; do
+  [ -f "$man_dir/${entry#man/}.mdx" ] || dangling+=("$entry")
+done < <(grep '^man/' <<< "$nav_pages")
+
 # Stale allowlist entries are warnings, not failures
 for entry in "${ALLOWLIST[@]}"; do
   if [ ! -f "$man_dir/$entry.mdx" ]; then
@@ -83,6 +91,8 @@ for entry in "${ALLOWLIST[@]}"; do
   fi
 done
 
+fail=0
+
 if [ "${#missing[@]}" -gt 0 ]; then
   echo "error: man pages with no docs.json nav entry:" >&2
   for name in "${missing[@]}"; do
@@ -91,7 +101,20 @@ if [ "${#missing[@]}" -gt 0 ]; then
   echo >&2
   echo "Add each page to the \"CLI reference\" tab in docs.json (see AGENTS.md)," >&2
   echo "or add it to ALLOWLIST in $0 if it is deliberately unlisted." >&2
-  exit 1
+  fail=1
 fi
 
-echo "ok: all man pages are in the docs.json nav (${#ALLOWLIST[@]} deliberately excluded)"
+if [ "${#dangling[@]}" -gt 0 ]; then
+  echo "error: docs.json nav entries with no man/*.mdx file (each 404s):" >&2
+  for entry in "${dangling[@]}"; do
+    echo "  $entry" >&2
+  done
+  echo >&2
+  echo "The sync deletes pages retired upstream; remove these entries from" >&2
+  echo "docs.json (and drop any cross-links to them in other pages)." >&2
+  fail=1
+fi
+
+[ "$fail" -eq 0 ] || exit 1
+
+echo "ok: man/ pages and the docs.json nav are in sync (${#ALLOWLIST[@]} deliberately excluded)"

@@ -1,8 +1,9 @@
 name: Check man page nav coverage
 
 # docs.json nav entries are maintained by hand while man/*.mdx is synced
-# from flox/flox, so a new command's page can ship without a sidebar link.
-# Fail PRs that add a man page (or touch the nav) without a docs.json entry.
+# from flox/flox, so the two can drift in either direction: a new command's
+# page can ship without a sidebar link, and a page retired upstream can
+# leave a nav entry that 404s. Fail PRs that introduce either mismatch.
 on:
   pull_request:
     paths:
