@@ -5,7 +5,7 @@
 #
 # The stub is inserted in date order (the page runs newest-first), so entries
 # land correctly even when several stub PRs merge out of publish order. Each
-# stub embeds a {/* changelog-id: owner/repo@tag */} comment that the
+# stub is followed by a {/* changelog-id: owner/repo@tag */} comment that the
 # changelog-stubs workflow greps to avoid opening duplicate PRs for the same
 # release.
 #
@@ -80,14 +80,16 @@ if any(iso == date for _, iso in updates):
     print(f"warning: an entry dated {date} already exists; "
           "the draft asks the editor to merge by hand", file=sys.stderr)
 
+# The changelog-id marker sits AFTER the closing tag, not inside the body:
+# Mintlify's RSS generator renders MDX comments inside an <Update> as literal
+# text in the feed item, while content between entries stays out of the feed.
 stub = f"""<Update label="{label}" description="{tag}" tags={{["{product}"]}}>
-  {{/* changelog-id: {repo}@{tag} */}}
-
   ## {product} {tag}
 
   _Draft: summarize what changed in [{name}]({url}), leading with what it lets
   users do rather than what was merged._{note}
 </Update>
+{{/* changelog-id: {repo}@{tag} */}}
 """
 
 # Newest-first: insert before the first strictly-older entry; append after

@@ -60,8 +60,9 @@ jobs:
             exit 1
           fi
           tag=$(jq -r '.tag_name' <<< "$release")
-          # Each published entry embeds an {/* changelog-id: owner/repo@tag */}
-          # marker, so the changelog page itself is the state — no state file.
+          # Each published entry is followed by an
+          # {/* changelog-id: owner/repo@tag */} marker, so the changelog page
+          # itself is the state — no state file.
           # -F plus the closing " */" keep prefix tags (v1.0 vs v1.0.0) and
           # regex dots from matching the wrong marker.
           if grep -qF "changelog-id: ${REPO}@${tag} */" changelog.mdx; then
