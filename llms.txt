@@ -1,0 +1,221 @@
+# Flox
+
+> Flox is a developer environment manager built on Nix. You declare a project's packages, environment variables, services, and build steps once in a `manifest.toml`; Flox resolves that to a lockfile, and every target runs that exact closure — a developer laptop, a CI runner, a container image, or an AI coding agent's sandbox.
+
+This file indexes the Flox reference documentation at https://flox.dev/docs. Positioning, product and use case pages, customer stories, and the blog are indexed separately at https://flox.dev/llms.txt.
+
+Every page listed below is served as clean Markdown at the URL shown; drop the `.md` suffix for the rendered HTML page. The full documentation corpus, concatenated for one-shot ingestion, is at https://flox.dev/docs/llms-full.txt.
+
+A `.flox/` directory in a repository means that project uses Flox to manage its dependencies and environment lifecycle.
+
+Instructions for AI coding assistants:
+
+- Do not run bare `flox activate`. With no command argument it launches an interactive sub-shell, which will hang a non-interactive harness. Use one of the two non-interactive forms:
+  - `flox activate -d <dir> -c '<command>'` runs the command in a shell with hooks and profile scripts applied. Prefer this form.
+  - `flox activate -d <dir> -- <command>` is exec mode: it replaces the process and does not run profile scripts.
+- Install packages with `flox install`, not with the system package manager. Inside a Flox environment, do not reach for `apt`, `yum`, `dnf`, or `brew` to add a dependency.
+- Edit `.flox/env/manifest.toml` directly rather than running `flox edit`, which opens `$EDITOR` interactively. Do not invent manifest fields; check the reference at https://flox.dev/docs/man/manifest.toml.md before writing one.
+- Package names are Flox Catalog pkg-paths and do not always match nixpkgs attribute paths. Verify with `flox search <term>` and `flox show <package>` rather than guessing.
+- Flox is not `nix develop` or `nix-shell`. It is built on Nix but has its own CLI surface.
+- There is no `curl | bash` installer. `install.flox.dev` and `flox.dev/install` do not exist — do not construct or suggest either. Install from https://flox.dev/download or a package manager; see https://flox.dev/docs/install-flox/install.md.
+- Flox runs on Linux and macOS, on x86_64 and aarch64. There is no native Windows build; Windows users run it under WSL2.
+
+Everyday command surface:
+
+```
+flox envs                          # show active and available environments
+flox init -d <dir>                 # initialize an environment
+flox search <term>                 # search the catalog
+flox show <package>                # show versions and details for one package
+flox install -d <dir> <package>    # install packages
+flox list -d <dir>                 # list installed packages
+flox activate -d <dir> -c '<cmd>'  # run a command inside the environment
+flox services start <name>         # start a service declared in the manifest
+flox push / flox pull              # move an environment to and from FloxHub
+```
+
+Agent skills:
+
+Flox maintains a skill library for AI coding agents at https://github.com/flox/flox-skills. It provides two skills: `flox`, which creates and manages environments, services, builds, containers, and package publishing; and `floxify`, which onboards an existing repository by detecting its runtimes, services, and build tools and writing a manifest so `flox activate` becomes the only setup command a new developer needs.
+
+```bash
+# Claude Code
+claude plugin marketplace add flox/flox-skills
+claude plugin install flox@flox-skills
+
+# Codex, from a clone of the repository
+codex plugin marketplace add .
+codex plugin add flox@flox-skills
+
+# Any agent supporting the skills.sh standard (Cursor, Copilot, Windsurf, Gemini, and more)
+npx skills add flox/flox-skills
+```
+
+Key terms:
+
+- Environment — a reproducible set of packages, variables, services, and build steps, declared in a manifest and resolved to a lockfile.
+- Manifest — `.flox/env/manifest.toml`, the declarative definition of an environment.
+- Generation — a numbered snapshot of an environment on FloxHub. Every change creates one, and any can be diffed or rolled back to.
+- Activation — running a command or a shell with the environment applied.
+- Flox Catalog — the package set Flox installs from, built and cached continuously.
+- Service — a long-running process declared in the manifest and managed with `flox services`.
+- FloxHub — https://hub.flox.dev, where environments are stored, versioned, and shared.
+
+## Introduction
+
+- [Introduction](https://flox.dev/docs/index.md): What is Flox?
+
+## Install Flox
+
+- [Install Flox](https://flox.dev/docs/install-flox/install.md): How to install or upgrade the Flox CLI
+- [Uninstall Flox](https://flox.dev/docs/install-flox/uninstall.md): How to uninstall the Flox CLI
+- [Troubleshooting installation](https://flox.dev/docs/install-flox/troubleshooting.md): How to diagnose and fix common Flox installation issues
+- [Extensions](https://flox.dev/docs/install-flox/ide-extensions.md): IDE extensions and AI agent integrations for Flox
+
+## Quickstart
+
+- [Flox in 5 minutes](https://flox.dev/docs/flox-5-minutes.md): Get started with creating Flox environments.
+
+## Tutorials
+
+- [Creating environments](https://flox.dev/docs/tutorials/creating-environments.md): Reproducible environments for any project.
+- [The default environment](https://flox.dev/docs/tutorials/default-environment.md): Using Flox as your system package manager
+- [Sharing your environments](https://flox.dev/docs/tutorials/sharing-environments.md): Multiple ways to share your environment with others.
+- [Layering multiple environments](https://flox.dev/docs/tutorials/layering-multiple-environments.md): Using more than one environment at a time
+- [Customizing the shell environment](https://flox.dev/docs/tutorials/customizing-environments.md): Using setup scripts, aliases, and environment variables to improve your workflows.
+- [Designing cross-platform environments](https://flox.dev/docs/tutorials/multi-arch-environments.md): Creating environments that run on different systems.
+- [Build and publish packages](https://flox.dev/docs/tutorials/build-and-publish.md): Building and publishing custom packages with Flox
+- [Using a newer version of a package](https://flox.dev/docs/tutorials/overriding-packages.md): Override the build recipe of a package from the Flox Catalog to install a newer version that is not yet available.
+- [Running Flox in CI/CD](https://flox.dev/docs/tutorials/ci-cd.md): Integrate with your favorite CI/CD platform.
+- [Reusing and combining developer environments](https://flox.dev/docs/tutorials/composition.md): How to build developer environments out of reusable building blocks.
+- [Selecting package outputs](https://flox.dev/docs/tutorials/package-outputs.md): Learn how to intentionally declare which parts of a package you want to install
+- [Flox + CUDA tutorial](https://flox.dev/docs/tutorials/cuda.md): It's easy to install and use the CUDA Toolkit with Flox
+- [Flox and systemd](https://flox.dev/docs/tutorials/flox-and-systemd.md): Run Flox environment services as persistent systemd units.
+- [Installing Flox from its repository on Debian and Red Hat](https://flox.dev/docs/tutorials/installing-from-repo.md): Install Flox by adding its official APT or YUM/DNF repository to your Debian- or Red Hat-based Linux distribution so updates flow through your package manager.
+
+## Tutorials: Migration guides
+
+- [Homebrew](https://flox.dev/docs/tutorials/migrations/homebrew.md): Using Flox to replace or augment Homebrew
+- [Node Version Manager (nvm)](https://flox.dev/docs/tutorials/migrations/nvm.md): Using Flox to replace nvm
+
+## Imageless Kubernetes
+
+- [Imageless Kubernetes Introduction](https://flox.dev/docs/imageless-kubernetes/intro.md): Imageless Kubernetes is a new way to run Kubernetes backed by Flox environments rather than container images.
+- [Tech](https://flox.dev/docs/imageless-kubernetes/tech.md): The tech behind Imageless Kubernetes
+- [Configuration](https://flox.dev/docs/imageless-kubernetes/config.md): Configuring Imageless Kubernetes
+
+## Imageless Kubernetes: Installation
+
+- [Amazon EKS](https://flox.dev/docs/imageless-kubernetes/install/eks.md): Installing Imageless Kubernetes to Amazon EKS
+- [Self-managed Kubernetes](https://flox.dev/docs/imageless-kubernetes/install/self-managed.md): Installing Imageless Kubernetes to a self-managed Kubernetes cluster
+- [Troubleshooting](https://flox.dev/docs/imageless-kubernetes/install/troubleshooting.md): Troubleshooting Imageless Kubernetes installation
+- [Upgrading](https://flox.dev/docs/imageless-kubernetes/install/upgrading.md): Upgrading Imageless Kubernetes
+- [Uninstall](https://flox.dev/docs/imageless-kubernetes/install/uninstall.md): Uninstalling Imageless Kubernetes from any cluster
+
+## Imageless Kubernetes: Examples
+
+- [GitLab CI](https://flox.dev/docs/imageless-kubernetes/examples/gitlab-ci.md): Demo running GitLab CI with Imageless Kubernetes
+- [Web server with Redis on kind](https://flox.dev/docs/imageless-kubernetes/examples/kind-demo.md): Demo running a simple web server backed by Redis on kind
+
+## Concepts
+
+- [What is a Flox environment?](https://flox.dev/docs/concepts/environments.md): Everything you need to know about Flox environments.
+- [Activating environments](https://flox.dev/docs/concepts/activation.md): How an environment is activated, and how to make the most of it
+- [Auto-activation](https://flox.dev/docs/concepts/auto-activation.md): Activate environments automatically when you enter their directory
+- [Compatibility policy](https://flox.dev/docs/concepts/compatibility.md): Compatibility policy
+- [What is FloxHub?](https://flox.dev/docs/concepts/floxhub.md): Everything you need to know about FloxHub.
+- [FloxHub environments](https://flox.dev/docs/concepts/floxhub-environments.md): Reusable environments that are centrally managed on FloxHub
+- [What is a generation?](https://flox.dev/docs/concepts/generations.md): Everything you need to know about generations.
+- [What is the Flox Catalog?](https://flox.dev/docs/concepts/packages-and-catalog.md): Everything you need to know about the Flox Catalog and Packages.
+- [Package Groups](https://flox.dev/docs/concepts/package-groups.md): How package groups work and when to use them
+- [What is the Base Catalog?](https://flox.dev/docs/concepts/base-catalog.md): Everything you need to know about the Base Catalog
+- [Services](https://flox.dev/docs/concepts/services.md): Using services with your environment
+- [Composing environments](https://flox.dev/docs/concepts/composition.md): How to combine and reuse environments.
+- [Understanding Organizations in FloxHub](https://flox.dev/docs/concepts/organizations.md): Roles, access control, and shared ownership of environments across a team
+- [Builds](https://flox.dev/docs/concepts/builds.md): Understanding how to build packages with Flox
+- [Manifest Builds](https://flox.dev/docs/concepts/manifest-builds.md): Manifest builds with Flox
+- [Nix expression builds](https://flox.dev/docs/concepts/nix-expression-builds.md): Nix expression builds with Flox
+- [Catalog imports](https://flox.dev/docs/concepts/catalog-imports.md): Import packages from external catalogs for Nix expression builds
+- [Publishing](https://flox.dev/docs/concepts/publishing.md): Understanding how to publish packages with Flox
+- [Secrets management](https://flox.dev/docs/concepts/secrets-management.md): Managing secrets in Flox environments using just-in-time retrieval
+- [Flox vs. container workflows](https://flox.dev/docs/concepts/flox-vs-containers.md): Where Flox environments and container workflows differ, and how teams combine them
+
+## Languages
+
+- [C/C++](https://flox.dev/docs/languages/c.md): Common questions and solutions for using C with Flox
+- [Go](https://flox.dev/docs/languages/go.md): Common questions and solutions for using Go with Flox
+- [JVM](https://flox.dev/docs/languages/jvm.md): Common questions and solutions for using the JVM ecosystem with Flox
+- [Node.js](https://flox.dev/docs/languages/nodejs.md): Common questions and solutions for using Node.js with Flox
+- [Python](https://flox.dev/docs/languages/python.md): Common questions and solutions for using Python with Flox
+- [Ruby](https://flox.dev/docs/languages/ruby.md): Common questions and solutions for using Ruby with Flox
+- [Rust](https://flox.dev/docs/languages/rust.md): Common questions and solutions for using Rust with Flox
+
+## Enterprise and operations
+
+- [Catalog Store](https://flox.dev/docs/customer/catalog-store.md): Create a Catalog Store for publishing your own Flox packages
+- [Known issues](https://flox.dev/docs/customer/known-issues.md): Known issues
+- [Signing keys](https://flox.dev/docs/customer/signing-keys.md): Create and use signing keys to sign built artifacts
+
+## CLI reference: Overview
+
+- [flox](https://flox.dev/docs/man/flox.md): Developer environments you can take with you.
+- [manifest.toml](https://flox.dev/docs/man/manifest.toml.md): Declarative environment configuration format.
+- [nix-builds.toml](https://flox.dev/docs/man/nix-builds.toml.md): Catalog configuration for Nix expression builds.
+
+## CLI reference: Setup
+
+- [flox init](https://flox.dev/docs/man/flox-init.md): Initialize a Flox environment.
+- [flox auth](https://flox.dev/docs/man/flox-auth.md): FloxHub authentication commands.
+- [flox config](https://flox.dev/docs/man/flox-config.md): View and set configuration options.
+
+## CLI reference: Environments
+
+- [flox activate](https://flox.dev/docs/man/flox-activate.md): Activate environments.
+- [flox deactivate](https://flox.dev/docs/man/flox-deactivate.md): Deactivate an environment.
+- [flox edit](https://flox.dev/docs/man/flox-edit.md): Edit the declarative environment configuration.
+- [flox delete](https://flox.dev/docs/man/flox-delete.md): Delete an environment.
+- [flox envs](https://flox.dev/docs/man/flox-envs.md): Show active and available environments.
+
+## CLI reference: Packages
+
+- [flox search](https://flox.dev/docs/man/flox-search.md): Search for packages.
+- [flox show](https://flox.dev/docs/man/flox-show.md): Show detailed information about a single package.
+- [flox run](https://flox.dev/docs/man/flox-run.md): Run a command from a Flox Catalog package.
+- [flox install](https://flox.dev/docs/man/flox-install.md): Install packages to an environment.
+- [flox uninstall](https://flox.dev/docs/man/flox-uninstall.md): Remove packages from an environment.
+- [flox upgrade](https://flox.dev/docs/man/flox-upgrade.md): Upgrade packages in an environment.
+- [flox list](https://flox.dev/docs/man/flox-list.md): List packages installed in an environment.
+
+## CLI reference: Sharing
+
+- [flox push](https://flox.dev/docs/man/flox-push.md): Send environment to FloxHub.
+- [flox pull](https://flox.dev/docs/man/flox-pull.md): Pull environment from FloxHub.
+
+## CLI reference: Build & Publish
+
+- [flox build](https://flox.dev/docs/man/flox-build.md): Build packages with Flox.
+- [flox build clean](https://flox.dev/docs/man/flox-build-clean.md): Clean the build directory.
+- [flox build import nixpkgs](https://flox.dev/docs/man/flox-build-import-nixpkgs.md): Import package definition from nixpkgs.
+- [flox build update catalogs](https://flox.dev/docs/man/flox-build-update-catalogs.md): Update catalog lockfile for Nix expression builds.
+- [flox containerize](https://flox.dev/docs/man/flox-containerize.md): Export an environment as a container image.
+- [flox publish](https://flox.dev/docs/man/flox-publish.md): Publish packages for Flox.
+
+## CLI reference: Services
+
+- [flox services start](https://flox.dev/docs/man/flox-services-start.md): Start services.
+- [flox services stop](https://flox.dev/docs/man/flox-services-stop.md): Stop running services.
+- [flox services restart](https://flox.dev/docs/man/flox-services-restart.md): Restart running services.
+- [flox services status](https://flox.dev/docs/man/flox-services-status.md): Display the status of services.
+- [flox services logs](https://flox.dev/docs/man/flox-services-logs.md): Show logs of services.
+
+## CLI reference: Generations
+
+- [flox generations list](https://flox.dev/docs/man/flox-generations-list.md): Show all environment generations that you can switch to.
+- [flox generations history](https://flox.dev/docs/man/flox-generations-history.md): Show the change log for the current environment.
+- [flox generations rollback](https://flox.dev/docs/man/flox-generations-rollback.md): Switch to the previous live generation.
+- [flox generations switch](https://flox.dev/docs/man/flox-generations-switch.md): Switch to the provided generation.
+
+## CLI reference: Other
+
+- [flox gc](https://flox.dev/docs/man/flox-gc.md): Garbage collection.
+- [flox include upgrade](https://flox.dev/docs/man/flox-include-upgrade.md): Upgrade an environment with latest changes to its included environments.
