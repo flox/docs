@@ -85,6 +85,9 @@ Most manifest fields are merged the way you would expect:
 - **`install`** — The install section contains the union of all package descriptors from all manifests. When there are conflicts, the entire package descriptor is overridden.
 - **`services`** — Same behavior as the `install` section.
 - **`vars`** — Same behavior as the `install` section.
+  In Flox CLI versions 1.14.1 and later, Flox evaluates references among the final merged values in dependency order.
+  Set [`minimum-cli-version`](/man/manifest.toml#minimum-cli-version) to `"1.14.1"` in composing environments that rely on this behavior.
+  A reference cycle prevents the environment from building and reports the variables in the cycle.
 - **`hook.on-activate`** — The `hook.on-activate` scripts are appended to each other.
 - **`profile`** — The corresponding scripts in the `profile` section are also appended to each other e.g. all of the `profile.common` scripts are appended, all of the `profile.bash` scripts are appended, etc.
 - **`containerize`** — The options in the `containerize` section are more complicated because merging some options instead of overriding them would lead to unintuitive behavior. `user`, `cmd`, `working-dir`, and `stop-signal` are completely overridden. `exposed-ports`, `volumes`, and `labels` are merged.
