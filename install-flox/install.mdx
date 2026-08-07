@@ -12,6 +12,103 @@ description: "How to install or upgrade the Flox CLI"
   Flox 1.14.0 online.
 </Note>
 <Tabs>
+  <Tab title="Install Script">
+
+  ## Install with one command
+
+  The install script detects your OS and CPU architecture and installs Flox
+  with the best method available on your machine. It supports MacOS and
+  Debian- and Red Hat-based Linux distributions, on `x86_64` and `aarch64`.
+
+  ```bash
+  curl -fsSL https://get.flox.dev | sh
+  ```
+
+  The script picks the install method that matches your platform:
+
+  * On MacOS, it downloads and runs the `.pkg` installer.
+  * On Debian- and Ubuntu-family systems, it installs the `.deb` package
+      with `apt`.
+  * On Fedora- and RHEL-family systems, it installs the `.rpm` package
+      with `dnf` or `yum`.
+
+  If Flox is already installed, the script makes no changes and instead
+  prints the upgrade command for your package manager.
+
+  <Note>
+    **Privileged commands are shown before they run**
+
+    Before using `sudo`, the script prints the exact commands it is about
+    to run with elevated privileges, so you know what you are agreeing to.
+    You may be prompted for your `sudo` password.
+  </Note>
+
+  Here is what an install looks like on Ubuntu:
+
+  ```console
+  $ curl -fsSL https://get.flox.dev | sh
+  ==> Resolving the latest Flox version (stable channel)...
+  ==> Installing Flox 1.14.0 for x86_64-linux
+  ==> Downloading https://downloads.flox.dev/by-env/stable/deb/flox-1.14.0.x86_64-linux.deb
+  ==> The following commands will be run with sudo:
+      sudo apt-get install -y /tmp/flox-install.XXXXXX/flox-1.14.0.x86_64-linux.deb
+  ==> Installing the .deb package with apt
+  ...
+  ```
+
+  <Info>
+    **If Nix is already installed on your system**
+
+    The script does not install Flox through Nix, and it will not modify
+    your existing Nix installation. When it detects Nix (the `nix` command
+    or a populated `/nix/store`), it stops and points you to the
+    [Nix](#nix) tab, which covers installing Flox with an existing Nix.
+  </Info>
+  <Info>
+    **Unsupported systems**
+
+    The script refuses to run on systems where the native packages are
+    untested: immutable (ostree-based) distributions such as Fedora
+    Silverblue or CoreOS, openSUSE/SLES, and RPM-family systems without
+    `dnf` or `yum`. On those systems, install Nix first and then follow the
+    [Nix](#nix) tab instructions.
+  </Info>
+
+  ## Pin a channel or version
+
+  The script honors two environment variables:
+
+  ```console
+  $ curl -fsSL https://get.flox.dev | FLOX_CHANNEL=<channel> sh
+  $ curl -fsSL https://get.flox.dev | FLOX_VERSION=<version> sh
+  ```
+
+  `FLOX_CHANNEL` (default `stable`) selects the release channel.
+  `FLOX_VERSION` pins an exact version instead of the channel's latest.
+
+  ## Verify Flox installation
+
+  If the following command returns without error then you're ready to get
+  started!
+
+  ```console
+  $ flox --version
+  1.14.0
+
+  ```
+
+  The version you see might be different.
+
+  ## Upgrade existing Flox installation
+
+  The script does not upgrade an existing installation. Re-running it on a
+  system that already has Flox prints the upgrade command for your package
+  manager, for example:
+
+  ```bash
+  sudo apt-get update && sudo apt-get install --only-upgrade flox
+  ```
+  </Tab>
   <Tab title="MacOS">
 
   Install Flox with the standalone [`.pkg` installer](#pkg-installer) or
@@ -108,7 +205,7 @@ description: "How to install or upgrade the Flox CLI"
 
     The package will register a new source in `/etc/apt/sources.list.d` to enable upgrades via `apt`.
   </Note>
-  **Download and install the package**
+  ## Download and install the package
 
   1. Download flox.deb for your system architecture:
 
@@ -149,7 +246,7 @@ description: "How to install or upgrade the Flox CLI"
     The version of Nix installed by Flox tracks the stable version of Nix in nixpkgs, occasionally adding additional backports or patches.
     Nix is usually updated monthly, although if Nix makes breaking changes, updates may be less frequent.
   </Accordion>
-  **Verify Flox installation**
+  ## Verify Flox installation
 
   If the following command returns without error then you're ready to get
   started!
@@ -162,7 +259,7 @@ description: "How to install or upgrade the Flox CLI"
 
   The version you see might be different.
 
-  **Upgrade existing Flox installation**
+  ## Upgrade existing Flox installation
 
   ```
   sudo apt update;
@@ -179,7 +276,7 @@ description: "How to install or upgrade the Flox CLI"
     The rpm will register a package repository in `/etc/yum.repos.d` to enable upgrades.
     via `yum`, `dnf` and other compatible tools.
   </Note>
-  **Download and install the package**
+  ## Download and install the package
 
   1. Download flox.rpm for your system architecture:
 
@@ -221,7 +318,7 @@ description: "How to install or upgrade the Flox CLI"
     The version of Nix installed by Flox tracks the stable version of Nix in nixpkgs, occasionally adding additional backports or patches.
     Nix is usually updated monthly, although if Nix makes breaking changes, updates may be less frequent.
   </Accordion>
-  **Verify Flox installation**
+  ## Verify Flox installation
 
   If the following command returns without error then you're ready to get
   started!
@@ -234,7 +331,7 @@ description: "How to install or upgrade the Flox CLI"
 
   The version you see might be different.
 
-  **Upgrade existing Flox installation**
+  ## Upgrade existing Flox installation
 
   ```
   sudo yum update flox
@@ -520,13 +617,13 @@ description: "How to install or upgrade the Flox CLI"
   If you have Docker installed then you can also run flox in a container to
   try it out before installing on your system.
 
-  **Invoke Flox container**
+  ## Invoke Flox container
 
   ```
   docker run --pull always --rm -it ghcr.io/flox/flox
   ```
 
-  **Verify Flox installation**
+  ## Verify Flox installation
 
   If the following command returns without error then you're ready to get
   started!
@@ -571,14 +668,14 @@ description: "How to install or upgrade the Flox CLI"
   * terminate distribution: `wsl --terminate <name>`
   * unregister and delete distribution: `wsl --unregister <name>`
 
-  **Supported distributions**
+  ## Supported distributions
 
   Please follow the steps below to install Flox on the distribution of your
   choice:
 
   <Accordion title="Ubuntu">
 
-    **Download and install the package**
+    ## Download and install the package
 
     1. Download flox.deb for your system architecture:
 
@@ -599,7 +696,7 @@ description: "How to install or upgrade the Flox CLI"
     sudo apt-get install policycoreutils semodule-utils tar wget xz-utils
     ```
 
-    **Download and install the package**
+    ## Download and install the package
 
     1. Download flox.deb for your system architecture:
 
@@ -620,7 +717,7 @@ description: "How to install or upgrade the Flox CLI"
     sudo yum install tar xz
     ```
 
-    **Download and install the package**
+    ## Download and install the package
 
     1. Download flox.rpm for your system architecture:
 
@@ -650,7 +747,7 @@ description: "How to install or upgrade the Flox CLI"
     You can disregard this message as we will be configuring the
     `nix-daemon` to start automatically in the next section.
   </Info>
-  **Configure `nix-daemon` to start on activation**
+  ## Configure `nix-daemon` to start on activation
 
   Once Flox has been installed on your WSL distribution the `nix-daemon` will
   need to be automatically started as you start your WSL instance.
@@ -670,7 +767,7 @@ description: "How to install or upgrade the Flox CLI"
   ```
   nix --extra-experimental-features nix-command store ping
   ```
-  **Verify Flox installation**
+  ## Verify Flox installation
 
   If the following command returns without error then you're ready to get
   started!
@@ -683,7 +780,7 @@ description: "How to install or upgrade the Flox CLI"
 
   The version you see might be different.
 
-  **Upgrade existing Flox installation**
+  ## Upgrade existing Flox installation
 
   Please follow the instructions provided on either the Debian or RPM tab
   (whichever matches the existing Linux Distribution installed with your
