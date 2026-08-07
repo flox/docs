@@ -310,12 +310,18 @@ To make life easier for you when it comes to writing scripts for your
 environment,
 here is some simple guidance:
 
+**vars**:
+
+- Defines environment variables before the `hook.on-activate` and `[profile]` scripts run.
+- In Flox CLI 1.14.1 and later, values can reference other `[vars]` entries with `${NAME}`.
+- References resolve in dependency order at activation time.
+
 **hook.on-activate**:
 
 - Always Bash, so there's only one shell syntax and set of quirks to keep in mind.
 - Can't use aliases.
 - Can define functions to use within the hook, but they won't be passed down to other shells.
-- _Can_ define environment variables that need to be computed.
+- Can define environment variables that require shell commands or conditional logic.
 
 **profile**:
 
@@ -325,11 +331,12 @@ here is some simple guidance:
   etc. sections for non-portable syntax.
 - Can define functions and aliases.
 - Can source scripts needed for other programs to work properly e.g. the `activate` script for a Python virtual environment.
-- _Can_ define environment variables that need to be computed.
+- Can define environment variables that require shell-specific logic.
 
-In short, it's probably best to put as much as you can in `hook.on-activate`
-until you have shell-specific needs, you need aliases, or you need to source
-a third-party script into your shell.
+In short, define environment variables in `[vars]` when you can express their
+values directly or by referencing other entries. Use `hook.on-activate` for
+environment-wide setup or values that require shell logic. Use `[profile]` for
+shell-specific needs, aliases, or third-party scripts that your shell must source.
 
 ## Attaching
 
