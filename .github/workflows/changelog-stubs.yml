@@ -1,0 +1,145 @@
+name: Changelog release stubs
+
+# Watches each source repo for a new GitHub release and opens a draft PR
+# pre-filling a changelog <Update> stub for a human to turn into real copy.
+# Poll-shaped like the sibling update-flox-version.yml / sync-man-pages.yml
+# workflows: no changes or secrets needed in the source repos.
+#
+# Lifecycle of a stub PR:
+#   - merge it        -> the changelog-id marker lands in changelog.mdx and
+#                        the release is never stubbed again
+#   - close unmerged  -> the release is declined; the PR-exists guard below
+#                        stops it from being recreated
+#   - leave it open   -> reruns skip it entirely (a human may be editing the
+#                        branch, so it is never force-reset)
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # daily at 08:00 UTC (offset from the 06:00/07:00 sibling jobs)
+  workflow_dispatch:
+
+jobs:
+  stub:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - flox/flox
+          - flox/floxhub
+          - flox/floxenvs
+          - flox/flox-plugins
+          - flox/flox-skills
+          - flox/flox-vscode
+    env:
+      # FloxBot token, not GITHUB_TOKEN: it can read private source repos
+      # (e.g. floxhub) and lets the created PR trigger CI.
+      GH_TOKEN: ${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}
+    steps:
+      - name: Checkout docs
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Check for a new release
+        id: release
+        env:
+          REPO: ${{ matrix.repo }}
+        run: |
+          err="$RUNNER_TEMP/gh-err.txt"
+          if ! release=$(gh api "repos/${REPO}/releases/latest" 2> "$err"); then
+            # Only "no releases yet" is a normal no-op; anything else (bad
+            # token, rate limit, outage) must fail loudly, or the automation
+            # dies silently while the workflow stays green. GitHub returns
+            # 404 for repos the token can't see too, so a 404 only counts as
+            # "no releases" when the repo itself is visible.
+            if grep -q "HTTP 404" "$err" && gh api "repos/${REPO}" --silent; then
+              echo "No releases in ${REPO}; nothing to do."
+              echo "new=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            cat "$err" >&2
+            exit 1
+          fi
+          tag=$(jq -r '.tag_name' <<< "$release")
+          # Each published entry is followed by an
+          # {/* changelog-id: owner/repo@tag */} marker, so the changelog page
+          # itself is the state — no state file.
+          # -F plus the closing " */" keep prefix tags (v1.0 vs v1.0.0) and
+          # regex dots from matching the wrong marker.
+          if grep -qF "changelog-id: ${REPO}@${tag} */" changelog.mdx; then
+            echo "Entry for ${REPO}@${tag} already exists; nothing to do."
+            echo "new=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          {
+            echo "new=true"
+            echo "tag=${tag}"
+            echo "name=$(jq -r '.name // .tag_name' <<< "$release" | tr '\n' ' ' | sed 's/ *$//')"
+            echo "url=$(jq -r '.html_url' <<< "$release")"
+            echo "date=$(jq -r '.published_at[:10]' <<< "$release")"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Slugify branch name
+        if: steps.release.outputs.new == 'true'
+        id: slug
+        env:
+          # Passed via env, not inline ${{ }}, so tag names can't inject into
+          # the shell (tags come from the source repo's release API).
+          REPO: ${{ matrix.repo }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          slug=$(printf '%s' "${REPO}-${TAG}" | tr '/' '-' | tr -cd '[:alnum:]._-')
+          echo "slug=${slug}" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if a PR for this release already exists
+        if: steps.release.outputs.new == 'true'
+        id: existing
+        env:
+          BRANCH: changelog-${{ steps.slug.outputs.slug }}
+        run: |
+          # Open PR: a human may have pushed real copy to the branch — never
+          # regenerate over it. Closed-unmerged PR: the release was declined —
+          # don't resurrect it every morning.
+          prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" \
+            --state all --json number,title,state)
+          count=$(jq 'length' <<< "$prs")
+          echo "count=${count}" >> "$GITHUB_OUTPUT"
+          if [ "$count" -gt 0 ]; then
+            echo "A PR for ${BRANCH} already exists; skipping:"
+            jq -r '.[] | "  #\(.number) [\(.state)] \(.title)"' <<< "$prs"
+          fi
+
+      - name: Insert changelog stub
+        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0'
+        env:
+          REPO: ${{ matrix.repo }}
+          TAG: ${{ steps.release.outputs.tag }}
+          NAME: ${{ steps.release.outputs.name }}
+          URL: ${{ steps.release.outputs.url }}
+          DATE: ${{ steps.release.outputs.date }}
+        run: |
+          ./scripts/changelog-stub.sh "$REPO" "$TAG" "$NAME" "$URL" "$DATE"
+
+      - name: Create draft pull request
+        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0'
+        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
+        with:
+          token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
+          add-paths: |
+            changelog.mdx
+          commit-message: "docs(changelog): stub for ${{ matrix.repo }} ${{ steps.release.outputs.tag }}"
+          committer: "FloxBot <bot@flox.dev>"
+          author: "FloxBot <bot@flox.dev>"
+          branch: "changelog-${{ steps.slug.outputs.slug }}"
+          delete-branch: true
+          draft: true
+          title: "docs(changelog): ${{ matrix.repo }} ${{ steps.release.outputs.tag }}"
+          body: |
+            [${{ matrix.repo }} ${{ steps.release.outputs.tag }}](${{ steps.release.outputs.url }}) was published on ${{ steps.release.outputs.date }}.
+
+            This draft PR pre-fills a changelog stub — replace the placeholder
+            with real release copy, then mark the PR ready for review. If this
+            release doesn't merit a changelog entry, close the PR and it won't
+            be recreated.
+
+            Created automatically by the [Changelog release stubs workflow](https://github.com/flox/docs/actions/workflows/changelog-stubs.yml).
+          labels: "team-developer-support"
