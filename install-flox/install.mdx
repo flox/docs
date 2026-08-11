@@ -110,16 +110,21 @@ description: "How to install or upgrade the Flox CLI"
   </Note>
   **Download and install the package**
 
-  1. Download flox.deb for your system architecture:
+  Run the command for your system architecture:
 
-       [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.x86_64-linux.deb)
-       [64-bit ARM](https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.aarch64-linux.deb)
+  64-bit Intel/AMD:
 
-  1. Install the downloaded file
+  ```
+  curl -LO https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.x86_64-linux.deb
+  sudo apt install ./flox-1.14.1.x86_64-linux.deb
+  ```
 
-      ```
-      sudo apt install /path/to/flox.deb
-      ```
+  64-bit ARM:
+
+  ```
+  curl -LO https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.aarch64-linux.deb
+  sudo apt install ./flox-1.14.1.aarch64-linux.deb
+  ```
 
   <Accordion title="This will replace an existing Nix installation">
 
@@ -181,16 +186,26 @@ description: "How to install or upgrade the Flox CLI"
   </Note>
   **Download and install the package**
 
-  1. Download flox.rpm for your system architecture:
-
-       [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/rpm/flox-1.14.1.x86_64-linux.rpm)
-       [64-bit ARM](https://downloads.flox.dev/by-env/stable/rpm/flox-1.14.1.aarch64-linux.rpm)
-
-  1. Install the downloaded file
+  1. Import the Flox archive keyring:
 
       ```
       sudo rpm --import https://downloads.flox.dev/by-env/stable/rpm/flox-archive-keyring.asc
-      sudo rpm -ivh /path/to/flox.rpm
+      ```
+
+  1. Run the command for your system architecture:
+
+      64-bit Intel/AMD:
+
+      ```
+      curl -LO https://downloads.flox.dev/by-env/stable/rpm/flox-1.14.1.x86_64-linux.rpm
+      sudo rpm -ivh ./flox-1.14.1.x86_64-linux.rpm
+      ```
+
+      64-bit ARM:
+
+      ```
+      curl -LO https://downloads.flox.dev/by-env/stable/rpm/flox-1.14.1.aarch64-linux.rpm
+      sudo rpm -ivh ./flox-1.14.1.aarch64-linux.rpm
       ```
 
   <Accordion title="This will replace an existing Nix installation">
@@ -580,16 +595,21 @@ description: "How to install or upgrade the Flox CLI"
 
     **Download and install the package**
 
-    1. Download flox.deb for your system architecture:
+    Run the command for your system architecture:
 
-         [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.x86_64-linux.deb)
-         [64-bit ARM](https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.aarch64-linux.deb)
+    64-bit Intel/AMD:
 
-    1. Install the downloaded file
+    ```
+    curl -LO https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.x86_64-linux.deb
+    sudo dpkg -i ./flox-1.14.1.x86_64-linux.deb
+    ```
 
-        ```
-        sudo dpkg -i /path/to/flox.deb
-        ```
+    64-bit ARM:
+
+    ```
+    curl -LO https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.aarch64-linux.deb
+    sudo dpkg -i ./flox-1.14.1.aarch64-linux.deb
+    ```
   </Accordion>
   <Accordion title="Debian">
 
@@ -601,16 +621,21 @@ description: "How to install or upgrade the Flox CLI"
 
     **Download and install the package**
 
-    1. Download flox.deb for your system architecture:
+    Run the command for your system architecture:
 
-         [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.x86_64-linux.deb)
-         [64-bit ARM](https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.aarch64-linux.deb)
+    64-bit Intel/AMD:
 
-    1. Install the downloaded file
+    ```
+    curl -LO https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.x86_64-linux.deb
+    sudo dpkg -i ./flox-1.14.1.x86_64-linux.deb
+    ```
 
-        ```
-        sudo dpkg -i /path/to/flox.deb
-        ```
+    64-bit ARM:
+
+    ```
+    curl -LO https://downloads.flox.dev/by-env/stable/deb/flox-1.14.1.aarch64-linux.deb
+    sudo dpkg -i ./flox-1.14.1.aarch64-linux.deb
+    ```
   </Accordion>
   <Accordion title="OracleLinux_8_5">
 
@@ -622,17 +647,21 @@ description: "How to install or upgrade the Flox CLI"
 
     **Download and install the package**
 
-    1. Download flox.rpm for your system architecture:
+    Run the command for your system architecture:
 
-         [64-bit Intel/AMD](https://downloads.flox.dev/by-env/stable/rpm/flox-1.14.1.x86_64-linux.rpm)
-         [64-bit ARM](https://downloads.flox.dev/by-env/stable/rpm/flox-1.14.1.aarch64-linux.rpm)
+    64-bit Intel/AMD:
 
-    1. Install the downloaded file
+    ```
+    curl -LO https://downloads.flox.dev/by-env/stable/rpm/flox-1.14.1.x86_64-linux.rpm
+    sudo rpm -ivh ./flox-1.14.1.x86_64-linux.rpm
+    ```
 
+    64-bit ARM:
 
-        ```
-        sudo rpm -ivh /path/to/flox.rpm
-        ```
+    ```
+    curl -LO https://downloads.flox.dev/by-env/stable/rpm/flox-1.14.1.aarch64-linux.rpm
+    sudo rpm -ivh ./flox-1.14.1.aarch64-linux.rpm
+    ```
   </Accordion>
   <Info>
     **Ignore warning about systemd**

@@ -64,7 +64,7 @@ common = '''
 ##  $ flox activate --start-services  <- Activates & starts all
 ## ------------------------------------------------------------------
 [services]
-# myservice.command = "python3 -m http.server"
+docs.command = "mint dev"
 
 
 ## Include ----------------------------------------------------------
