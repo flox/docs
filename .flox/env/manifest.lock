@@ -19,7 +19,12 @@
     "profile": {
       "common": "  export NPM_CONFIG_PREFIX=\"$FLOX_ENV_CACHE/npm\"\n  export PATH=\"$FLOX_ENV_CACHE/npm/bin:$PATH\"\n"
     },
-    "options": {}
+    "options": {},
+    "services": {
+      "docs": {
+        "command": "mint dev"
+      }
+    }
   },
   "packages": [
     {
@@ -81,37 +86,6 @@
         "out": "/nix/store/amh21igq2gjg6ai42f3ksan8fh89qvpm-nodejs-24.14.1"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "nodejs",
-      "broken": false,
-      "derivation": "/nix/store/aarkp2y0aj12skgji58mbf5va0dcf9bd-nodejs-24.14.1.drv",
-      "description": "Event-driven I/O framework for the V8 JavaScript engine",
-      "install_id": "nodejs",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
-      "name": "nodejs-24.14.1",
-      "pname": "nodejs",
-      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
-      "rev_count": 998534,
-      "rev_date": "2026-05-15T18:21:44Z",
-      "scrape_date": "2026-05-17T08:01:42.769829Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "24.14.1",
-      "outputs_to_install": [
-        "out",
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/w9axwcpzxv1cd78d6v748az2j08k6vfw-nodejs-24.14.1"
-      },
-      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
@@ -209,36 +183,6 @@
     {
       "attr_path": "pandoc",
       "broken": false,
-      "derivation": "/nix/store/x15gfpkflzx3gsg08y6rkx917darzb10-pandoc-cli-3.7.0.2.drv",
-      "description": "Conversion between documentation formats",
-      "install_id": "pandoc",
-      "license": "GPL-2.0-or-later",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
-      "name": "pandoc-cli-3.7.0.2",
-      "pname": "pandoc",
-      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
-      "rev_count": 998534,
-      "rev_date": "2026-05-15T18:21:44Z",
-      "scrape_date": "2026-05-17T08:01:48.495636Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.7.0.2",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/1v6hfw7ar8pd36pvqh9l9sjnm5n288mc-pandoc-cli-3.7.0.2"
-      },
-      "system": "x86_64-darwin",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "pandoc",
-      "broken": false,
       "derivation": "/nix/store/iy8ipmp1l4v52ldb3865b7n3764phiqh-pandoc-cli-3.7.0.2.drv",
       "description": "Conversion between documentation formats",
       "install_id": "pandoc",
@@ -323,36 +267,6 @@
         "out": "/nix/store/2yd70fbbphaaq3ra096cn358p9qpid3q-vale-3.14.1"
       },
       "system": "aarch64-linux",
-      "group": "toplevel",
-      "priority": 5
-    },
-    {
-      "attr_path": "vale",
-      "broken": false,
-      "derivation": "/nix/store/rvxw7hffkng2a0549j0dzn9fs2ddv3bx-vale-3.14.1.drv",
-      "description": "Syntax-aware linter for prose built with speed and extensibility in mind",
-      "install_id": "vale",
-      "license": "MIT",
-      "locked_url": "https://github.com/flox/nixpkgs?rev=d233902339c02a9c334e7e593de68855ad26c4cb",
-      "name": "vale-3.14.1",
-      "pname": "vale",
-      "rev": "d233902339c02a9c334e7e593de68855ad26c4cb",
-      "rev_count": 998534,
-      "rev_date": "2026-05-15T18:21:44Z",
-      "scrape_date": "2026-05-17T08:03:58.551361Z",
-      "stabilities": [
-        "staging",
-        "unstable"
-      ],
-      "unfree": false,
-      "version": "3.14.1",
-      "outputs_to_install": [
-        "out"
-      ],
-      "outputs": {
-        "out": "/nix/store/56jykiasb7wbbhqflx5mhpp7rdi2hqrf-vale-3.14.1"
-      },
-      "system": "x86_64-darwin",
       "group": "toplevel",
       "priority": 5
     },
