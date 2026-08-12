@@ -12,6 +12,69 @@ description: "How to install or upgrade the Flox CLI"
   Flox 1.14.1 online.
 </Note>
 <Tabs>
+  <Tab title="Script">
+
+  <Warning>
+    **This install method is experimental.**
+
+    The script installer is new and has not yet seen broad production use.
+    If you run into trouble, use one of the platform-specific tabs instead.
+  </Warning>
+
+  The quickest way to install Flox on macOS or Linux:
+
+  ```bash
+  curl -fsSL https://get.flox.dev | sh
+  ```
+
+  The script detects your operating system and CPU architecture, then
+  installs Flox using the best package manager available:
+
+  | Platform | Method |
+  |----------|--------|
+  | macOS | `.pkg` installer |
+  | Debian / Ubuntu | `apt` |
+  | Fedora / RHEL / Amazon Linux | `rpm` |
+
+  <Note>
+    **Existing Nix installation?**
+
+    The script will not modify an existing Nix installation.
+    Use the [Nix](#nix) tab instead.
+  </Note>
+
+  ## Verify Flox installation
+
+  If the following command returns without error then you're ready to get
+  started!
+
+  ```console
+  $ flox --version
+  1.14.1
+
+  ```
+
+  The version you see might be different.
+
+  ## Advanced options
+
+  Override the release channel or pin to a specific version with environment
+  variables before the command:
+
+  ```bash
+  FLOX_CHANNEL=stable curl -fsSL https://get.flox.dev | sh
+  ```
+
+  ```bash
+  FLOX_VERSION=1.13.0 curl -fsSL https://get.flox.dev | sh
+  ```
+
+  ## Upgrade existing Flox installation
+
+  The script will not upgrade an existing Flox installation.
+  Use the platform-specific tab for your OS to upgrade.
+
+  </Tab>
   <Tab title="MacOS">
 
   Install Flox with the standalone [`.pkg` installer](#pkg-installer) or
