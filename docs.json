@@ -124,6 +124,7 @@
               "concepts/base-catalog",
               "concepts/services",
               "concepts/composition",
+              "concepts/authentication",
               "concepts/organizations",
               "concepts/service-accounts",
               "concepts/personal-access-tokens",
