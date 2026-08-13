@@ -20,6 +20,19 @@ October, these commands will require authentication.
 - [`flox run`](/man/flox-run)
 - [`flox list`](/man/flox-list)
 
+<Accordion title="Do I need to do anything?">
+  Probably not, and if you do it's one command. Find the row closest to how you
+  use Flox.
+
+  | What you're doing | Sign in? | What to do |
+  | --- | --- | --- |
+  | Activating an environment that already exists | No | Nothing |
+  | Looking up packages with `flox search` or `flox show` | No | Nothing |
+  | Installing, upgrading, or editing your own environment | Yes | Run `flox auth login` once |
+  | CI that activates an environment with a committed lockfile | No | Nothing |
+  | CI that runs `flox install` or `flox build` each time | Yes | Give it a [token](#ci-and-automation) |
+</Accordion>
+
 ## What stays the same
 
 [`flox activate`](/man/flox-activate) does not require authentication. If your
@@ -57,7 +70,8 @@ subscription.
 
 ## Signing in
 
-We spent the last few months making this easy.
+FloxHub has made it easy to login. How you sign in depends on where you're
+running Flox.
 
 <Tabs>
   <Tab title="On your machine">
@@ -74,8 +88,10 @@ We spent the last few months making this easy.
   </Tab>
   <Tab title="No browser">
     Over SSH, inside a container, or anywhere a browser can't open, use a
-    [personal access token](/concepts/personal-access-tokens). It signs the CLI
-    in as you.
+    token instead. A
+    [personal access token](/concepts/personal-access-tokens) signs the CLI in
+    as you. A [service account](/concepts/service-accounts) token signs it in
+    as your organization. The CLI reads either one from the same variable.
 
     ```bash
     export FLOX_FLOXHUB_TOKEN=<your-token>
@@ -151,9 +167,3 @@ The [CI/CD tutorial](/tutorials/ci-cd) covers setup on specific platforms.
     [Flox Discourse](https://discourse.flox.dev/), or email support@flox.dev.
   </Accordion>
 </AccordionGroup>
-
-## Also worth knowing
-
-If you're using Flox with coding agents, we recently published
-[flox/flox-skills](https://github.com/flox/flox-skills/), which lets Claude,
-Codex, and similar agent tools use Flox in natural language.
