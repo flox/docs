@@ -1,0 +1,240 @@
+---
+title: "2026"
+description: "What's new across the Flox CLI, FloxHub, and extensions"
+rss: true
+---
+
+New releases, improvements, and fixes across Flox, in reverse-chronological
+order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
+
+{/* changelog:insert */}
+
+<Update label="August 11" description="v1.14.1">
+  ## Clearer activations and prompts
+
+  Activations now announce the environment they enter, the shell prompt
+  shows just the environment name — including environments named `default`,
+  which you can hide again with `hide_default_prompt = true` — and
+  `flox -q activate` is now silent in every mode.
+
+  ## Changed defaults
+
+  - `x86_64-darwin` is no longer an implicit default system, because
+    nixpkgs drops it from LTS releases after 26.05. It stays valid when
+    listed explicitly in `options.systems`, and the current system is
+    always included.
+  - `flox activate` no longer adds the environment's `sbin` directory to
+    `PATH` by default — opt back in with `flox activate --add-sbin`.
+
+  ## Also in this release
+
+  `flox search` now accepts terms such as `c++`, `g++`, and terms written
+  in non-Latin scripts, and Flox reminds you to run `flox auth login` when
+  you aren't logged in to FloxHub. See the
+  [v1.14.1 release notes](https://github.com/flox/flox/releases/tag/v1.14.1)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.14.1 */}
+
+<Update label="July 29" description="v1.14.0">
+  ## Auto-activation
+
+  Flox now prompts to auto-activate environments when your shell enters
+  their directory, and deactivates them on the way out — packages,
+  environment variables, shell aliases, and services all load with a single
+  `cd`. See the
+  [auto-activation docs](/concepts/auto-activation).
+
+  ## FloxHub personal access tokens
+
+  `flox auth login` accepts personal access tokens generated on your FloxHub
+  profile page, supports non-interactive login via `--token-file`, and now
+  stores credentials in your OS keychain instead of plain text — existing
+  tokens migrate automatically.
+
+  ## Also in this release
+
+  - Trust every environment from an organization at once with
+    `flox config --set 'trusted_environments.myorg/*' trust`.
+  - Packages that ship `etc/profile.d` scripts have them sourced on
+    activation.
+  - `flox build update-catalogs` is deprecated — catalog inputs for Nix
+    expression builds now resolve and lock automatically during `flox build`
+    and `flox publish`.
+
+  See the [v1.14.0 release notes](https://github.com/flox/flox/releases/tag/v1.14.0).
+</Update>
+{/* changelog-id: flox/flox@v1.14.0 */}
+
+<Update label="July 27" description="v1.0.0">
+  ## Flox skills v1.0.0
+
+  Expert Flox guidance for your AI coding agent: the `flox` skill creates
+  and manages reproducible environments, and `floxify` onboards an existing
+  repo — it detects runtimes, package managers, and services, then writes
+  the manifest so `flox activate` is the only setup a new developer needs.
+  Works with Claude Code, Codex, and any agent supporting the
+  [skills.sh](https://skills.sh) standard. See the
+  [v1.0.0 release notes](https://github.com/flox/flox-skills/releases/tag/v1.0.0).
+</Update>
+{/* changelog-id: flox/flox-skills@v1.0.0 */}
+
+<Update label="July 14" description="v1.13.2">
+  ## Auto-activate improvements
+
+  Declining the auto-activation prompt is now remembered, re-allowed
+  environments return to their correct position in the activation stack,
+  and the prompt no longer hangs on fish. (Experimental — enable with
+  `flox config --set features.auto_activate true`.)
+
+  ## Custom catalogs in `flox run`
+
+  `flox run -p owner/pkg -- ...` now runs packages from custom catalogs
+  using an authenticated download path.
+
+  See the [v1.13.2 release notes](https://github.com/flox/flox/releases/tag/v1.13.2)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.13.2 */}
+
+<Update label="June 30" description="v1.13.1">
+  ## Run packages without an environment
+
+  `flox run -p <package> -- <command>` resolves, downloads, and executes a
+  Flox Catalog package in a single step — no environment required. Packages
+  not in the binary cache, such as unfree packages, build from source
+  automatically.
+
+  ## Containerize dev or run directly
+
+  `flox containerize` accepts `--mode` to containerize the `dev` or `run`
+  environment without editing the manifest, and
+  `flox build import-nixpkgs` gains `--stability` to select the nixpkgs
+  revision used for the import.
+
+  See the [v1.13.1 release notes](https://github.com/flox/flox/releases/tag/v1.13.1).
+</Update>
+{/* changelog-id: flox/flox@v1.13.1 */}
+
+<Update label="June 17" description="v1.13.0">
+  ## `flox deactivate`
+
+  Leave an active environment and return your shell to its previous state
+  without closing it, plus a new `profile.deactivate` section for scripts
+  that run on the way out.
+
+  ## Build sandbox levels
+
+  Manifest builds add `warn` and `enforce` sandbox levels alongside `off`
+  and `pure`, with a `sandbox-allow` list for files outside the build
+  closure.
+
+  ## Faster, clearer environment operations
+
+  `flox upgrade` output now separates version changes from same-version
+  rebuilds, `flox activate` skips re-locking environments that are already
+  current, and environment creation uses one `nix build` invocation per
+  build-and-link cycle instead of three.
+
+  See the [v1.13.0 release notes](https://github.com/flox/flox/releases/tag/v1.13.0).
+</Update>
+{/* changelog-id: flox/flox@v1.13.0 */}
+
+<Update label="June 2" description="v1.12.2">
+  ## Flox CLI v1.12.2
+
+  Manifest builds can now use `git describe` to set version strings,
+  `flox publish` no longer triggers unnecessary rebuilds, and debug output
+  gains color highlighting to make slow operations easier to spot.
+  See the [v1.12.2 release notes](https://github.com/flox/flox/releases/tag/v1.12.2).
+</Update>
+{/* changelog-id: flox/flox@v1.12.2 */}
+
+<Update label="May 19" description="v1.12.1">
+  ## Default environment shortcut
+
+  The `-D`/`--default` flag references your default FloxHub environment in
+  any command that accepts `-r`/`--reference`, replacing `-r <user>/default`.
+
+  ## Smarter install and publish
+
+  `flox install <package>^<output>` now appends outputs to packages that
+  are already installed, and `flox publish` skips the rebuild and publish
+  when the exact build has already been published.
+
+  See the [v1.12.1 release notes](https://github.com/flox/flox/releases/tag/v1.12.1).
+</Update>
+{/* changelog-id: flox/flox@v1.12.1 */}
+
+<Update label="May 1" description="v1.12.0">
+  ## Services auto-start
+
+  Configure services to start automatically on activate.
+
+  ## Build catalog updates
+
+  `flox build update-catalogs` is now public with full docs.
+
+  See the [v1.12.0 release notes](https://github.com/flox/flox/releases/tag/v1.12.0).
+</Update>
+{/* changelog-id: flox/flox@v1.12.0 */}
+
+<Update label="April 7">
+  ## Package outputs on FloxHub
+
+  Browse and select package outputs on version and build pages on
+  [FloxHub](https://hub.flox.dev/packages).
+</Update>
+
+<Update label="March 20">
+  ## Package deprecation notices
+
+  FloxHub shows deprecation info in search results and on
+  [package detail pages](https://hub.flox.dev/packages).
+</Update>
+
+<Update label="March 15">
+  ## Environment SBOMs
+
+  Export SPDX and CycloneDX compliance documents for your environments.
+</Update>
+
+<Update label="March 10">
+  ## CUDA 12.6 support
+
+  First-class GPU toolkit support in the catalog.
+  [Read more](https://flox.dev/blog/deploying-hardened-flox-nvidia-cuda-stacks-in-minutes-not-hours/).
+</Update>
+
+<Update label="March 5" description="v1.10.0">
+  ## Improved search
+
+  Package search is now 5x faster. See the
+  [v1.10.0 release notes](https://github.com/flox/flox/releases/tag/v1.10.0).
+</Update>
+{/* changelog-id: flox/flox@v1.10.0 */}
+
+<Update label="February 15" description="v1.9.1">
+  ## Kerberos auth preview
+
+  Enterprise on-prem authentication, in preview. See the
+  [v1.9.1 release notes](https://github.com/flox/flox/releases/tag/v1.9.1).
+</Update>
+{/* changelog-id: flox/flox@v1.9.1 */}
+
+<Update label="February 1" description="v1.9.0">
+  ## Node version detection
+
+  Flox auto-detects `.node-version` files. See the
+  [v1.9.0 release notes](https://github.com/flox/flox/releases/tag/v1.9.0).
+</Update>
+{/* changelog-id: flox/flox@v1.9.0 */}
+
+<Update label="January 30">
+  ## VS Code extension
+
+  Manage Flox environments from VS Code.
+  [Read more](https://flox.dev/blog/reproducible-dev-environments-in-your-workflow-with-flox-and-vs-code/).
+</Update>
+{/* changelog-id: flox/flox-vscode@v1.0.0 */}
+{/* changelog-id: flox/flox-vscode@v1.0.1 */}
