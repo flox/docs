@@ -10,7 +10,8 @@ authentication with a free Flox account.
 
 Several Flox commands have always run through Flox cloud services for search,
 indexing, package resolution, and environment operations. Beginning in early
-October, these commands will require authentication.
+October, these commands will require authentication to communicate with the Flox
+catalog:
 
 - [`flox init`](/man/flox-init)
 - [`flox install`](/man/flox-install)
@@ -18,7 +19,9 @@ October, these commands will require authentication.
 - [`flox edit`](/man/flox-edit)
 - [`flox include upgrade`](/man/flox-include-upgrade)
 - [`flox run`](/man/flox-run)
-- [`flox list`](/man/flox-list)
+
+Other commands such as [`flox activate`](/man/flox-activate) will require
+authentication only when an environment doesn't already have a lockfile.
 
 <Accordion title="Do I need to do anything?">
   Probably not, and if you do it's one command. Find the row closest to how you
@@ -35,9 +38,10 @@ October, these commands will require authentication.
 
 ## What stays the same
 
-[`flox activate`](/man/flox-activate) does not require authentication. If your
-daily workflow or CI pipeline simply activates an existing environment that
-relies on public packages, nothing changes for you.
+[`flox activate`](/man/flox-activate) does not require authentication for an
+environment that already has a lockfile. If your daily workflow or CI pipeline
+simply activates an existing environment that relies on public packages, nothing
+changes for you.
 
 [`flox search`](/man/flox-search) and [`flox show`](/man/flox-show) stay open
 too, so browsing the catalog needs no account. So does pulling a public
