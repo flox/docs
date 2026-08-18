@@ -243,6 +243,14 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Changelog",
+        "pages": [
+          "changelog",
+          "changelog/2025",
+          "changelog/2024"
+        ]
       }
     ]
   },
