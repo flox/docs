@@ -86,7 +86,7 @@ def name_line(text):
 
 
 def walk(node, crumbs, acc):
-    """Yield (section-crumbs, page-path) in nav order."""
+    """Collect (section-crumbs, page-path) into `acc`, in nav order."""
     if isinstance(node, list):
         for item in node:
             walk(item, crumbs, acc)
@@ -103,7 +103,8 @@ def walk(node, crumbs, acc):
 
 
 pages = []
-walk(json.load(open(os.path.join(docs_root, "docs.json")))["navigation"], [], pages)
+with open(os.path.join(docs_root, "docs.json"), encoding="utf-8") as f:
+    walk(json.load(f)["navigation"], [], pages)
 
 # Group by section, preserving first-seen nav order.
 sections, order = {}, []
@@ -114,7 +115,8 @@ for crumbs, page in pages:
         order.append(title)
     sections[title].append(page)
 
-chunks = [open(os.path.join(docs_root, "llms.txt.header")).read().rstrip("\n"), ""]
+with open(os.path.join(docs_root, "llms.txt.header"), encoding="utf-8") as f:
+    chunks = [f.read().rstrip("\n"), ""]
 missing, described = [], 0
 
 for title in order:
@@ -124,7 +126,8 @@ for title in order:
         if not os.path.exists(path):
             missing.append(page)
             continue
-        text = open(path).read()
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
         fm = frontmatter(text)
         label = fm.get("title") or os.path.basename(page)
         desc = fm.get("description") or name_line(text)
@@ -138,14 +141,18 @@ for title in order:
         chunks.extend(lines)
         chunks.append("")
 
-with open(out_path, "w") as f:
-    f.write("\n".join(chunks).rstrip("\n") + "\n")
-
-total = sum(len(v) for v in sections.values()) - len(missing)
-print(f"wrote {out_path}: {total} pages in {len(order)} sections, {described} with descriptions")
+# Validate before writing. A failed run must not leave a truncated llms.txt
+# behind: the file is committed, so a partial one can be staged by a distracted
+# `git add -A` and would then pass the drift check on the next run.
 if missing:
     print("error: nav references pages with no .mdx file:", file=sys.stderr)
     for page in missing:
         print(f"  {page}", file=sys.stderr)
     sys.exit(1)
+
+with open(out_path, "w", encoding="utf-8") as f:
+    f.write("\n".join(chunks).rstrip("\n") + "\n")
+
+total = sum(len(v) for v in sections.values())
+print(f"wrote {out_path}: {total} pages in {len(order)} sections, {described} with descriptions")
 EOF
