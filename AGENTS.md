@@ -59,6 +59,29 @@ Everything under `man/` is generated from the man page sources in the
   `man/` or `docs.json`); pages deliberately left out of the sidebar go
   in that script's `ALLOWLIST`.
 
+## `llms.txt` is generated — do not edit directly
+
+`llms.txt` is the index AI agents read. It is generated from the `docs.json`
+navigation tree by `scripts/generate-llms-txt.sh` and committed, because
+Mintlify serves it from the repo rather than building it.
+
+- **Do not edit `llms.txt` directly** — the whole file, preamble included, is
+  overwritten by the next generator run.
+- Edit the hand-written preamble in `llms.txt.header`; everything below the
+  first `##` heading comes from the nav and from each page's frontmatter
+  `title` and `description` (falling back to a man page's `## NAME` line).
+- After changing `docs.json`, `llms.txt.header`, or any page's `title` or
+  `description`, regenerate and commit the result:
+
+  ```bash
+  ./scripts/generate-llms-txt.sh
+  ```
+
+  The script requires `python3`.
+- `.github/workflows/check-llms-txt.yml` fails PRs where the committed file
+  no longer matches what the generator produces. The daily man-page sync
+  regenerates it too, so bot PRs arrive correct.
+
 ## Content boundaries
 
 This is a **public repository**. Keep that in mind when adding or editing content:

@@ -8,3 +8,6 @@
 # Draft content
 drafts/
 *.draft.mdx
+
+# Build input for llms.txt, not a page (see scripts/generate-llms-txt.sh)
+llms.txt.header

@@ -52,7 +52,7 @@ jobs:
           branch: "chore-sync-man-pages"
           delete-branch: true
           title: "chore(man): sync man pages from flox/flox"
-          body: "This PR was automatically created by the [Sync man pages workflow](https://github.com/flox/docs/actions/workflows/sync-man-pages.yml). `man/*.mdx` is generated from flox/flox `cli/flox/doc` — please spot-check the rendered pages before merging. `llms.txt` is regenerated in the same job, so any change to it here follows from a reworded `## NAME` line."
+          body: "This PR was automatically created by the [Sync man pages workflow](https://github.com/flox/docs/actions/workflows/sync-man-pages.yml). `man/*.mdx` is generated from flox/flox `cli/flox/doc` — please spot-check the rendered pages before merging. `llms.txt` is regenerated in the same job, so any change to it here follows from an added, removed, renamed or reworded man page — spot-check it alongside the pages themselves."
           # Routing is via the label, matching the sibling
           # update-flox-version.yml workflow.
           labels: "team-developer-support"
