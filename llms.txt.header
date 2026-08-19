@@ -10,15 +10,15 @@ A `.flox/` directory in a repository means that project uses Flox to manage its 
 
 Instructions for AI coding assistants:
 
-- Do not run bare `flox activate`. With no command argument it launches an interactive sub-shell, which will hang a non-interactive harness. Use one of the two non-interactive forms:
+- Do not run bare `flox activate`. Invoked from an interactive shell it launches an interactive sub-shell, which will hang a non-interactive harness; invoked from a non-interactive shell with stdout redirected it is in-place mode and emits shell commands to be sourced, which is rarely what you want either. Use one of the two non-interactive forms:
   - `flox activate -d <dir> -c '<command>'` runs the command in a shell with hooks and profile scripts applied. Prefer this form.
   - `flox activate -d <dir> -- <command>` is exec mode: it replaces the process and does not run profile scripts.
 - Install packages with `flox install`, not with the system package manager. Inside a Flox environment, do not reach for `apt`, `yum`, `dnf`, or `brew` to add a dependency.
-- Edit `.flox/env/manifest.toml` directly rather than running `flox edit`, which opens `$EDITOR` interactively. Do not invent manifest fields; check the reference at https://flox.dev/docs/man/manifest.toml.md before writing one.
+- Do not run bare `flox edit`, which opens `$EDITOR` interactively. Use `flox edit -d <dir> -f <file>` to replace the manifest non-interactively, or edit `.flox/env/manifest.toml` directly. On an environment pushed to or pulled from FloxHub, a direct edit to the local manifest blocks `flox install`, `flox uninstall`, `flox edit` and `flox upgrade` until you run `flox edit --sync` to commit it as a new generation, or `flox edit --reset` to discard it. Do not invent manifest fields; check the reference at https://flox.dev/docs/man/manifest.toml.md before writing one.
 - Package names are Flox Catalog pkg-paths and do not always match nixpkgs attribute paths. Verify with `flox search <term>` and `flox show <package>` rather than guessing.
 - Flox is not `nix develop` or `nix-shell`. It is built on Nix but has its own CLI surface.
 - There is no `curl | bash` installer. `install.flox.dev` and `flox.dev/install` do not exist — do not construct or suggest either. Install from https://flox.dev/download or a package manager; see https://flox.dev/docs/install-flox/install.md.
-- Flox runs on Linux and macOS, on x86_64 and aarch64. There is no native Windows build; Windows users run it under WSL2.
+- Flox runs on Linux and macOS, on x86_64 and aarch64. There is no native Windows build; Windows users run it under WSL 2, support for which is experimental. Installation fails on WSL 1.
 
 Everyday command surface:
 
@@ -43,8 +43,8 @@ Flox maintains a skill library for AI coding agents at https://github.com/flox/f
 claude plugin marketplace add flox/flox-skills
 claude plugin install flox@flox-skills
 
-# Codex, from a clone of the repository
-codex plugin marketplace add .
+# Codex
+codex plugin marketplace add flox/flox-skills
 codex plugin add flox@flox-skills
 
 # Any agent supporting the skills.sh standard (Cursor, Copilot, Windsurf, Gemini, and more)
@@ -55,7 +55,7 @@ Key terms:
 
 - Environment — a reproducible set of packages, variables, services, and build steps, declared in a manifest and resolved to a lockfile.
 - Manifest — `.flox/env/manifest.toml`, the declarative definition of an environment.
-- Generation — a numbered snapshot of an environment on FloxHub. Every change creates one, and any can be diffed or rolled back to.
+- Generation — a numbered version of an environment on FloxHub. Every change creates one, and any can be listed, switched to, or rolled back to.
 - Activation — running a command or a shell with the environment applied.
 - Flox Catalog — the package set Flox installs from, built and cached continuously.
 - Service — a long-running process declared in the manifest and managed with `flox services`.
