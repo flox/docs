@@ -7,7 +7,10 @@ name: Check llms.txt is current
 on:
   pull_request:
     paths:
-      - '**/*.mdx'
+      # '**.mdx', not '**/*.mdx' — '**' matches any character including '/',
+      # so the '/' in '**/*.mdx' is literal and the root-level nav pages
+      # (index.mdx, flox-5-minutes.mdx) would not match. Both feed llms.txt.
+      - '**.mdx'
       - 'docs.json'
       - 'llms.txt'
       - 'llms.txt.header'
@@ -24,10 +27,16 @@ jobs:
       - name: Regenerate llms.txt
         run: ./scripts/generate-llms-txt.sh
 
+      # Stage before diffing, and diff the index. A PR that DELETES llms.txt
+      # would otherwise pass: the step above recreates the file as untracked,
+      # and `git diff` cannot see untracked files, so the drift comes back
+      # empty and the one outcome this workflow exists to prevent — handing
+      # /docs/llms.txt back to Mintlify's generated version — merges green.
       - name: Check for drift
         run: |
-          if ! git diff --exit-code --stat llms.txt; then
+          git add llms.txt
+          if ! git diff --cached --exit-code --stat llms.txt; then
             echo "::error::llms.txt is out of date. Run ./scripts/generate-llms-txt.sh and commit the result."
-            git diff llms.txt
+            git diff --cached llms.txt
             exit 1
           fi
