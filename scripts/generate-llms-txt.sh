@@ -9,8 +9,14 @@
 # Rather than hand-maintain a curated file (which drifts the moment someone
 # adds a page), this derives it from the nav. The nav is already the place
 # curation happens, and check-man-nav.sh already fails PRs that add a page
-# without a nav entry — so a page cannot reach the site without also reaching
-# llms.txt.
+# under man/ without a nav entry — so a *man* page cannot reach the site
+# without also reaching llms.txt.
+#
+# That guarantee stops at man/. check-man-nav.sh iterates man/*.mdx only, so
+# an ordinary page can still ship out of the nav and therefore out of this
+# file: concepts/flox-vs-containers-faq.mdx is live and linked today and is
+# in neither. Generalizing nav coverage to every .mdx outside an allowlist
+# belongs in check-man-nav.sh, not here.
 #
 # Structure:
 #   - Preamble is copied verbatim from llms.txt.header (hand-written: summary,
@@ -20,7 +26,8 @@
 #   - One H2 per nav group, in nav order.
 #   - Link text is the page's frontmatter `title`. The description is its
 #     frontmatter `description`, falling back to the `## NAME` line for man
-#     pages, which is the canonical one-liner shipped with the command.
+#     pages, which is the canonical one-liner shipped with the command. Every
+#     link must carry one: a page with neither is an error, not a bare link.
 #
 # Usage:
 #   ./scripts/generate-llms-txt.sh [docs-root]   # defaults to the repo root
@@ -55,8 +62,17 @@ SECTION_TITLES = {
 }
 
 
+# A block-scalar indicator (`description: >`, `|-`, …) opens a value this
+# one-line parser cannot read: the text lives on the following lines. Treat it
+# as absent rather than emitting the indicator itself as a description.
+BLOCK_SCALAR = re.compile(r"^[>|][+-]?\d*$")
+
+
 def frontmatter(text):
-    """Return the YAML frontmatter block's simple key/value pairs."""
+    """Return the YAML frontmatter block's simple key/value pairs.
+
+    Values written as block scalars are omitted, not returned verbatim.
+    """
     m = re.match(r"^---\n(.*?)\n---", text, re.DOTALL)
     if not m:
         return {}
@@ -64,7 +80,10 @@ def frontmatter(text):
     for line in m.group(1).splitlines():
         km = re.match(r'^([A-Za-z_-]+):\s*(.*)$', line)
         if km:
-            fields[km.group(1)] = km.group(2).strip().strip('"').strip("'")
+            value = km.group(2).strip().strip('"').strip("'")
+            if BLOCK_SCALAR.match(value):
+                continue
+            fields[km.group(1)] = value
     return fields
 
 
@@ -85,17 +104,42 @@ def name_line(text):
     return desc if desc[-1] in ".!?" else desc + "."
 
 
+# The nav containers this walker descends into. Mintlify has others —
+# `anchors`, `dropdowns`, `versions`, `languages` — and a nav that grew one
+# would silently drop every page beneath it, shrinking the published index with
+# no error, while check-man-nav.sh (which recurses every dict value) kept
+# reporting `ok` against the same docs.json. Rather than guess at the section
+# semantics of containers this repo does not use, walk() refuses a nav it does
+# not fully understand.
+CONTAINER_KEYS = ("tabs", "groups", "pages")
+
+
 def walk(node, crumbs, acc):
-    """Collect (section-crumbs, page-path) into `acc`, in nav order."""
+    """Collect (section-crumbs, page-path) into `acc`, in nav order.
+
+    Raises on a container key this walker does not handle, so a nav
+    restructure fails loudly instead of publishing a shorter index.
+    """
     if isinstance(node, list):
         for item in node:
             walk(item, crumbs, acc)
     elif isinstance(node, dict):
+        unhandled = sorted(
+            key for key, value in node.items()
+            if key not in CONTAINER_KEYS and isinstance(value, (list, dict))
+        )
+        if unhandled:
+            raise ValueError(
+                "unhandled docs.json nav container(s): "
+                + ", ".join(unhandled)
+                + " — teach walk() how to descend them (and what they contribute "
+                  "to a section title) before adding them to the nav"
+            )
         if "tab" in node:
             crumbs = crumbs if node["tab"] in DROP_TABS else crumbs + [node["tab"]]
         elif "group" in node:
             crumbs = crumbs + [node["group"]]
-        for key in ("tabs", "groups", "pages"):
+        for key in CONTAINER_KEYS:
             if key in node:
                 walk(node[key], crumbs, acc)
     elif isinstance(node, str):
@@ -104,7 +148,12 @@ def walk(node, crumbs, acc):
 
 pages = []
 with open(os.path.join(docs_root, "docs.json"), encoding="utf-8") as f:
-    walk(json.load(f)["navigation"], [], pages)
+    nav = json.load(f)["navigation"]
+try:
+    walk(nav, [], pages)
+except ValueError as exc:
+    print(f"error: {exc}", file=sys.stderr)
+    sys.exit(1)
 
 # Group by section, preserving first-seen nav order.
 sections, order = {}, []
@@ -117,7 +166,7 @@ for crumbs, page in pages:
 
 with open(os.path.join(docs_root, "llms.txt.header"), encoding="utf-8") as f:
     chunks = [f.read().rstrip("\n"), ""]
-missing, described = [], 0
+missing, undescribed = [], []
 
 for title in order:
     lines = []
@@ -131,10 +180,11 @@ for title in order:
         fm = frontmatter(text)
         label = fm.get("title") or os.path.basename(page)
         desc = fm.get("description") or name_line(text)
-        if desc:
-            described += 1
+        if not desc:
+            undescribed.append(page)
+            continue
         url = f"{BASE}/{page}.md"
-        lines.append(f"- [{label}]({url}): {desc}" if desc else f"- [{label}]({url})")
+        lines.append(f"- [{label}]({url}): {desc}")
     if lines:
         chunks.append(f"## {title}")
         chunks.append("")
@@ -150,9 +200,26 @@ if missing:
         print(f"  {page}", file=sys.stderr)
     sys.exit(1)
 
+# "Every link carries a description" is the reason this file exists at all —
+# Mintlify's own llms.txt leaves 40 of 100 bare. Without this the property was
+# an observation about today's content, not an invariant: a page added later
+# with neither `description:` frontmatter nor a `## NAME` line would emit a
+# bare link and pass the drift check, since the check only compares the
+# committed file against a fresh run.
+if undescribed:
+    print("error: nav pages with no description:", file=sys.stderr)
+    for page in undescribed:
+        print(f"  {page}", file=sys.stderr)
+    print(
+        "\nAdd `description:` frontmatter (a man page can instead carry a "
+        "`## NAME` line, which the sync generates).",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+
 with open(out_path, "w", encoding="utf-8") as f:
     f.write("\n".join(chunks).rstrip("\n") + "\n")
 
 total = sum(len(v) for v in sections.values())
-print(f"wrote {out_path}: {total} pages in {len(order)} sections, {described} with descriptions")
+print(f"wrote {out_path}: {total} pages in {len(order)} sections, all with descriptions")
 EOF
