@@ -126,6 +126,7 @@
               "concepts/composition",
               "concepts/authentication",
               "concepts/organizations",
+              "concepts/enterprise-sso",
               "concepts/service-accounts",
               "concepts/personal-access-tokens",
               "concepts/builds",
