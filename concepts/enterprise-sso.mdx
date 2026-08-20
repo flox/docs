@@ -1,0 +1,72 @@
+---
+title: "Enterprise SSO"
+description: "Let your organization's members sign in to Flox through your own identity provider."
+---
+
+<Tip>
+  **This is a Flox Enterprise feature**
+
+
+  This is a paid feature included with Flox Enterprise.
+</Tip>
+**Enterprise SSO** connects your [organization](/concepts/organizations) to
+your company's identity provider, so members sign in to FloxHub and the Flox
+CLI with their work accounts instead of GitHub, Google, or GitLab. Flox
+supports any SAML or OIDC identity provider, including Okta Workforce
+Identity, Entra ID, and Google Workspace.
+
+Organization owners set the connection up themselves from the organization's
+settings page, in a guided flow that includes verifying your company's email
+domain.
+
+## How members sign in
+
+Once the connection is active, sign-in is driven entirely by email domain.
+A member enters their work email address on the FloxHub sign-in page, or in
+the browser window opened by [`flox auth login`](/man/flox-auth), and is sent
+to your identity provider to authenticate. There is no separate button to
+find and nothing to configure on the member's side.
+
+On first sign-in, the member automatically joins your organization with the
+**Reader** role. Owners can raise a member's role afterwards from the
+organization's **Users** tab.
+
+## Setting up the connection
+
+Only organization owners can set up SSO.
+
+1. Sign in to [FloxHub](https://hub.flox.dev)
+2. Open your organization's page and go to the **Settings** tab
+3. On the **Enterprise SSO** card, select **Set up SSO**
+
+The setup flow opens in a new tab and walks you through choosing your identity
+provider, configuring the connection, and verifying your email domain. It
+shows the values to paste into your identity provider's admin console and
+asks for the values it needs back.
+
+You can close the setup flow at any point and pick it up later: the card
+shows **Resume setup** while a connection is partially configured. Each
+setup link is valid for 24 hours, and reopening the flow from the card
+issues a fresh one.
+
+## Domain verification
+
+Sign-in routing is based on your email domain, so you prove you control it
+before the connection goes live. The setup flow shows a DNS TXT record to
+publish on your domain and completes verification once the record is
+visible. You can verify more than one domain if your members sign in with
+addresses on several.
+
+While verification is pending, the **Enterprise SSO** card names the domains
+still waiting. Reopen the setup flow to see the DNS record details again.
+The connection is enabled for your organization when setup is complete and
+a domain has been verified.
+
+## After setup
+
+The **Enterprise SSO** card shows the active connection. Members on your
+verified domains sign in through your identity provider from then on, on
+both FloxHub and the CLI.
+
+To update or remove the connection, for example to change identity providers
+or add a domain, contact [support@flox.dev](mailto:support@flox.dev).

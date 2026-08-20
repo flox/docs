@@ -31,6 +31,10 @@ Organizations in FloxHub use role-based access control (RBAC) to assign permissi
 
 The organization must have at least one owner, but may have multiple. Owners can manage the organization, including adding or removing members and changing roles. Owners may not modify their own role or remove themselves from the organization.
 
+## Enterprise SSO
+
+Organizations can connect their own identity provider, so members sign in with their work accounts and join the organization automatically on first sign-in. Owners set the connection up themselves from the organization's settings page. See [Enterprise SSO](/concepts/enterprise-sso) for how sign-in works and how to set it up.
+
 ## Service Accounts
 
 A [service account](/concepts/service-accounts) is an identity your automation signs in with, such as a release pipeline or a nightly test run. It belongs to the organization rather than to the person who created it, has read-only or read and write access across the organization, and authenticates with its own tokens.
