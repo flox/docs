@@ -36,7 +36,7 @@ flox push / flox pull              # move an environment to and from FloxHub
 
 Agent skills:
 
-Flox maintains a skill library for AI coding agents at https://github.com/flox/flox-skills. It provides two skills: `flox`, which creates and manages environments, services, builds, containers, and package publishing; and `floxify`, which onboards an existing repository by detecting its runtimes, services, and build tools and writing a manifest so `flox activate` becomes the only setup command a new developer needs.
+Flox maintains a skill library for AI coding agents at https://github.com/flox/flox-skills. It provides three skills: `flox`, which creates and manages environments, services, builds, containers, and package publishing; `floxify`, which onboards an existing repository by detecting its runtimes, services, and build tools and writing a manifest so `flox activate` becomes the only setup command a new developer needs; and `flox-debug`, which diagnoses catalog resolution — a package that will not resolve, `flox install` or `flox upgrade` picking an older build after a newer one was published, and a working environment failing with "constraints for group 'toplevel' are too tight" after one package is added.
 
 ```bash
 # Claude Code
