@@ -8,8 +8,8 @@ description: "IDE extensions and AI agent integrations for Flox"
 
   [Flox Skills](https://github.com/flox/flox-skills) teaches AI coding
   agents how to use Flox properly: building reproducible environments,
-  onboarding existing repositories, and wiring up services, builds,
-  containers, and package publishing.
+  onboarding existing repositories, wiring up services, builds,
+  containers, and package publishing, and debugging catalog resolution.
 
   **Skills included:**
 
@@ -20,6 +20,11 @@ description: "IDE extensions and AI agent integrations for Flox"
   - `floxify` — onboard an existing repository. Detects your runtimes,
     services, and build tools, then writes `.flox/env/manifest.toml` so
     `flox activate` becomes the only setup command a new developer needs.
+  - `flox-debug` — diagnose catalog resolution. Explains why a package
+    won't resolve, why `flox install` picks an older build after you
+    published a new one, and why adding one package to a working
+    environment fails with "constraints for group 'toplevel' are too
+    tight".
 
   ## Claude Code
 
