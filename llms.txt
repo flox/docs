@@ -129,6 +129,7 @@ Key terms:
 - [What is the Flox Catalog?](https://flox.dev/docs/concepts/packages-and-catalog.md): Everything you need to know about the Flox Catalog and Packages.
 - [Package Groups](https://flox.dev/docs/concepts/package-groups.md): How package groups work and when to use them
 - [What is the Base Catalog?](https://flox.dev/docs/concepts/base-catalog.md): Everything you need to know about the Base Catalog
+- [CUDA packages in the Flox Catalog and binary cache](https://flox.dev/docs/concepts/cuda-catalog-and-cache.md): How Flox and Nix users can consume pre-built CUDA packages from the Flox Catalog and public binary cache
 - [Services](https://flox.dev/docs/concepts/services.md): Using services with your environment
 - [Composing environments](https://flox.dev/docs/concepts/composition.md): How to combine and reuse environments.
 - [Authentication](https://flox.dev/docs/concepts/authentication.md): Which Flox commands need a free account, what stays open, and how to keep CI running.

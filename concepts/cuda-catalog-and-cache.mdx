@@ -1,0 +1,192 @@
+---
+title: "CUDA packages in the Flox Catalog and binary cache"
+description: "How Flox and Nix users can consume pre-built CUDA packages from the Flox Catalog and public binary cache"
+---
+
+Flox is [one of the providers](https://developer.nvidia.com/blog/developers-can-now-get-cuda-directly-from-their-favorite-third-party-platforms/) that NVIDIA works with to redistribute CUDA libraries and runtime packages. Flox also distributes [PyTorch](https://github.com/pytorch/pytorch), [MAGMA](https://icl.utk.edu/magma/), [ONNX Runtime](https://github.com/microsoft/onnxruntime), and other CUDA-enabled packages whose Nix store closures include proprietary NVIDIA software. This agreement allows Flox to publish pre-built store paths that are not normally available from `cache.nixos.org`.
+
+Pre-built CUDA packages in the Flox binary cache can be used by both Flox and Nix users.
+
+Flox users do not need to configure anything to search for, install, or define pre-built CUDA packages in their [environments](/concepts/environments). The [Flox Catalog](/concepts/packages-and-catalog) publishes pre-built CUDA packages under the `flox-cuda` namespace.
+
+Nix users first need to add `https://cache.flox.dev` to the list of `extra-substituters` and the Flox cache public key to `extra-trusted-public-keys` in `nix.conf`. However, there are a couple of other considerations Nix users need be aware of.
+
+This article covers how Flox and Nix users can consume pre-built CUDA packages from the Flox Catalog and Flox binary cache. **Flox users** can skip ahead to [Flox users: Getting pre-built CUDA dependencies from the Flox Catalog](#flox-users-getting-pre-built-cuda-dependencies-from-the-flox-catalog). **Nix users** can skip ahead to [Nix users: Getting CUDA packages from Flox's public binary cache](#nix-users-getting-cuda-packages-from-floxs-public-binary-cache).
+
+**Note**: The Flox binary cache depends on the voluntary work of the [Nixpkgs CUDA maintainers](https://nixos.org/community/teams/cuda/), who package and maintain NVIDIA's CUDA software for Nixpkgs. This team also tests PyTorch and other critical CUDA-accelerated packages against core NVIDIA CUDA dependencies, working tirelessly to make sure these packages build and link correctly against the evolving NVIDIA CUDA stack. CUDA-on-Nix would not be a reality without them.
+
+
+## CUDA dependencies and Nixpkgs
+
+NVIDIA CUDA Toolkit libraries and binaries are available via Nixpkgs' `cudaPackages` package set. Most `cudaPackages` are marked `unfree`, with the result that Nixpkgs does not normally build or publish them to `cache.nixos.org`, the public Nix binary cache. In addition, packages built with `cudaSupport = true`, such as PyTorch and MAGMA, are not usually published to `cache.nixos.org`. These packages, too, typically need to build or link against unfree `cudaPackages` libraries and binaries.
+
+This means that if a user declares `nvcc` and PyTorch in a Nix or Flox environment, and if no configured Nix [substituter](https://nix.dev/manual/nix/2.26/glossary#gloss-substituter) provides their matching store paths, these packages need to be built from source. For example, imperatively installing `cudaPackages.cuda_nvcc` (the NVIDIA CUDA compiler) to a **Flox** environment triggers a build:
+
+```console
+$ flox install cudaPackages.cuda_nvcc
+⠖ Installing 1 package(s) to environment …
+  ↳ ⠤ Building environment
+ ⠠ Building 'cudaPackages.cuda_nvcc' from source (unfree license)
+```
+
+Similarly, with **Nix**, requesting the same package likewise triggers a build:
+
+```console
+$ NIXPKGS_ALLOW_UNFREE=1 nix shell --impure nixpkgs#cudaPackages.cuda_nvcc
+```
+
+The same behavior applies to PyTorch, MAGMA, and other CUDA-enabled packages. Note that because of their large transitive closures, these packages can take considerable time to build. It is not uncommon for PyTorch or MAGMA builds to exhaust memory or disk space, even on high-capacity systems, causing out-of-memory (OOM) errors. Many users do not have the resources to build these packages.
+
+Instead of building these packages from source, Flox users can pull them pre-built from the Flox Catalog, while Nix users can pull matching store paths from the Flox binary cache. The next section covers how to do this with Flox.
+
+For instructions on what Nix users need to know and do to consume packages from the Flox binary cache, skip ahead to [Nix users: Getting CUDA packages from Flox's public binary cache](#nix-users-getting-cuda-packages-from-floxs-public-binary-cache).
+
+
+## Flox users: Getting pre-built CUDA dependencies from the Flox Catalog
+
+Flox users do not need to do anything extra to take advantage of pre-built CUDA packages in the Flox Catalog. The only requirement is that they consume packages prefixed with the `flox-cuda` namespace.
+
+To install pre-built, CUDA-accelerated PyTorch:
+
+```console
+$ flox install flox-cuda/python3Packages.torch
+```
+
+Similarly, to declaratively define PyTorch in a Flox environment, run [`flox edit`](/man/flox-edit):
+
+```toml
+[install]
+pytorch-cuda.pkg-path = "flox-cuda/python3Packages.torch"
+pytorch-cuda.systems = ["x86_64-linux", "aarch64-linux"]	## define only for your arch if you prefer
+pytorch-cuda.pkg-group = "cuda"
+```
+
+This makes the most recent version of PyTorch available in your Flox environment.
+
+If an environment is pre-populated with many dependencies, Flox's resolver may select an older version of PyTorch. If this happens, consider isolating PyTorch in a [package group](/concepts/package-groups), as shown above.
+
+The Flox Catalog indexes thousands of `flox-cuda` packages. If you are uncertain as to the name of a `flox-cuda` package, search [via FloxHub](https://hub.flox.dev/packages) or with the [Flox CLI](/man/flox-search):
+
+```console
+$ flox search flox-cuda --all | grep -i torch
+flox-cuda/python3Packages.torch                         PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration
+flox-cuda/python3Packages.pytorch                       PyTorch: Tensors and Dynamic neural networks in Python with strong GPU acceleration
+flox-cuda/python3Packages.torchaudio                    PyTorch audio library
+flox-cuda/python3Packages.torchvision                   PyTorch vision library
+flox-cuda/python3Packages.transformers                  Natural Language Processing for TensorFlow 2.0 and PyTorch
+flox-cuda/python3Packages.pytorch-lightning             Lightweight PyTorch wrapper for machine learning researchers
+```
+
+**Note**: Nix-defined Python packages like Torchvision, Torchaudio, or Transformers *already include* their transitive runtime dependencies as part of their closures. As a result, a package like `flox-cuda/python3Packages.torchvision` *automatically pulls in* the version of PyTorch against which it was built. So defining `flox-cuda/python3Packages.torchvision` and `flox-cuda/python3Packages.torch` in the same environment can fetch multiple PyTorch store paths if the explicitly defined `torch` resolves to a different store path from the version pulled in by Torchvision, along with their respective transitive dependencies. This substantially increases the size of the Flox environment's closure.
+
+To learn more about working with CUDA packages in the Flox Catalog, refer to [this tutorial](/tutorials/cuda).
+
+The remainder of this article covers how Nix users can consume packages from Flox's binary cache.
+
+
+## Nix users: Getting CUDA packages from Flox's public binary cache
+
+Flox builds [Nixpkgs' `release-cuda` jobset](https://github.com/nixos/nixpkgs/blob/master/pkgs/top-level/release-cuda.nix) and publishes the built store paths to its public binary cache.
+
+|            |                                                                  |
+| ---------- | ---------------------------------------------------------------- |
+| Cache URL  | https://cache.flox.dev                                           |
+| Public Key | flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs= |
+
+Which store paths are available in the cache depends on the specific Nixpkgs revisions that Flox builds against. Flox currently evaluates and builds CUDA packages against revisions from [its own Nixpkgs fork](https://github.com/flox/nixpkgs). This repo tracks the upstream `nixpkgs-unstable` branch across four distinct [Flox-maintained branches](/concepts/base-catalog#flox-branches): `unstable`, `staging`, `stable`, and `lts`.
+
+These branch names describe Flox's Nixpkgs update schedules, *not* the stability of the software they reference. In general the `unstable` branch tracks upstream `nixpkgs-unstable` most closely (i.e., on a daily update schedule). Notably, Flox does not presently build against Nixpkgs release channels, so users that pin to revisions from these channels are unlikely to find matching CUDA store paths in the Flox cache. Because different Nixpkgs revisions can produce different store paths for the same package, **choosing a revision that Flox builds against significantly increases the chances of a cache hit**.
+
+<Warning>
+NixOS users who do not want system builds to query the Flox cache for NVIDIA driver derivations and other CUDA package derivations should read [Control which builds query the Flox cache](#control-which-builds-query-the-flox-cache) before adding it to `extra-substituters`.
+</Warning>
+
+
+### Configure Nix to use the Flox binary cache
+
+For a multi-user Nix installation, add the following settings to `/etc/nix/nix.conf`:
+
+```ini
+extra-substituters = https://cache.flox.dev
+extra-trusted-public-keys = flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs=
+```
+
+On NixOS, add the settings to the system configuration:
+
+```nix
+{
+  nix.settings = {
+    extra-substituters = [
+      "https://cache.flox.dev"
+    ];
+
+    extra-trusted-public-keys = [
+      "flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs="
+    ];
+  };
+}
+```
+
+Apply the NixOS configuration:
+
+```console
+$ sudo nixos-rebuild switch
+```
+
+Check that the cache is configured as a substituter:
+
+```console
+$ nix config show | grep substituters
+```
+
+The output should contain `https://cache.flox.dev`.
+
+
+### Maximizing CUDA cache hits with Flox Nixpkgs branches
+
+CUDA packages remain subject to the Nixpkgs unfree-package policy.
+
+To maximize the likelihood of a cache hit, use one of the revisions that Flox builds against. The example below references Flox's `stable` branch:
+
+```console
+$ NIXPKGS_ALLOW_UNFREE=1 nix shell --impure \
+    github:flox/nixpkgs/stable#cudaPackages.cuda_nvcc
+$ nvcc --version
+```
+
+Flox's `unstable`, `staging`, `stable`, and `lts` branches update at different cadences: `unstable` updates daily, `staging` weekly, `stable` monthly, and `lts` every six months.
+
+Each Flox branch feeds the next. Flox `unstable` tracks snapshots of upstream `nixos-unstable`; `staging` updates from Flox `unstable`, `stable` from `staging`, and `lts` from `stable`. A revision that appears in `unstable` won't necessarily propagate to `staging`, `stable`, or `lts` before a subsequent revision replaces it. Flox builds packages for its binary cache against the Nixpkgs revisions referenced by these branches, so evaluating packages against one of these revisions increases the likelihood of a cache hit.
+
+If no matching store path is available in the Flox cache, Nix builds the derivation locally.
+
+
+### Control which builds query the Flox cache
+
+When Nix needs a store path, it queries substituters in priority order, starting with higher-priority substituters and falling back to lower-priority ones if it can't find a match. By adding Flox's cache to Nix's substituter set, it therefore becomes one of the sources that Nix queries for matches. On NixOS, this behavior also applies to any builds that use the Nix daemon's default substituter set, including `nixos-rebuild`. These builds may fetch matching NVIDIA driver store paths from Flox *in addition to* user-space CUDA package store paths.
+
+If you do not want NixOS system builds to obtain NVIDIA driver store paths or other CUDA package store paths from the Flox cache, authorize the cache without adding it to the Nix daemon's default substituter set:
+
+```nix
+{
+  nix.settings = {
+    trusted-substituters = [
+      "https://cache.flox.dev"
+    ];
+
+    extra-trusted-public-keys = [
+      "flox-cache-public-1:7F4OyH7ZCnFhcze3fJdfyXYLQw/aV7GEed86nQ7IsOs="
+    ];
+  };
+}
+```
+
+Then specify the Flox cache as a substituter only for commands that request CUDA packages:
+
+```console
+$ NIXPKGS_ALLOW_UNFREE=1 nix shell --impure \
+    --extra-substituters https://cache.flox.dev \
+    github:flox/nixpkgs/stable#cudaPackages.cuda_nvcc
+```
+
+This way, a `nixos-rebuild` operation queries the Flox cache *only* when the command that starts the build explicitly specifies it as a substituter.
