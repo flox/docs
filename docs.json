@@ -136,6 +136,7 @@
               "concepts/catalog-imports",
               "concepts/publishing",
               "concepts/secrets-management",
+              "concepts/plugins",
               "concepts/flox-vs-containers"
             ]
           },
