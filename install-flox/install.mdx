@@ -56,24 +56,6 @@ description: "How to install or upgrade the Flox CLI"
   ...
   ```
 
-  <Info>
-    **If Nix is already installed on your system**
-
-    The script does not install Flox through Nix, and it will not modify
-    your existing Nix installation. When it detects Nix (the `nix` command
-    or a populated `/nix/store`), it stops and points you to the
-    [Nix](#nix) tab, which covers installing Flox with an existing Nix.
-  </Info>
-  <Info>
-    **Unsupported systems**
-
-    The script refuses to run on systems where the native packages are
-    untested: immutable (ostree-based) distributions such as Fedora
-    Silverblue or CoreOS, openSUSE/SLES, and RPM-family systems without
-    `dnf` or `yum`. On those systems, install Nix first and then follow the
-    [Nix](#nix) tab instructions.
-  </Info>
-
   ## Pin a channel or version
 
   The script honors two environment variables:
@@ -111,6 +93,25 @@ description: "How to install or upgrade the Flox CLI"
   ```bash
   sudo apt-get update && sudo apt-get install --only-upgrade flox
   ```
+
+  ## FAQ
+
+  <AccordionGroup>
+    <Accordion title="What happens if Nix is already installed?">
+      The script does not install Flox through Nix, and it will not modify
+      your existing Nix installation. When it detects Nix (the `nix` command
+      or a populated `/nix/store`), it stops and points you to the
+      [Nix](#nix) tab, which covers installing Flox with an existing Nix.
+    </Accordion>
+
+    <Accordion title="Which systems does the script refuse to run on?">
+      The script refuses to run on systems where the native packages are
+      untested: immutable (ostree-based) distributions such as Fedora
+      Silverblue or CoreOS, openSUSE/SLES, and RPM-family systems without
+      `dnf` or `yum`. On those systems, install Nix first and then follow the
+      [Nix](#nix) tab instructions.
+    </Accordion>
+  </AccordionGroup>
   </Tab>
   <Tab title="MacOS">
 
