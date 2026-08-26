@@ -122,6 +122,7 @@
               "concepts/packages-and-catalog",
               "concepts/package-groups",
               "concepts/base-catalog",
+              "concepts/cuda-catalog-and-cache",
               "concepts/services",
               "concepts/composition",
               "concepts/authentication",
