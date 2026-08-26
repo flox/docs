@@ -46,7 +46,7 @@ For instructions on what Nix users need to know and do to consume packages from 
 
 Flox users do not need to do anything extra to take advantage of pre-built CUDA packages in the Flox Catalog. The only requirement is that they consume packages prefixed with the `flox-cuda` namespace.
 
-To install pre-built, CUDA-accelerated PyTorch:
+To imperatively install pre-built, CUDA-accelerated PyTorch:
 
 ```console
 $ flox install flox-cuda/python3Packages.torch
@@ -58,12 +58,12 @@ Similarly, to declaratively define PyTorch in a Flox environment, run [`flox edi
 [install]
 pytorch-cuda.pkg-path = "flox-cuda/python3Packages.torch"
 pytorch-cuda.systems = ["x86_64-linux", "aarch64-linux"]	## define only for your arch if you prefer
-pytorch-cuda.pkg-group = "cuda"
+pytorch-cuda.pkg-group = "pytorch-cuda"
 ```
 
 This makes the most recent version of PyTorch available in your Flox environment.
 
-If an environment is pre-populated with many dependencies, Flox's resolver may select an older version of PyTorch. If this happens, consider isolating PyTorch in a [package group](/concepts/package-groups), as shown above.
+If an environment is pre-populated with many dependencies, Flox's resolver may select an older version of PyTorch. If this happens, consider isolating PyTorch in its own [package group](/concepts/package-groups), as shown above.
 
 The Flox Catalog indexes thousands of `flox-cuda` packages. If you are uncertain as to the name of a `flox-cuda` package, search [via FloxHub](https://hub.flox.dev/packages) or with the [Flox CLI](/man/flox-search):
 
