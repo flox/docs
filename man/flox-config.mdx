@@ -77,6 +77,20 @@ Silence logs except for errors.
 
 ## SUPPORTED CONFIGURATION OPTIONS
 
+`auth_notifications`  
+Print the advisory reminder shown after a command when you are not
+logged in to FloxHub:
+
+```console
+You are not logged in to FloxHub. Run 'flox auth login' to log in.
+```
+
+Set to `false` to quiet it. Authentication *errors* are unaffected:
+commands that require a login, such as `flox push`, still fail with an
+explanation.
+
+(default: true)
+
 `auto_activate`  
 How auto-activation treats environments you have not yet allowed or
 denied. Possible values are `prompt` (default), `allowlist`, and
@@ -130,7 +144,7 @@ Token to authenticate on FloxHub.
 `hide_default_prompt`  
 Hide environments named ‘default’ from the shell prompt, and don’t add
 environments named ‘default’ to `$FLOX_PROMPT_ENVIRONMENTS` (default:
-true).
+false).
 
 `installer_channel`  
 Release channel to use when checking for updates to Flox. Valid values

@@ -1,0 +1,62 @@
+# Flox
+
+> Flox is a developer environment manager built on Nix. You declare a project's packages, environment variables, services, and build steps once in a `manifest.toml`; Flox resolves that to a lockfile, and every target runs that exact closure — a developer laptop, a CI runner, a container image, or an AI coding agent's sandbox.
+
+This file indexes the Flox reference documentation at https://flox.dev/docs. Positioning, product and use case pages, customer stories, and the blog are indexed separately at https://flox.dev/llms.txt.
+
+Every page listed below is served as clean Markdown at the URL shown; drop the `.md` suffix for the rendered HTML page. The full documentation corpus, concatenated for one-shot ingestion, is at https://flox.dev/docs/llms-full.txt.
+
+A `.flox/` directory in a repository means that project uses Flox to manage its dependencies and environment lifecycle.
+
+Instructions for AI coding assistants:
+
+- Do not run bare `flox activate`. Invoked from an interactive shell it launches an interactive sub-shell, which will hang a non-interactive harness; invoked from a non-interactive shell with stdout redirected it is in-place mode and emits shell commands to be sourced, which is rarely what you want either. Use one of the two non-interactive forms:
+  - `flox activate -d <dir> -c '<command>'` runs the command in a shell with hooks and profile scripts applied. Prefer this form.
+  - `flox activate -d <dir> -- <command>` is exec mode: it replaces the process and does not run profile scripts.
+- Install packages with `flox install`, not with the system package manager. Inside a Flox environment, do not reach for `apt`, `yum`, `dnf`, or `brew` to add a dependency.
+- Do not run bare `flox edit`, which opens `$EDITOR` interactively. Use `flox edit -d <dir> -f <file>` to replace the manifest non-interactively, or edit `.flox/env/manifest.toml` directly. On an environment pushed to or pulled from FloxHub, a direct edit to the local manifest blocks `flox install`, `flox uninstall`, `flox edit` and `flox upgrade` until you run `flox edit --sync` to commit it as a new generation, or `flox edit --reset` to discard it. Do not invent manifest fields; check the reference at https://flox.dev/docs/man/manifest.toml.md before writing one.
+- Package names are Flox Catalog pkg-paths and do not always match nixpkgs attribute paths. Verify with `flox search <term>` and `flox show <package>` rather than guessing.
+- Flox is not `nix develop` or `nix-shell`. It is built on Nix but has its own CLI surface.
+- There is no `curl | bash` installer. `install.flox.dev` and `flox.dev/install` do not exist — do not construct or suggest either. Install from https://flox.dev/download or a package manager; see https://flox.dev/docs/install-flox/install.md.
+- Flox runs on Linux and macOS, on x86_64 and aarch64. There is no native Windows build; Windows users run it under WSL 2, support for which is experimental. Installation fails on WSL 1.
+
+Everyday command surface:
+
+```
+flox envs                          # show active and available environments
+flox init -d <dir>                 # initialize an environment
+flox search <term>                 # search the catalog
+flox show <package>                # show versions and details for one package
+flox install -d <dir> <package>    # install packages
+flox list -d <dir>                 # list installed packages
+flox activate -d <dir> -c '<cmd>'  # run a command inside the environment
+flox services start <name>         # start a service declared in the manifest
+flox push / flox pull              # move an environment to and from FloxHub
+```
+
+Agent skills:
+
+Flox maintains a skill library for AI coding agents at https://github.com/flox/flox-skills. It provides three skills: `flox`, which creates and manages environments, services, builds, containers, and package publishing; `floxify`, which onboards an existing repository by detecting its runtimes, services, and build tools and writing a manifest so `flox activate` becomes the only setup command a new developer needs; and `flox-debug`, which diagnoses catalog resolution — a package that will not resolve, `flox install` or `flox upgrade` picking an older build after a newer one was published, and a working environment failing with "constraints for group 'toplevel' are too tight" after one package is added.
+
+```bash
+# Claude Code
+claude plugin marketplace add flox/flox-skills
+claude plugin install flox@flox-skills
+
+# Codex
+codex plugin marketplace add flox/flox-skills
+codex plugin add flox@flox-skills
+
+# Any agent supporting the skills.sh standard (Cursor, Copilot, Windsurf, Gemini, and more)
+npx skills add flox/flox-skills
+```
+
+Key terms:
+
+- Environment — a reproducible set of packages, variables, services, and build steps, declared in a manifest and resolved to a lockfile.
+- Manifest — `.flox/env/manifest.toml`, the declarative definition of an environment.
+- Generation — a numbered version of an environment on FloxHub. Every change creates one, and any can be listed, switched to, or rolled back to.
+- Activation — running a command or a shell with the environment applied.
+- Flox Catalog — the package set Flox installs from, built and cached continuously.
+- Service — a long-running process declared in the manifest and managed with `flox services`.
+- FloxHub — https://hub.flox.dev, where environments are stored, versioned, and shared.

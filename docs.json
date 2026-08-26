@@ -122,9 +122,12 @@
               "concepts/packages-and-catalog",
               "concepts/package-groups",
               "concepts/base-catalog",
+              "concepts/cuda-catalog-and-cache",
               "concepts/services",
               "concepts/composition",
+              "concepts/authentication",
               "concepts/organizations",
+              "concepts/enterprise-sso",
               "concepts/service-accounts",
               "concepts/personal-access-tokens",
               "concepts/builds",
@@ -165,8 +168,7 @@
             "group": "Overview",
             "pages": [
               "man/flox",
-              "man/manifest.toml",
-              "man/nix-builds.toml"
+              "man/manifest.toml"
             ]
           },
           {
@@ -212,7 +214,6 @@
               "man/flox-build",
               "man/flox-build-clean",
               "man/flox-build-import-nixpkgs",
-              "man/flox-build-update-catalogs",
               "man/flox-containerize",
               "man/flox-publish"
             ]
@@ -243,6 +244,14 @@
               "man/flox-include-upgrade"
             ]
           }
+        ]
+      },
+      {
+        "tab": "Changelog",
+        "pages": [
+          "changelog",
+          "changelog/2025",
+          "changelog/2024"
         ]
       }
     ]

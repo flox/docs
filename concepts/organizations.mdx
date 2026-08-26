@@ -1,5 +1,6 @@
 ---
 title: "Understanding Organizations in FloxHub"
+description: "Roles, access control, and shared ownership of environments across a team"
 ---
 
 <Tip>
@@ -29,6 +30,10 @@ Organizations in FloxHub use role-based access control (RBAC) to assign permissi
 - **Reader**: Can view and pull environments and can install packages, but cannot create or modify them.
 
 The organization must have at least one owner, but may have multiple. Owners can manage the organization, including adding or removing members and changing roles. Owners may not modify their own role or remove themselves from the organization.
+
+## Enterprise SSO
+
+Organizations can connect their own identity provider, so members sign in with their work accounts and join the organization automatically on first sign-in. Owners set the connection up themselves from the organization's settings page. See [Enterprise SSO](/concepts/enterprise-sso) for how sign-in works and how to set it up.
 
 ## Service Accounts
 

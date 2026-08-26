@@ -1,0 +1,173 @@
+---
+title: "Authentication"
+description: "Which Flox commands need a free account, what stays open, and how to keep CI running."
+---
+
+Starting in **early October 2026**, several Flox CLI commands will require
+authentication with a free Flox account.
+
+## What's changing
+
+Several Flox commands have always run through Flox cloud services for search,
+indexing, package resolution, and environment operations. Beginning in early
+October, these commands will require authentication to communicate with the Flox
+catalog:
+
+- [`flox init`](/man/flox-init)
+- [`flox install`](/man/flox-install)
+- [`flox upgrade`](/man/flox-upgrade)
+- [`flox edit`](/man/flox-edit)
+- [`flox include upgrade`](/man/flox-include-upgrade)
+- [`flox run`](/man/flox-run)
+
+Other commands such as [`flox activate`](/man/flox-activate) will require
+authentication only when an environment doesn't already have a lockfile.
+
+<Accordion title="Do I need to do anything?">
+  Probably not, and if you do it's one command. Find the row closest to how you
+  use Flox.
+
+  | What you're doing | Sign in? | What to do |
+  | --- | --- | --- |
+  | Activating an environment that already exists | No | Nothing |
+  | Looking up packages with `flox search` or `flox show` | No | Nothing |
+  | Installing, upgrading, or editing your own environment | Yes | Run `flox auth login` once |
+  | CI that activates an environment with a committed lockfile | No | Nothing |
+  | CI that runs `flox install` or `flox build` each time | Yes | Give it a [token](#ci-and-automation) |
+</Accordion>
+
+## What stays the same
+
+[`flox activate`](/man/flox-activate) does not require authentication for an
+environment that already has a lockfile. If your daily workflow or CI pipeline
+simply activates an existing environment that relies on public packages, nothing
+changes for you.
+
+[`flox search`](/man/flox-search) and [`flox show`](/man/flox-show) stay open
+too, so browsing the catalog needs no account. So does pulling a public
+environment with [`flox pull`](/man/flox-pull).
+
+Private packages and environments continue to require authentication as they
+do today, and so does [publishing](/concepts/publishing). Nothing about those
+changes.
+
+## Why we're doing this
+
+Flox has grown from an open source CLI into foundational infrastructure used
+across developer machines, CI, build systems, and increasingly AI agents. As
+usage has grown exponentially, so has our responsibility to operate the cloud
+services behind Flox reliably and to keep improving them based on how they're
+actually being used.
+
+Requiring authentication for the commands that interact with those services
+gives us a better foundation for understanding those workflows, operating the
+service reliably, and investing in the parts of Flox people depend on most. It
+also gives us better standards around abuse prevention.
+
+We're intentionally keeping `flox activate` available without an account for
+public environments. If you're consuming an environment someone else
+maintains, you do not need to create an account just to use it.
+
+To be clear: this is not a paywall. The free tier keeps the same capabilities
+it has today. You'll need a free account for the commands above, not a paid
+subscription.
+
+## Signing in
+
+FloxHub has made it easy to login. How you sign in depends on where you're
+running Flox.
+
+<Tabs>
+  <Tab title="On your machine">
+    Run [`flox auth login`](/man/flox-auth) and follow the browser prompt. You
+    can log in with an existing GitHub, Google, or GitLab account. If you don't
+    have an account, the same flow creates one.
+
+    ```bash
+    flox auth login
+    ```
+
+    You do this once per machine. Paid customers can also authenticate with
+    their own SSO provider — see [Enterprise SSO](/concepts/enterprise-sso).
+  </Tab>
+  <Tab title="No browser">
+    Over SSH, inside a container, or anywhere a browser can't open, use a
+    token instead. A
+    [personal access token](/concepts/personal-access-tokens) signs the CLI in
+    as you. A [service account](/concepts/service-accounts) token signs it in
+    as your organization. The CLI reads either one from the same variable.
+
+    ```bash
+    export FLOX_FLOXHUB_TOKEN=<your-token>
+    ```
+  </Tab>
+</Tabs>
+
+You can also sign in on the web at [hub.flox.dev](https://hub.flox.dev).
+
+## CI and automation
+
+Automation breaks quietly, so it's worth handling before anything else. Two
+ways through:
+
+- **Commit your lockfile.** A pipeline that activates an existing environment
+  against a committed `manifest.lock` never calls the catalog, so there's no
+  token to manage. You get reproducible builds and one less network dependency
+  out of it, which is worth doing anyway.
+- **Or give the pipeline a token.** Pipelines that run `flox install`,
+  `flox upgrade`, or any of the other commands above do reach the catalog. So
+  does `flox build` when the lockfile it's building against is out of date.
+  Issue a token in FloxHub and set it as `FLOX_FLOXHUB_TOKEN` from your CI
+  platform's secret store. The pipeline or agent then runs Flox commands
+  without user interaction.
+
+A [personal access token](/concepts/personal-access-tokens) works on any
+account, including a free personal one, and acts as you. A
+[service account](/concepts/service-accounts) token belongs to an organization
+instead, so the pipeline keeps running after someone changes teams or leaves.
+The CLI reads both from the same variable.
+
+The [CI/CD tutorial](/tutorials/ci-cd) covers setup on specific platforms.
+
+<Warning>
+  Service account and personal access tokens need **Flox CLI 1.14.0 or newer**.
+  Older releases reject the token as invalid and clear it, so the pipeline
+  fails as though it were never set. Check with `flox --version`, and see
+  [installing Flox](/install-flox/install) to upgrade.
+</Warning>
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Do I have to pay for Flox now?">
+    No. Flox has always had a free tier and we keep adding to it. You need a
+    free account, not a paid subscription.
+  </Accordion>
+
+  <Accordion title="What happens to my CI pipelines?">
+    If your pipeline uses one of the commands listed above, add a personal
+    access token or a service account token to your CI secrets before October.
+    Pipelines that only activate an existing environment against a committed
+    lockfile carry on unchanged.
+  </Accordion>
+
+  <Accordion title="What's the exact cutoff date?">
+    Early October 2026. We'll follow up with the specific date and send a
+    reminder before the change takes effect.
+  </Accordion>
+
+  <Accordion title="What if I miss the deadline?">
+    The commands prompt you to sign in rather than failing silently. Signing up
+    takes under a minute.
+  </Accordion>
+
+  <Accordion title="Do you have an option that isn't public FloxHub?">
+    Yes. FloxHub Enterprise runs on your own infrastructure. Email
+    hello@flox.dev for more information.
+  </Accordion>
+
+  <Accordion title="My question was not addressed here.">
+    Ask in [Flox Community Slack](https://go.flox.dev/slack) or on
+    [Flox Discourse](https://discourse.flox.dev/), or email support@flox.dev.
+  </Accordion>
+</AccordionGroup>

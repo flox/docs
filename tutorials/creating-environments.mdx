@@ -190,10 +190,11 @@ mkcert.pkg-path = "mkcert"
 # hello.pkg-path = "hello"
 # nodejs = { version = "^18.4.2", pkg-path = "nodejs_18" }
 
-# Set an environment variable. These variables may not reference one another.
+# Set environment variables. References resolve in dependency order.
 [vars]
 # message = "Howdy"
-# pass-in = "$some-env-var"
+# greeting = "$message from Flox"
+# pass-in = "${SOME_ENV_VAR}"
 
 # Set your activation hook ( run when entering the environment )
 # You can write this inline with the `on-activate` field.
@@ -204,6 +205,14 @@ on-activate = """
   echo ""
 """
 ```
+
+<Note>
+  **Flox CLI version**
+
+  Flox CLI versions 1.14.1 and later support `[vars]` interpolation.
+  Set [`minimum-cli-version`](/man/manifest.toml#minimum-cli-version) to `"1.14.1"`
+  in environments that rely on this behavior.
+</Note>
 
 Save changes to the file.
 

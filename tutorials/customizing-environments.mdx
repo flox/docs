@@ -42,9 +42,10 @@ Otherwise, try this:
 
 
 - Are you setting an environment variable?
-    - Is it a constant value?
+    - Can you express its value directly or by referencing another `[vars]` entry?
         - If so, set it in the `[vars]` section.
-        - If not, compute and `export` the variable in the `hook.on-activate` script.
+        - References between entries require Flox CLI 1.14.1 or later.
+        - If it requires shell commands or conditional logic, compute and `export` it in the `hook.on-activate` script.
 - Are you sourcing a script (like activating a Python virtual environment)?
     - If so, do this in the `[profile]` section.
 - Are you setting shell aliases?

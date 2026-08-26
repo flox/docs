@@ -1,0 +1,42 @@
+name: Check llms.txt is current
+
+# llms.txt is generated from the docs.json nav by scripts/generate-llms-txt.sh
+# and committed, because Mintlify serves it from the repo rather than building
+# it. Fail PRs where the committed file no longer matches what the generator
+# produces — otherwise adding a page silently leaves it out of the index.
+on:
+  pull_request:
+    paths:
+      # '**.mdx', not '**/*.mdx' — '**' matches any character including '/',
+      # so the '/' in '**/*.mdx' is literal and the root-level nav pages
+      # (index.mdx, flox-5-minutes.mdx) would not match. Both feed llms.txt.
+      - '**.mdx'
+      - 'docs.json'
+      - 'llms.txt'
+      - 'llms.txt.header'
+      - 'scripts/generate-llms-txt.sh'
+  workflow_dispatch:
+
+jobs:
+  check-llms-txt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout docs
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+      - name: Regenerate llms.txt
+        run: ./scripts/generate-llms-txt.sh
+
+      # Stage before diffing, and diff the index. A PR that DELETES llms.txt
+      # would otherwise pass: the step above recreates the file as untracked,
+      # and `git diff` cannot see untracked files, so the drift comes back
+      # empty and the one outcome this workflow exists to prevent — handing
+      # /docs/llms.txt back to Mintlify's generated version — merges green.
+      - name: Check for drift
+        run: |
+          git add llms.txt
+          if ! git diff --cached --exit-code --stat llms.txt; then
+            echo "::error::llms.txt is out of date. Run ./scripts/generate-llms-txt.sh and commit the result."
+            git diff --cached llms.txt
+            exit 1
+          fi
