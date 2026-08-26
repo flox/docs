@@ -79,7 +79,7 @@ flox-cuda/python3Packages.pytorch-lightning             Lightweight PyTorch wrap
 
 **Note**: Nix-defined Python packages like Torchvision, Torchaudio, or Transformers *already include* their transitive runtime dependencies as part of their closures. As a result, a package like `flox-cuda/python3Packages.torchvision` *automatically pulls in* the version of PyTorch against which it was built. So defining `flox-cuda/python3Packages.torchvision` and `flox-cuda/python3Packages.torch` in the same environment can fetch multiple PyTorch store paths if the explicitly defined `torch` resolves to a different store path from the version pulled in by Torchvision, along with their respective transitive dependencies. This substantially increases the size of the Flox environment's closure.
 
-To learn more about working with CUDA packages in the Flox Catalog, refer to [this tutorial](/tutorials/cuda).
+To learn more about working with CUDA packages in the Flox Catalog, refer to the [Flox + CUDA tutorial](/tutorials/cuda).
 
 The remainder of this article covers how Nix users can consume packages from Flox's binary cache.
 
