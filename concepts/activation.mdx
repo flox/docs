@@ -247,8 +247,8 @@ sequenceDiagram
     rect rgb(235, 248, 240)
       Note over P: bash
       P->>P: run setup scripts
-      P->>P: source profile.d scripts (plugins)
       P->>P: set user variables
+      P->>P: source profile.d scripts (plugins)
       P->>P: source hook.on-activate
       P->>P: exec FLOX_SHELL
     end
@@ -278,13 +278,20 @@ which is also the variable you can use to override which shell Flox uses when
 you activate an environment.
 
 As part of this activation script,
-Flox runs some initial setup, then sources every installed package's
-`profile.d` scripts — this is how [plugins](/concepts/plugins) hook into
-activation. This only happens in `dev` (the default) and `build` modes;
-`run` mode deliberately skips package `profile.d` scripts. Next, it sets
-the variables you've provided in the
-[[vars] section of your manifest](/man/manifest.toml#vars) — these aren't
-visible to profile.d scripts, only to what runs after them.
+Flox runs some initial setup, then sets the variables you've provided in the
+[[vars] section of your manifest](/man/manifest.toml#vars).
+It then sources every installed package's `profile.d` scripts —
+this is how [plugins](/concepts/plugins) hook into activation.
+Plugins are **experimental** and under active development,
+so this part of the timeline may change in future releases.
+These scripts only run in `dev` (the default) and `build` modes;
+`run` mode deliberately skips them.
+Because `[vars]` are set first, plugin scripts can read them,
+so a plugin can be configured through `[vars]` as well as through its own
+`[plugins.<name>]` table.
+If a plugin script exports a variable with the same name as a `[vars]` entry,
+the plugin's value wins;
+use `hook.on-activate` to override a variable set by a plugin.
 Next, the script _sources_ the `hook.on-activate` script that you've provided
 in the [[hook] section of your manifest](/man/manifest.toml#hook).
 Since this script is run by the Bash shell we're using,
@@ -318,7 +325,9 @@ here is some simple guidance:
 
 **vars**:
 
-- Defines environment variables before the `hook.on-activate` and `[profile]` scripts run.
+- Defines environment variables before plugin `profile.d` scripts,
+  `hook.on-activate`, and the `[profile]` scripts run.
+- Readable by plugins, so a plugin can be configured with `[vars]` entries.
 - In Flox CLI 1.14.1 and later, values can reference other `[vars]` entries with `${NAME}`.
 - References resolve in dependency order at activation time.
 
