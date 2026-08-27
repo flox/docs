@@ -143,6 +143,7 @@ Key terms:
 - [Catalog imports](https://flox.dev/docs/concepts/catalog-imports.md): Import packages from external catalogs for Nix expression builds
 - [Publishing](https://flox.dev/docs/concepts/publishing.md): Understanding how to publish packages with Flox
 - [Secrets management](https://flox.dev/docs/concepts/secrets-management.md): Managing secrets in Flox environments using just-in-time retrieval
+- [Plugins](https://flox.dev/docs/concepts/plugins.md): Package reusable, manifest-configured behavior as an installable component
 - [Flox vs. container workflows](https://flox.dev/docs/concepts/flox-vs-containers.md): Where Flox environments and container workflows differ, and how teams combine them
 
 ## Languages
