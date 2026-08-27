@@ -337,6 +337,9 @@ here is some simple guidance:
 - Can't use aliases.
 - Can define functions to use within the hook, but they won't be passed down to other shells.
 - Can define environment variables that require shell commands or conditional logic.
+- Runs for the first `flox activate`. Subsequent activations apply environment variables from the first activation
+- Bookended by `hook.on-deactivate`, which likewise runs once, when the last
+  activation detaches.
 
 **profile**:
 
@@ -395,6 +398,42 @@ Activation is reversible.
 activated environment in your shell,
 restoring the environment variables and shell customizations that activation
 changed.
+Exiting the shell has the same effect.
+
+Just as `[profile]` scripts run for every single `flox activate`,
+`profile.deactivate` scripts run for every `flox deactivate`.
+Just as `hook.on-activate` runs once when the first `flox activate` runs,
+`hook.on-deactivate` runs once when the last `flox activate` detaches.
+
+```mermaid
+%%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','noteBkgColor':'#e8eef6','noteTextColor':'#1f2937','noteBorderColor':'#7d96b8','actorBkg':'#e8eef6','actorBorder':'#7d96b8','actorTextColor':'#1f2937','actorLineColor':'#7d96b8','signalColor':'#1f2937','signalTextColor':'#1f2937','labelBoxBkgColor':'#e8eef6','labelBoxBorderColor':'#7d96b8','labelTextColor':'#1f2937','loopTextColor':'#1f2937','sequenceNumberColor':'#1f2937'},'sequence':{'mirrorActors':false}}}%%
+sequenceDiagram
+    participant S1 as First shell
+    participant A as Activation
+    participant S2 as Second shell
+    S1->>A: flox activate
+    Note over A: hook.on-activate runs, services start
+    S2->>A: flox activate (attach)
+    S1->>A: flox deactivate
+    Note over S1: profile.deactivate runs
+    Note over A: Still active — one shell attached
+    S2->>A: flox deactivate
+    Note over S2: profile.deactivate runs
+    rect rgb(235, 248, 240)
+      Note over A: Teardown
+      A->>A: stop services
+      A->>A: run hook.on-deactivate
+    end
+```
+
+`hook.on-deactivate` runs in a background process rather than in one of your
+shells,
+so it can't prompt for input and its output goes to the activation's logs
+instead of your terminal.
+It's also best-effort:
+it doesn't run if the activation's background process is killed or the
+machine shuts down uncleanly.
+
 See [`flox deactivate`](/man/flox-deactivate) for the full command reference.
 
 ## Development vs. runtime mode
