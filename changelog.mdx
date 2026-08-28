@@ -10,10 +10,40 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 {/* changelog:insert */}
 
 <Update label="August 25" description="v1.15.0">
-  ## Flox CLI v1.15.0
+  ## Run cleanup when the last shell exits
 
-  _Draft: summarize what changed in [v.1.15.0](https://github.com/flox/flox/releases/tag/v1.15.0), leading with what it lets
-  users do rather than what was merged._
+  The new `hook.on-deactivate` manifest section runs a Bash script once,
+  when the last activation of an environment exits — the teardown
+  counterpart to `hook.on-activate`. See
+  [deactivating environments](/concepts/activation#deactivating-environments).
+
+  ## Instant re-publish
+
+  `flox publish` now detects an already-published build before building
+  the package, so re-publishing an unchanged package returns immediately
+  instead of paying for a full build first.
+
+  ## Tunable auth reminders
+
+  Quiet the "You are not logged in to FloxHub" reminder with
+  `flox config --set auth_notifications false`. Separately, unauthenticated
+  users now see a warning — at most once every 8 hours — that resolving
+  packages will require FloxHub authentication in an upcoming release; see
+  [go.flox.dev/auth](https://go.flox.dev/auth).
+
+  ## Also in this release
+
+  - `flox service` is now an alias for `flox services`.
+  - Variables from `[vars]` behave predictably in repeated and stacked
+    activations, and experimental plugin scripts can now read them.
+  - Clearer errors for package file collisions, for Nix expression builds
+    that can't be parsed, and for packages whose `systems` names a system
+    missing from `options.systems`.
+
+  After upgrading, exit all current activations or reboot before
+  activating again. See the
+  [v1.15.0 release notes](https://github.com/flox/flox/releases/tag/v1.15.0)
+  for the full list of fixes.
 </Update>
 {/* changelog-id: flox/flox@v1.15.0 */}
 
