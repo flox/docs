@@ -70,3 +70,21 @@ both FloxHub and the CLI.
 
 To update or remove the connection, for example to change identity providers
 or add a domain, contact [support@flox.dev](mailto:support@flox.dev).
+
+## Direct sign-in link
+
+Once the connection is active, the **Enterprise SSO** card also shows a
+direct sign-in link. The link sends members straight to your identity
+provider and skips the email prompt, which makes it the right target for
+your identity provider's app tile:
+
+- In Okta, set it as the **Initiate login URI** on your app integration
+  and set **Login initiated by** to **Either Okta or App**. Members can
+  then start from the Flox tile in their Okta dashboard.
+- In Microsoft Entra ID, set it as the **Home page URL** in your app
+  registration's **Branding** settings. Members can then start from the
+  Flox tile in My Apps.
+
+The link also works as a plain bookmark. A member who follows it with an
+active session at your identity provider signs in to FloxHub without
+typing anything.
