@@ -1,6 +1,6 @@
 ---
 title: "Plugins"
-description: "Package reusable, manifest-configured behavior as an installable component"
+description: "Extend Flox with environment plugins and subcommand extensions"
 ---
 
 [Secrets management](/concepts/secrets-management) shows a pattern: an
@@ -16,18 +16,28 @@ logic; they only need to supply the configuration.
 Secrets retrieval is the use case that motivated plugins, and this page
 anchors on it. But `[plugins]` itself is general-purpose: Flox stores
 whatever data you put there without interpreting it, so a plugin can use
-it for anything. And a plugin isn't limited to running a script at
-activation — through a [lifecycle hook](#lifecycle-hooks), a plugin can
-also wrap the whole session under its control, which is how
-[sandboxing](/concepts/sandboxing) works. See
-[Beyond secrets](#beyond-secrets) for other examples.
+it for anything. See [Beyond secrets](#beyond-secrets) for other
+examples.
+
+There are two ways to extend Flox:
+
+- **Environment plugins** are packages installed into an environment that
+  take part in its lifecycle — a `profile.d` script at activation, or a
+  [`session-wrap` hook](#lifecycle-hooks) around the whole session, which
+  is how [sandboxing](/concepts/sandboxing) works — and are configured per
+  environment through the manifest. Most of this page is about them.
+- **[Subcommand extensions](#subcommand-extensions)** add commands to the
+  `flox` CLI itself: an executable `flox-<name>` becomes `flox <name>`.
+  They are installed per user, belong to no environment, and run only
+  when you invoke them.
 
 <Warning>
   Plugins are **experimental** and under active development. Expect much of
   what this page describes to change in future releases. Plugins require a
   `schema-version` of `"1.14.0"` or higher in the manifest; the
   [`session-wrap` hook](#lifecycle-hooks) additionally requires `"1.16.0"`
-  and a feature flag, and is currently prototype-only.
+  and a feature flag, and is currently prototype-only. Subcommand
+  extensions are a **beta** feature behind the `features.beta` flag.
 </Warning>
 
 ## How plugins work
@@ -59,16 +69,20 @@ package as one.
 
 A Flox environment moves through phases — it's created and edited, locked
 and built, activated, attached to by additional shells, and eventually
-deactivated. Two extension points let a plugin participate:
+deactivated. Two mechanisms let a plugin participate:
 
-| Lifecycle phase | Extension point | Payload | Availability |
+| Lifecycle phase | Mechanism | Payload | Availability |
 |---|---|---|---|
 | Activation: before the session starts | [`session-wrap`](#session-wrap) — run the entire session under the plugin's control | executable | prototype |
 | Activation: environment setup | `profile.d` script — runs before `hook.on-activate` | sourced script | Flox 1.14.0 |
 
-Further extension points for the other phases were prototyped on the
+Further hooks for the other phases were prototyped on the
 flox/flox branch `prototype/sandbox-plugins` and are deferred until
 something ships that needs them.
+
+[Subcommand extensions](#subcommand-extensions) sit outside this table:
+they extend the CLI rather than an environment, so there is no phase at
+which Flox dispatches them — you run them.
 
 ## Installing and configuring a plugin
 
@@ -523,6 +537,106 @@ key you want to keep in the including environment's table.
 declaration is dropped, as described in
 [Consent and composition](#consent-and-composition).
 
+## Subcommand extensions
+
+<Warning>
+  Subcommand extensions are a **beta** feature, available since Flox 1.14.1
+  behind a feature flag: `flox config --set features.beta true`, or export
+  `FLOX_FEATURES_BETA=true`. While in beta, `flox extension` is hidden from
+  `flox --help`, and extensions can only be installed from a local
+  directory.
+</Warning>
+
+Environment plugins extend what an *environment* does. Subcommand
+extensions extend what the *`flox` command* does: an executable named
+`flox-<name>` becomes `flox <name>`, the way `git-<name>` becomes
+`git <name>`. An extension is installed per user rather than per
+environment, and Flox never runs one on its own — it runs when you invoke
+it. (These are unrelated to the [IDE extensions](/install-flox/ide-extensions)
+that integrate editors and coding agents with Flox.)
+
+### How dispatch works
+
+When `flox <name>` doesn't match a built-in subcommand, Flox looks for an
+executable `flox-<name>` — first in its managed extensions directory
+(`flox-<name>/flox-<name>` under `$XDG_DATA_HOME/flox/extensions/`,
+typically `~/.local/share/flox/extensions/`), then on `PATH` — and
+replaces itself with it. Everything after the name is passed through verbatim, the
+extension inherits your environment, and Flox adds three variables:
+
+| Variable | Value |
+|---|---|
+| `FLOX_EXTENSION_NAME` | The extension's name |
+| `FLOX_EXTENSION_PATH` | The managed install directory, or the executable itself when it was found on `PATH` |
+| `FLOX_BIN` | The `flox` binary that dispatched it, for calling back into Flox |
+
+Built-in command names are reserved: dispatch never fires for them, and
+installing a `flox-install` is refused up front rather than leaving you
+with an extension that can never run. Global options
+placed before the name (`flox -v hello`) are dropped rather than
+forwarded; anything after the name belongs to the extension.
+
+### Installing, listing, and removing
+
+```console
+$ cd ~/src
+$ flox extension install --from-path ./flox-hello
+✔ Installed flox-hello -> /home/me/.local/share/flox/extensions/flox-hello
+$ flox hello world
+Hello from hello
+args: world
+$ flox extension list
+NAME                  PATH
+hello                 /home/me/src/flox-hello
+$ flox extension remove hello
+✔ Removed flox-hello
+```
+
+`flox extension install .` installs the current directory. Reinstalling
+with `--force` is how an extension updates; `remove` deletes the install
+directory and any state kept inside it.
+
+### Writing an extension
+
+An extension is a directory — conventionally named `flox-<name>`, which
+is how the name is derived when there is no manifest — containing an
+executable `flox-<name>`, written in any language. An optional
+`flox-extension.toml` at the source root names it explicitly:
+
+```toml
+schema = "1"
+
+[extension]
+name = "hello"
+description = "Says hello"
+```
+
+`name` is lowercase (`[a-z0-9][a-z0-9_-]*`) and must match the directory
+when both are present; `description` is recorded but not yet shown by
+`flox extension list`. Only the executable and `flox-extension.toml` are
+copied on install; anything else in the source directory is left behind,
+so keep an extension to one self-contained executable. The canonical
+reference is [flox-hello-local](https://github.com/flox/flox-hello-local):
+clone it and install from the working tree, and it becomes
+`flox hello-local`.
+
+### Combining a plugin and an extension
+
+An environment plugin runs at activation but has no command surface of
+its own; an extension has a command surface but no place in the
+activation. Take the `vault-secrets` plugin above: it exports secrets
+during `flox activate`, and a failed lookup surfaces only as an aborted
+activation. A `flox-vault-secrets` extension, installed once per user,
+gives it a command: `flox vault-secrets check` runs
+`"$FLOX_BIN" list --config` to read the current environment's manifest,
+pulls out the `[plugins.vault-secrets]` table, and reports which
+references resolve before you activate. Invoked inside an activated
+shell, the extension also inherits `FLOX_ENV_PROJECT` and
+`FLOX_ENV_CACHE`, so it can read any state the plugin leaves under its
+cache directory (by convention `$FLOX_ENV_CACHE/plugins/<plugin-name>/`).
+Today that is two installs: `flox install` for the package,
+`flox extension install` for the command.
+
 ## Beyond secrets
 
 Secrets retrieval fits `[plugins]` well because "environment variable name
@@ -546,7 +660,9 @@ with no sandbox-specific code in Flox itself.
 Flox doesn't distinguish any of these from a secrets plugin. `[plugins]`
 is free-form storage plus a convention for reading it; what a given
 plugin does with its table — and with its hook — is entirely up to its
-author.
+author. And when a plugin needs a command of its own — to review state,
+grant access, or trigger work — a
+[subcommand extension](#subcommand-extensions) provides one.
 
 ## Further reading
 
@@ -558,5 +674,8 @@ author.
   consumer of the `session-wrap` hook
 - [Activating environments](/concepts/activation) — where `profile.d`
   scripts run relative to `hook` and `profile`
+- [flox-hello-local](https://github.com/flox/flox-hello-local) — the
+  reference subcommand extension, and the in-tree
+  [extension guides](https://github.com/flox/flox/tree/main/cli/flox/src/beta/extensions/docs)
 - [Composing environments](/concepts/composition) — how `include` merges
   manifests

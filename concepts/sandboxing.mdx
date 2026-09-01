@@ -13,7 +13,7 @@ credentials, and can talk to any host on the network.
 what it can touch. In Flox, sandboxing is not a CLI feature — it is a
 [plugin](/concepts/plugins) built on the plugin framework's
 [`session-wrap` hook](/concepts/plugins#session-wrap). Flox core provides
-one generic extension point (wrap the session); a sandbox is an ordinary
+one generic hook (wrap the session); a sandbox is an ordinary
 installable package that uses it. The same pattern as
 [secrets management](/concepts/secrets-management) — a class of problem
 solved by a class of plugin — applied to isolation. The first such
