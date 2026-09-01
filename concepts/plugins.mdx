@@ -16,12 +16,18 @@ logic; they only need to supply the configuration.
 Secrets retrieval is the use case that motivated plugins, and this page
 anchors on it. But `[plugins]` itself is general-purpose: Flox stores
 whatever data you put there without interpreting it, so a plugin can use
-it for anything. See [Beyond secrets](#beyond-secrets) for other examples.
+it for anything. And a plugin isn't limited to running a script at
+activation — through a [lifecycle hook](#lifecycle-hooks), a plugin can
+also wrap the whole session under its control, which is how
+[sandboxing](/concepts/sandboxing) works. See
+[Beyond secrets](#beyond-secrets) for other examples.
 
 <Warning>
   Plugins are **experimental** and under active development. Expect much of
   what this page describes to change in future releases. Plugins require a
-  `schema-version` of `"1.14.0"` or higher in the manifest.
+  `schema-version` of `"1.14.0"` or higher in the manifest; the
+  [`session-wrap` hook](#lifecycle-hooks) additionally requires `"1.16.0"`
+  and a feature flag, and is currently prototype-only.
 </Warning>
 
 ## How plugins work
@@ -31,17 +37,38 @@ A plugin has two halves:
 - **Configuration** lives in the manifest, under `[plugins.<plugin-name>]`.
   Flox treats it as opaque data — any keys, any values — and stores it
   without validating its shape.
-- **Behavior** lives in a package. It ships a script in its output's
-  `etc/profile.d/` directory — the standard way packages hook into shell
-  setup — and Flox sources every installed package's `profile.d` scripts
-  before running your manifest's `hook.on-activate`. See [Activating
-  environments](/concepts/activation#activation-flow) for where this fits
-  in the activation timeline.
+- **Behavior** lives in a package, at well-known paths inside its output:
+  - a script in `etc/profile.d/`, sourced during activation — the
+    standard way packages hook into shell setup, and the only payload most
+    plugins need. Flox sources every installed package's `profile.d`
+    scripts before running your manifest's `hook.on-activate`; see
+    [Activating environments](/concepts/activation#activation-flow) for
+    where this fits in the activation timeline.
+  - optionally, a `session-wrap` hook executable under `etc/flox/hooks/`,
+    which lets the plugin run the entire activation session under its
+    control. See [Lifecycle hooks](#lifecycle-hooks).
 
 A plugin's `profile.d` script reads its own configuration with the
 `flox_plugin_data` shell function, which Flox provides during activation.
-Nothing else ties a package to a plugin — it's a naming convention, not a
-manifest field that marks a package as one.
+A hook executable receives the same table through a context file instead,
+since it runs outside the activation shell. Nothing else ties a package
+to a plugin — it's a naming convention, not a manifest field that marks a
+package as one.
+
+## The environment lifecycle
+
+A Flox environment moves through phases — it's created and edited, locked
+and built, activated, attached to by additional shells, and eventually
+deactivated. Two extension points let a plugin participate:
+
+| Lifecycle phase | Extension point | Payload | Availability |
+|---|---|---|---|
+| Activation: before the session starts | [`session-wrap`](#session-wrap) — run the entire session under the plugin's control | executable | prototype |
+| Activation: environment setup | `profile.d` script — runs before `hook.on-activate` | sourced script | Flox 1.14.0 |
+
+Further extension points for the other phases were prototyped on the
+flox/flox branch `prototype/sandbox-plugins` and are deferred until
+something ships that needs them.
 
 ## Installing and configuring a plugin
 
@@ -81,6 +108,13 @@ script that lets `flox_plugin_data`'s failure propagate aborts activation;
 one that checks for it explicitly can warn and continue instead. See
 [Writing a plugin](#writing-a-plugin) for both patterns.
 
+A plugin that uses the [`session-wrap` hook](#lifecycle-hooks) needs one
+more piece: a declaration in the
+[`[plugin-hooks]`](#declaring-hooks-plugin-hooks) section. Unlike
+`[plugins.<name>]` data, hook participation *is* cross-referenced — a
+declaration without a matching installed package fails the activation,
+and a shipped hook without a declaration is ignored with a warning.
+
 ## Writing a plugin
 
 Any package can be a plugin. What makes it one is a `profile.d` script that
@@ -114,7 +148,10 @@ A few conventions to follow when naming and scoping a plugin:
 
 - **Name it after your package.** The plugin name doesn't have to match the
   package's install ID or `pkg-path`, but matching `pkg-path` makes the
-  connection obvious to anyone reading the manifest.
+  connection obvious to anyone reading the manifest. For a plugin that
+  declares a [`session-wrap` hook](#lifecycle-hooks) the alignment is
+  mandatory: the `[plugin-hooks]` value, the package's install ID, and
+  the shipped hook filename must all carry the same name.
 - **Read only your own table.** Nothing stops a script from reading the
   whole manifest, but Flox won't enforce that boundary for you — stick to
   `[plugins.<your-plugin-name>]`.
@@ -126,6 +163,278 @@ A few conventions to follow when naming and scoping a plugin:
 The same script runs during `flox build` too, so `[build]` commands can
 read your plugin's exported variables — not just interactive and
 `flox activate -- <cmd>` sessions.
+
+## Lifecycle hooks
+
+<Warning>
+  Lifecycle hooks are a **prototype**: they exist on a development branch
+  of Flox, not in any release. They require a manifest `schema-version`
+  of `"1.16.0"` and an explicit feature flag:
+  `flox config --set features.plugin_hooks true` (or export
+  `FLOX_FEATURES_PLUGIN_HOOKS=true`). With the flag off, a
+  `[plugin-hooks]` declaration is ignored with a warning and the
+  activation proceeds unwrapped — so an environment that declares a hook
+  stays usable for teammates who haven't opted in.
+</Warning>
+
+`profile.d` scripts cover one moment in the lifecycle: environment setup
+at activation start. A lifecycle hook is a file at a well-known path
+inside the plugin package, discovered in the rendered environment and
+dispatched by Flox at the right moment. One hook exists today:
+[`session-wrap`](#session-wrap), which runs before the activation
+session starts.
+
+With the feature flag off, the warning names the flag to enable:
+
+```text
+Ignored [plugin-hooks] because the 'plugin_hooks' feature is not enabled.
+Enable it with 'flox config --set features.plugin_hooks true'.
+```
+
+### The hook tree
+
+```text
+<plugin package>/
+├── etc/profile.d/0900_<name>.sh        # existing: activation env setup
+└── etc/flox/hooks/
+    └── session-wrap.d/<name>           # executable
+```
+
+Per-plugin files inside per-hook directories merge across packages
+exactly like `profile.d` does. One caveat is load-bearing: two packages
+shipping an identical leaf filename is a hard build failure, so naming
+the hook file after the plugin (`<plugin-name>`) is a requirement, not
+tidiness.
+
+### Declaring hooks: `[plugin-hooks]`
+
+A hook doesn't run just because a package ships it. The environment's
+manifest must opt in, through a typed, top-level section with a single
+key:
+
+```toml
+[plugin-hooks]
+session-wrap = "plugin-openshell"   # a string, not a list: at most one wrapper
+```
+
+The value names a plugin — the install ID of a package that must ship
+`etc/flox/hooks/session-wrap.d/<plugin-name>`. Unknown keys in
+`[plugin-hooks]` fail at parse time, and `session-wrap` is typed as a
+single string, so two wrappers are unrepresentable in one manifest.
+
+At activation, Flox verifies the binding in both directions. Each of the
+following fails the activation with the message shown:
+
+- The declared hook file is missing — the plugin isn't installed, or its
+  package doesn't ship the hook:
+
+  ```text
+  Plugin '<name>' declares a session-wrap hook but the environment provides none.
+  Expected an executable at <path>.
+  Ensure the plugin package is installed and provides the hook, or remove the [plugin-hooks] declaration.
+  ```
+
+- A hook file exists, but no installed package has the declared install
+  ID:
+
+  ```text
+  Plugin '<name>' is declared in [plugin-hooks] but not installed in this environment.
+  Add a package with install id '<name>' to [install] before declaring its hooks.
+  ```
+
+- The hook file is shipped by a *different* package than the declared
+  plugin's — a look-alike package shadowing a plugin's name:
+
+  ```text
+  The session-wrap hook for plugin '<name>' is provided by a different package.
+  Hooks must be shipped by the declared plugin's own package.
+  Remove the conflicting package or fix the [plugin-hooks] declaration.
+  ```
+
+- The hook file isn't executable:
+
+  ```text
+  The session-wrap hook for plugin '<name>' is not executable.
+  The plugin package must ship etc/flox/hooks/session-wrap.d/<name> with the executable bit set.
+  ```
+
+In the other direction, a shipped hook that isn't declared is ignored
+with a warning naming the fix:
+
+```text
+Ignored session-wrap hook '<name>' shipped by an installed package.
+Declare it under [plugin-hooks] in the manifest to enable it.
+```
+
+Why the declaration exists at all: installing any package already
+concedes code execution at activation — every package's `profile.d`
+script runs with your privileges. The declaration is not a code-execution
+boundary. What it gates is one specific power a `profile.d` script
+doesn't have: **session capture** — a `session-wrap` hook execs your
+terminal session under code the plugin controls. `profile.d` scripts
+have no such power, so they stay undeclared.
+
+### Consent and composition
+
+Declaring a session wrapper means "activating this environment hands the
+session to that plugin". Flox makes sure that's always something *you*
+wrote, and something you agree to:
+
+- **Only the top-level manifest's `[plugin-hooks]` section is
+  effective.** When one environment [includes](/concepts/composition)
+  another, an included manifest's `[plugin-hooks]` section is dropped
+  during composition, with a notice naming the include:
+
+  ```text
+  Ignored [plugin-hooks] declared by included environment '<include>'.
+  Declare plugin hooks in this environment's manifest to enable them.
+  ```
+
+  Plugin *data* tables flow through includes; hook *participation* does
+  not — a declaration can never arrive from a manifest you didn't
+  author. To enable an included environment's plugin hook, restate the
+  declaration in your own manifest.
+- **[Auto-activation](/concepts/auto-activation) asks first.** A
+  directory whose environment declares a session wrapper is never
+  activated in place by the prompt hook. Instead, entering it prompts
+  before handing over the session, and the default is No:
+
+  ```text
+  Enter '<path>'? Activation hands this session to plugin '<name>'. [y/N]
+  ```
+
+  Only `y` or `yes` accepts; bare Enter declines. The answer is
+  remembered for the current shell visit — leaving the directory clears
+  it, and re-entering asks again. The prompt appears even for
+  directories you've allowed with `flox activate allow`, since a prior
+  allow may predate the wrap declaration; an unregistered directory
+  prompts only while `auto_activate` is `prompt`, and a denied one never
+  does. Accepting runs `flox activate --dir <path>` as a foreground
+  session rather than the usual in-place activation: when the session
+  exits you are back in your original shell, with nothing activated. On
+  fish and tcsh, or without a terminal, no prompt is shown — a notice
+  points at running `flox activate` yourself instead:
+
+  ```text
+  Run 'flox activate --dir <path>' to enter this environment (activation is handled by plugin '<name>').
+  ```
+
+### The hook protocol
+
+Flox writes a JSON context file readable only by you (mode `0600`, in
+Flox's temporary directory) and invokes the hook with five environment
+variables:
+
+- `FLOX_HOOK_CTX` — path to the context file
+- `FLOX_HOOK` — the hook kind, `session-wrap`
+- `FLOX_PLUGIN_NAME` — the plugin whose hook is being invoked
+- `FLOX_BIN` — the invoking `flox` binary, for hooks that need to run
+  Flox commands themselves (an image bake with `flox containerize`, say)
+- `FLOX_HOOK_JQ` — a `jq` bundled with Flox, so shell-scripted hooks can
+  parse the context without depending on one
+
+The context is versioned (`ctx_version`, currently `1`) and carries
+`plugin_table` — the plugin's own `[plugins.<name>]` table as verbatim
+JSON, or `null` when the manifest has no table for it. This is how a
+hook executable reads its configuration: it runs outside the activation
+shell, so the `flox_plugin_data` function isn't available to it.
+
+Hooks are language-agnostic — a hook with real logic can be a compiled
+binary shipped in the package; simple ones stay shell. The hook inherits
+your environment, working directory, and stdio, and runs before any
+activation setup — which on macOS can mean bash 3.2 for a shell hook, so
+keep it compatible.
+
+### session-wrap
+
+The hook runs the entire activation session under the plugin's control.
+Flox dispatches it during `flox activate`, after the environment is
+locked, built, and rendered (hooks are discovered in the rendered
+environment), immediately before the session would start. The hook
+composes whatever boundary it implements — an OS sandbox, a container —
+and **execs the activation inside it; on success it never returns**. The
+hook replaces the `flox` process, so its exit status becomes the
+activation's: a hook that can't hand off must exit non-zero and say why
+on stderr. There is no "decline and continue unwrapped" path — an
+environment that declares a wrapper either activates wrapped or not at
+all.
+
+The context a `session-wrap` hook receives:
+
+| Field | Meaning |
+|---|---|
+| `ctx_version` | Context schema version, `1` |
+| `dot_flox_path` | Absolute path to the environment's `.flox` directory |
+| `env_name` | The environment's name |
+| `activation_mode` | `dev` or `run` |
+| `rendered_env` | Store path of the rendered environment |
+| `lockfile_path` | Path to the environment's lockfile |
+| `plugin_table` | The plugin's `[plugins.<name>]` table, or `null` |
+| `invocation_type` | How `flox activate` was invoked, with its payload |
+| `stdin_is_tty`, `stdout_is_tty` | Whether stdin and stdout are terminals |
+| `inner_argv` | The host-side argv to re-exec under a boundary |
+| `wrap_scope` | The re-entry marker value (see below) |
+
+The context gives a wrapper two ways to re-enter the activation.
+`inner_argv` is the `flox activate` invocation itself — an argv starting
+with the absolute path of the `flox` binary — sufficient for a boundary
+that shares the host filesystem and can simply re-exec `flox` under a
+wrapper process. `invocation_type` is the structured form of how you
+invoked activation — `"interactive"`, `{"shellcommand": "<string>"}`
+for `-c`, or `{"execcommand": ["<cmd>", "<arg>", ...]}` for
+`-- <cmd>` — from which a container boundary composes its own
+in-boundary command.
+
+Rules Flox enforces around the wrap:
+
+- **One wrapper per manifest**, structurally (see the schema above).
+- **Re-entry is detected, nesting is refused.** The hook exports
+  `_FLOX_SESSION_WRAPPED=<wrap_scope>` on the wrapped process. When the
+  same environment re-activates inside its own boundary, the marker
+  matches and Flox skips the wrap; activating a *different* wrapping
+  environment inside it is an error, because nested boundaries are
+  unsupported:
+
+  ```text
+  Cannot activate this environment inside another environment's session-wrap boundary.
+  Exit the wrapped session first, then run 'flox activate' again.
+  ```
+
+- **In-place activation is refused.** `eval "$(flox activate)"` cannot
+  hand your current shell to a wrapper:
+
+  ```text
+  Cannot activate in-place an environment that declares a session-wrap plugin.
+  An 'eval "$(flox activate)"' cannot hand the current shell to plugin '<name>'.
+  Run 'flox activate' to enter a wrapped session instead.
+  ```
+
+- **Ephemeral activations skip the wrap.** The ephemeral activation
+  that `flox services start` and `flox services restart` perform to
+  launch a new process-compose instance is never wrapped.
+- Stdio is inherited but not guaranteed to be a terminal —
+  `flox activate -- cmd | tee` reaches the hook with stdout a pipe. A
+  hook that wants to prompt must check the tty state the context
+  provides and talk to the terminal directly (`/dev/tty` or stderr),
+  never stdout.
+
+### Writing and testing a hook
+
+Hooks are testable without publishing anything. Build the plugin package
+(a `[build]` target whose output ships the hook tree), install it into a
+test environment by store path, declare it, and activate:
+
+```console
+$ flox build plugin-myname
+$ cd ../test-env
+$ flox install /nix/store/...-plugin-myname-0.0.1
+$ flox edit    # add [plugin-hooks] declaring your hook
+$ FLOX_FEATURES_PLUGIN_HOOKS=true flox activate
+```
+
+The cache directory blessed for plugin state is
+`<project>/.flox/cache/plugins/<plugin-name>/` — it survives across
+activations and is not committed.
 
 ## Debugging a plugin
 
@@ -178,6 +487,15 @@ The trace answers the questions that come up while writing a plugin:
   into an issue or capture it in CI logs.
 </Warning>
 
+A `session-wrap` hook has a different debugging surface, since it runs
+outside the traced activation script:
+
+- Pass `-vv` (debug-level logging) and Flox logs the dispatch —
+  `exec'ing session-wrap hook` — with the plugin name and the resolved
+  hook path.
+- The hook inherits your terminal, so anything it writes to stderr
+  reaches you directly.
+
 ## Plugin data in composed environments
 
 When one environment [includes](/concepts/composition) another, and both
@@ -201,6 +519,10 @@ partial, key-by-key merge could hand a plugin a table its author never
 intended. If you compose environments that share a plugin, restate every
 key you want to keep in the including environment's table.
 
+`[plugin-hooks]` sections don't merge at all: an included environment's
+declaration is dropped, as described in
+[Consent and composition](#consent-and-composition).
+
 ## Beyond secrets
 
 Secrets retrieval fits `[plugins]` well because "environment variable name
@@ -216,9 +538,15 @@ equally:
 - Inject build-time metadata, like a license key or an internal registry
   URL, that a package needs to configure itself correctly.
 
-Flox doesn't distinguish these from a secrets plugin. `[plugins]` is
-free-form storage plus a convention for reading it; what a given plugin
-does with its table is entirely up to its author.
+With the `session-wrap` hook the space widens from configuration to
+behavior: a [sandbox plugin](/concepts/sandboxing) runs the whole
+session inside an isolation boundary — an ordinary installable package,
+with no sandbox-specific code in Flox itself.
+
+Flox doesn't distinguish any of these from a secrets plugin. `[plugins]`
+is free-form storage plus a convention for reading it; what a given
+plugin does with its table — and with its hook — is entirely up to its
+author.
 
 ## Further reading
 
@@ -226,6 +554,8 @@ does with its table is entirely up to its author.
   section
 - [Secrets management](/concepts/secrets-management) — the hand-written
   pattern a secrets plugin packages up
+- [Sandboxing](/concepts/sandboxing) — the OpenShell plugin, the first
+  consumer of the `session-wrap` hook
 - [Activating environments](/concepts/activation) — where `profile.d`
   scripts run relative to `hook` and `profile`
 - [Composing environments](/concepts/composition) — how `include` merges
