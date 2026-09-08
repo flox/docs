@@ -1,0 +1,66 @@
+---
+title: "flox build update catalogs"
+---
+
+## NAME
+
+flox-build-update-catalogs - Update the project catalog lockfile
+
+## SYNOPSIS
+
+```text
+flox [<general-options>] build update-catalogs
+     [-d=<path>]
+```
+
+## DESCRIPTION
+
+Scan the project’s Nix expression builds (`.nix` files under
+`.flox/pkgs/`) for `catalogs.<catalog>.<package>` references and lock
+them to `.flox/catalog.lock`.
+
+There is exactly one catalog lock per project. It pins the source of
+every catalog reference the project’s expressions make, resolved as a
+union in a single request, so that every build of a revision evaluates
+against one consistent set of inputs. Commit the file alongside the
+manifest.
+
+A committed lock is used exactly as it is found: `flox build` and
+`flox publish` never rewrite it. When the project’s expressions gain a
+reference the lock does not cover, re-run `flox build update-catalogs`
+and commit the result. References the scanner cannot fully resolve are
+pinned conservatively; a package newly referenced beneath one of them
+cannot be detected as missing from the lock and instead fails during
+evaluation. Re-running `flox build update-catalogs` resolves this as
+well. Without a committed lock, builds resolve the references of the
+packages being built fresh on every invocation.
+
+## OPTIONS
+
+### Environment Options
+
+If no environment is specified for an environment command, the
+environment in the current directory or the active environment that was
+last activated is used.
+
+`-d`, `--dir`  
+Path containing a .flox/ directory.
+
+### General Options
+
+`-h`, `--help`  
+Prints help information.
+
+The following options can be passed when running any `flox` subcommand
+but must be specified *before* the subcommand.
+
+`-v`, `--verbose`  
+Increase logging verbosity. Invoke multiple times for increasing detail.
+
+`-q`, `--quiet`  
+Silence logs except for errors.
+
+## SEE ALSO
+
+[`flox-build`](/man/flox-build)
+[`flox-publish`](/man/flox-publish)
