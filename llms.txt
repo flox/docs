@@ -201,6 +201,7 @@ Key terms:
 - [flox build](https://flox.dev/docs/man/flox-build.md): Build packages with Flox.
 - [flox build clean](https://flox.dev/docs/man/flox-build-clean.md): Clean the build directory.
 - [flox build import nixpkgs](https://flox.dev/docs/man/flox-build-import-nixpkgs.md): Import package definition from nixpkgs.
+- [flox build update catalogs](https://flox.dev/docs/man/flox-build-update-catalogs.md): Update the project catalog lockfile.
 - [flox containerize](https://flox.dev/docs/man/flox-containerize.md): Export an environment as a container image.
 - [flox publish](https://flox.dev/docs/man/flox-publish.md): Publish packages for Flox.
 
