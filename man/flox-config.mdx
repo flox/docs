@@ -78,14 +78,9 @@ Silence logs except for errors.
 ## SUPPORTED CONFIGURATION OPTIONS
 
 `auth_notifications`  
-Print the advisory reminder shown after a command when you are not
-logged in to FloxHub:
-
-```console
-You are not logged in to FloxHub. Run 'flox auth login' to log in.
-```
-
-Set to `false` to quiet it. Authentication *errors* are unaffected:
+Print the advisory FloxHub authentication messages. Set to `false` to
+quiet both the reminder to log in and the warnings that resolution will
+soon require authentication. Authentication *errors* are unaffected:
 commands that require a login, such as `flox push`, still fail with an
 explanation.
 
@@ -107,6 +102,18 @@ Per-directory auto-activation decisions. Keys are absolute paths to
 directories containing a `.flox` directory, each mapping to `allow` or
 `deny`. These are normally written for you by `flox activate allow` and
 `flox activate deny` rather than edited by hand.
+
+A key may also be a glob pattern, so that one entry covers many
+directories: `*` matches a single directory name and `**` matches any
+depth. An exact path always wins over patterns. If several patterns
+match a directory and disagree, the directory is denied. Patterns are
+matched against the canonical (symlink-resolved) directory path. Set
+patterns with `flox config --set`, quoting the key:
+
+```bash
+flox config --set 'auto_activate_environments."/home/me/work/*"' allow
+flox config --set 'auto_activate_environments."/home/me/work/vendor/**"' deny
+```
 
 `auto_activate_fish_mode`  
 Controls how the `fish` shell hook responds to directory changes during

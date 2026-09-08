@@ -20,7 +20,8 @@ Authenticate with FloxHub so that you can push and pull environments.
 ### Quieting login reminders
 
 Flox reminds you to log in when you run a command without a FloxHub
-account. To turn this reminder off:
+account, and warns when it resolves packages against the catalog without
+a login. To turn these messages off:
 
 ```bash
 flox config --set auth_notifications false
@@ -46,9 +47,12 @@ interactively it can open the browser for you if you press `<enter>`.
 
 With `--token-file <path>` the login is non-interactive: the FloxHub
 token is read from `<path>` instead (pass `-` to read the token from
-stdin). The token is validated and stored, and no browser, prompt, or
-network access is involved. Use this in CI, containers, and other
-scripted setups.
+stdin). The file can contain a JWT access token, a personal access
+token, or a service account token. Token-file login does not open a
+browser or prompt for input. A JWT access token is validated locally.
+FloxHub must be reachable to validate personal access tokens and service
+account tokens. The validated token is stored. Use this in CI,
+containers, and other scripted setups.
 
 See also: [`flox-push`](/man/flox-push),
 [`flox-pull`](/man/flox-pull),
@@ -60,7 +64,7 @@ Logs out from FloxHub.
 
 ### `status`
 
-Print your current login status.
+Print your current login status and token expiry when known.
 
 ### `token`
 
