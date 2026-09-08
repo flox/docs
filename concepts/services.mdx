@@ -59,6 +59,16 @@ vars.PGPORT = "9001"
 
 You can define a `shutdown.command` for any service, including services that do not run as daemons. Note that this pattern can have unpredictable effects in practice: it replaces the Flox service manager’s controlled `SIGTERM` → grace → `SIGKILL` shutdown path, which tracks the service’s PID, with the command that you define. And if your shutdown command fails to locate and kill the process for any reason, there's no fallback; the service never receives any signal and keeps running.
 
+The service manager waits 10 seconds for `shutdown.command` to complete before giving up and sending `SIGKILL` to the process it is tracking. Some shutdown commands need longer than that — for example a command that stops a collection of containers. You can extend the wait by setting `shutdown.timeout-seconds`, which must be greater than zero and requires manifest `schema-version = "1.14.0"` or later:
+
+```toml
+[services.supabase]
+command = "supabase start"
+is-daemon = true
+shutdown.command = "supabase stop"
+shutdown.timeout-seconds = 30
+```
+
 ## Starting services
 
 Services can be started automatically when you activate your environment via
