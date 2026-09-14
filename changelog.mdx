@@ -10,10 +10,57 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 {/* changelog:insert */}
 
 <Update label="September 8" description="v1.16.0">
-  ## Flox CLI v1.16.0
+  ## Service start order and shutdown control
 
-  _Draft: summarize what changed in [v1.16.0](https://github.com/flox/flox/releases/tag/v1.16.0), leading with what it lets
-  users do rather than what was merged._
+  Services can now say what they depend on and how they want to be shut
+  down. `depends-on` holds a service back until another service has
+  started or completed, so a web server can wait for its migrations to
+  finish. `shutdown.timeout-seconds` sets how long a service gets to exit
+  before it is killed, and `shutdown.signal` chooses the signal it
+  receives. Manifests that use these fields are written at schema version
+  1.16.0. See [start order](/concepts/services#start-order) and
+  [shutdown behavior](/concepts/services#shutdown-behavior).
+
+  ## Run a command without naming its package
+
+  `flox run rg` now finds the package that provides `rg` on its own. When
+  several packages provide the same command, Flox asks which one to use
+  and remembers the answer; `flox run --reselect <command>` clears it.
+  `flox search --command <command>` lists the packages that provide a
+  command. See [`flox run`](/man/flox-run).
+
+  ## Pin catalog inputs for Nix expression builds
+
+  Projects that use Nix expression builds can commit a
+  `.flox/catalog.lock`, created with `flox build update-catalogs`, so
+  every build of a revision resolves the same catalog inputs. See
+  [`flox build update-catalogs`](/man/flox-build-update-catalogs).
+
+  ## Run services from Flox environments on NixOS
+
+  A new NixOS module runs systemd services from Flox environments, with
+  automatic provisioning, scheduled updates, and restart-on-change. See
+  the [module README](https://github.com/flox/flox/blob/main/modules/nixos/README.md).
+
+  ## Also in this release
+
+  - `auto_activate_environments` keys accept glob patterns, so one entry
+    can allow or deny auto-activation for many repositories, as in
+    `flox config --set 'auto_activate_environments."/home/me/work/*"' allow`.
+  - `flox develop` no longer activates an environment; use `flox activate`
+    instead.
+  - `flox auth status` shows when the active credential expires, and
+    `flox auth token` prints personal access tokens instead of reporting
+    that you are not logged in.
+  - `flox init` records the environment's anonymous metrics id in
+    `.flox/env.json` instead of a separate `telemetry_id` file.
+  - `flox publish` no longer sends credentials embedded in a git remote
+    URL. Publishes made with earlier releases may have recorded them, so
+    rotate any token that was configured in a remote.
+
+  See the
+  [v1.16.0 release notes](https://github.com/flox/flox/releases/tag/v1.16.0)
+  for the full list of fixes.
 </Update>
 {/* changelog-id: flox/flox@v1.16.0 */}
 
