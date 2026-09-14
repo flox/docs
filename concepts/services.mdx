@@ -108,11 +108,13 @@ If it exits successfully but leaves the service's process running,
 the service never receives any signal and keeps running.
 
 `shutdown.timeout-seconds` must be greater than zero.
-Both it and `shutdown.signal` require manifest
-`schema-version = "1.16.0"` or later.
-Flox updates the schema version when you save a manifest that uses them,
-after which versions of Flox older than 1.16.0 can no longer read the
-environment.
+<Note>
+  Both `shutdown.timeout-seconds` and `shutdown.signal` require manifest
+  `schema-version = "1.16.0"` or later.
+  Flox updates the schema version when you save a manifest that uses them,
+  after which versions of Flox older than 1.16.0 can no longer read the
+  environment.
+</Note>
 
 ### Start order
 
