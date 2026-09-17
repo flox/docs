@@ -64,7 +64,7 @@ is refused. Nothing inside the package can change that.
 
 Two ways to install 1.16.0 or earlier unattended:
 
-* **Use the MDM's native package install command** rather than a policy script
+* **Use the native package install command of the MDM** rather than a policy script
   that calls `installer`. That keeps the agent out of the process tree, and the
   scripts run with the identity of an Apple system process that has the grant.
 * **Grant the agent the permission** with a Privacy Preferences Policy Control
