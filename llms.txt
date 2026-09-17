@@ -68,6 +68,7 @@ Key terms:
 ## Install Flox
 
 - [Install Flox](https://flox.dev/docs/install-flox/install.md): How to install or upgrade the Flox CLI
+- [Unattended and MDM installs](https://flox.dev/docs/install-flox/mdm.md): How to install the Flox macOS package from an MDM or a script with nobody at the keyboard
 - [Uninstall Flox](https://flox.dev/docs/install-flox/uninstall.md): How to uninstall the Flox CLI
 - [Troubleshooting installation](https://flox.dev/docs/install-flox/troubleshooting.md): How to diagnose and fix common Flox installation issues
 - [Extensions](https://flox.dev/docs/install-flox/ide-extensions.md): IDE extensions and AI agent integrations for Flox
