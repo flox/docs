@@ -130,7 +130,8 @@ A Flox environment is configured via a declarative TOML file called a
 The manifest for the environment created above looks like this:
 
 ```toml
-version = 1
+schema-version = "1.17.0"
+description = "curl, yarn 1.22, and Python 3.10 for the demo service"
 
 [install]
 curl.pkg-path = "curl"
@@ -145,6 +146,9 @@ systems = ["aarch64-darwin", "aarch64-linux", "x86_64-darwin", "x86_64-linux"]
 
 One thing to note here is that the manifest defines a cross-platform environment
 out of the box to ensure that there are no nasty surprises down the line.
+The `description` travels with the environment when you push, pull, or include it,
+so nobody has to hunt for a README to learn what the environment is for.
+A `Dockerfile` has no equivalent.
 
 A container is configured via a `Dockerfile`,
 which is an imperative sequence of commands.
