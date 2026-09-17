@@ -92,6 +92,8 @@ Most manifest fields are merged the way you would expect:
 - **`profile`** — The corresponding scripts in the `profile` section are also appended to each other e.g. all of the `profile.common` scripts are appended, all of the `profile.bash` scripts are appended, etc.
 - **`containerize`** — The options in the `containerize` section are more complicated because merging some options instead of overriding them would lead to unintuitive behavior. `user`, `cmd`, `working-dir`, and `stop-signal` are completely overridden. `exposed-ports`, `volumes`, and `labels` are merged.
 - **`options`** — The options in the `options` section are all overridden completely. This prevents a merge of `options.systems` from providing more systems than the environment can support. Similarly, this prevents a merge of `allow.licenses` from allowing more licenses than intended.
+- **`description`** — Only the composing environment's `description` is used.
+  An included environment's `description` is never used, not even when the composing environment has none.
 
 One option to note is `options.activate.mode`.
 Recall that the activation mode determines whether development dependencies of packages are added to `PATH`, etc when the environment is activated.

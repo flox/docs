@@ -60,8 +60,14 @@ The best way to edit the manifest is by running [`flox edit`](/man/flox-edit) wh
 
 See [`manifest.toml`](/man/manifest.toml) for a complete description of the manifest format and the [customizing environments guide](/tutorials/customizing-environments) to walk through examples.
 
+A manifest can carry a `description`, a short summary of what the environment provides and how to use it.
+The description travels with the environment when you push, pull, or include it, so the context stays with the manifest rather than in a separate README.
+It has no effect on activation.
+See [`description`](/man/manifest.toml#description).
+
 ```toml title=".flox/env/manifest.toml"
-version  = 1
+schema-version = "1.17.0"
+description = "Node.js toolchain for the example project"
 
 [install]
 nodejs.pkg-path = "nodejs_24"
