@@ -9,7 +9,13 @@ See the [builds concept](/concepts/builds) page for an overview of the different
 
 Nix expression builds are defined by creating files in the `.flox/pkgs/` directory of a Flox environment. These expressions are written in the Nix language, which is incredibly powerful and results in truly reproducible builds.
 
-The environment that contains the builds doesn't need to have any packages installed because all of the build's dependencies are defined within the expression, but if there are any packages installed then Flox will attempt to produce a build that is compatible with any packages in the "toplevel" [package group](/man/manifest.toml#package-descriptors).
+The environment that contains the builds doesn't need to have any packages installed, because all of the build's dependencies are defined within the expression.
+
+A build uses the nixpkgs of the thing you are building.
+
+A Nix expression build uses a revision supplied by the catalog: the latest revision of the default stability, or the one named with [`--stability`](/man/flox-build#options).
+
+A manifest build uses the package set its environment is [locked](/concepts/environments#manifestlock) to, and so do any Nix expression builds it reaches through `${pkg}` references. Building a Nix expression build and a manifest build in the same invocation uses the catalog's revision for the expressions, which matters when the two are expected to link against the same libraries.
 
 ## Defining builds
 
