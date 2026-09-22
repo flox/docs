@@ -217,6 +217,7 @@
               "man/flox-build-import-nixpkgs",
               "man/flox-build-update-catalogs",
               "man/flox-containerize",
+              "man/flox-develop",
               "man/flox-publish"
             ]
           },
