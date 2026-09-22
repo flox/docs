@@ -52,6 +52,7 @@ Valid string values are:
 - `1.15.0`: introduced `hook.on-deactivate`
 - `1.16.0`: introduced services `depends-on`, and
   `shutdown.timeout-seconds` / `shutdown.signal`
+- `1.17.0`: introduced `description`
 
 Existing manifest schemas, including the older `version = 1` format, are
 automatically forward-migrated when using features that require a newer
@@ -80,6 +81,29 @@ included in the emitted warning message:
 version = "1.11.0"
 reason = "Needs feature X"
 ```
+
+### `description`
+
+`description` is an optional top-level field to describe the
+environment’s purpose and usage. The value must be a string, and it
+supports Markdown syntax.
+
+Description is rendered as Markdown by `flox activate` and in FloxHub.
+
+The Markdown title or first line of the string is used as a summary
+line.
+
+Descriptions are dedented to allow indenting within manifest.toml.
+
+```toml
+description = '''
+  Multiline descriptions
+  are dedented
+'''
+```
+
+When composing environments, the composing environment’s `description`
+is used. An included environment’s `description` is never surfaced.
 
 ### `[install]`
 
