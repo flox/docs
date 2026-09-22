@@ -203,6 +203,7 @@ Key terms:
 - [flox build import nixpkgs](https://flox.dev/docs/man/flox-build-import-nixpkgs.md): Import package definition from nixpkgs.
 - [flox build update catalogs](https://flox.dev/docs/man/flox-build-update-catalogs.md): Update the project catalog lockfile.
 - [flox containerize](https://flox.dev/docs/man/flox-containerize.md): Export an environment as a container image.
+- [flox develop](https://flox.dev/docs/man/flox-develop.md): Enter a development shell for a Nix expression build.
 - [flox publish](https://flox.dev/docs/man/flox-publish.md): Publish packages for Flox.
 
 ## CLI reference: Services
