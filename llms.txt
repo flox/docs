@@ -80,6 +80,7 @@ Key terms:
 
 - [Creating environments](https://flox.dev/docs/tutorials/creating-environments.md): Reproducible environments for any project.
 - [The default environment](https://flox.dev/docs/tutorials/default-environment.md): Using Flox as your system package manager
+- [Example default environments](https://flox.dev/docs/tutorials/default-environment-examples.md): Four starting points for your default environment, from a Homebrew replacement to a team baseline
 - [Sharing your environments](https://flox.dev/docs/tutorials/sharing-environments.md): Multiple ways to share your environment with others.
 - [Layering multiple environments](https://flox.dev/docs/tutorials/layering-multiple-environments.md): Using more than one environment at a time
 - [Customizing the shell environment](https://flox.dev/docs/tutorials/customizing-environments.md): Using setup scripts, aliases, and environment variables to improve your workflows.
