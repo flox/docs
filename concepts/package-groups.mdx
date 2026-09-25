@@ -445,7 +445,7 @@ If you're familiar with Nix flakes, Flox package groups map directly to patterns
 | --- | --- |
 | Package group (single) | Pinned nixpkgs flake input at a specific rev |
 | Multiple pkg-groups | Multiple nixpkgs inputs (`nixpkgs`, `nixpkgs-stable`) |
-| `toplevel` default group | Primary `nixpkgs` input in a flake |
+| Default package group (`toplevel`) | Primary `nixpkgs` input in a flake |
 | Group upgrade (`flox upgrade`) | `nix flake update nixpkgs` (per-input) |
 | `priority` | `meta.priority` in nixpkgs |
 | Lock file group entries | `flake.lock` input nodes |
