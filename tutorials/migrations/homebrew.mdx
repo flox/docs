@@ -169,6 +169,7 @@ jq: jq (1.7.1)
 As you continue to migrate packages from Homebrew to Flox, you may find that you don’t need them all in your default environment.
 
 The default environment is intended for packages that should be available to the user across all of the contexts where they work. It is commonly used for general utilities like `gh`, `gnused`, and `curl` that apply to many situations.
+For complete manifests you can start from, see [example default environments](/tutorials/default-environment-examples).
 
 Packages that are required for specific contexts (e.g., different projects in a monorepo, different repos, different customer deployments, etc.) are often installed into path environments which are then activated in addition to the default environment.
 
