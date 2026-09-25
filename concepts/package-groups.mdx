@@ -61,12 +61,12 @@ Every dependency in a package group gets pinned to the same historical `nixpkgs`
 
 ## How Package Groups Work
 
-### Default Group: `toplevel`
+### Default Group (`toplevel`)
 
 ```mermaid
 %%{init: {'theme':'base','themeVariables':{'primaryColor':'#e8eef6','primaryBorderColor':'#7d96b8','primaryTextColor':'#1f2937','lineColor':'#7d96b8','clusterBkg':'#f4f6fa','clusterBorder':'#7d96b8','edgeLabelBackground':'#ffffff'}}}%%
 flowchart LR
-  subgraph toplevel ["Group: toplevel"]
+  subgraph toplevel ["Group: Default (toplevel)"]
     direction TB
     tp["bash, curl, git, jq"]
     tr["Catalog rev b40629e…<br/>(nixpkgs commit 2026-03-18)"]
@@ -78,7 +78,9 @@ flowchart LR
   end
 ```
 
-When you install a package with `flox install`, it goes into **`toplevel`**, the default package group. `toplevel` is an **implicit** package group: any package installed without defining a `pkg-group` field gets placed into it.
+When you install a package with `flox install`, it goes into the **Default package group (`toplevel`)**. This is an **implicit** package group: any package installed without defining a `pkg-group` field gets placed into it.
+
+FloxHub labels this group **Default**, while CLI messages and the lockfile call it `toplevel`. Both names refer to the same group. The name `toplevel` appears in your manifest only if you set `pkg-group = "toplevel"` explicitly.
 
 ```toml
 [install]

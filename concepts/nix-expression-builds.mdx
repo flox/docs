@@ -9,7 +9,7 @@ See the [builds concept](/concepts/builds) page for an overview of the different
 
 Nix expression builds are defined by creating files in the `.flox/pkgs/` directory of a Flox environment. These expressions are written in the Nix language, which is incredibly powerful and results in truly reproducible builds.
 
-The environment that contains the builds doesn't need to have any packages installed because all of the build's dependencies are defined within the expression, but if there are any packages installed then Flox will attempt to produce a build that is compatible with any packages in the "toplevel" [package group](/man/manifest.toml#package-descriptors).
+The environment that contains the builds doesn't need to have any packages installed because all of the build's dependencies are defined within the expression, but if there are any packages installed then Flox will attempt to produce a build that is compatible with any packages in the Default [package group](/man/manifest.toml#package-descriptors) (`toplevel`).
 
 ## Defining builds
 
