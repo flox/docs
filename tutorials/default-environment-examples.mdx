@@ -1,0 +1,262 @@
+---
+title: "Example default environments"
+description: "Four starting points for your default environment, from a Homebrew replacement to a team baseline"
+---
+
+"What should go in my default environment?" is one of the most common questions about Flox.
+The answer depends on how you work,
+so this page walks through four example manifests.
+Each one uses a different part of the manifest,
+so you can mix and match the pieces you need.
+
+If you haven't set up a default environment yet,
+start with [the default environment tutorial](/tutorials/default-environment).
+
+| Example | Good for | Shows you how to use |
+| --- | --- | --- |
+| [Everyday essentials](#everyday-essentials) | Replacing Homebrew, `apt`, or another system package manager | `[install]` |
+| [Shell power user](#shell-power-user) | Taking your editor, prompt, and shell integrations to every machine | `[vars]` and `[profile]` |
+| [macOS and Linux](#macos-and-linux) | Using one environment on a Mac and on Linux servers | Per-package `systems` |
+| [Team baseline](#team-baseline) | Sharing a common set of tools across an organization | `[include]` |
+
+## What belongs in a default environment
+
+Your default environment is active in every shell, in every directory.
+That makes it the right home for tools you use everywhere:
+
+- General-purpose command-line tools, such as `git`, `curl`, and `jq`
+- Your editor, terminal multiplexer, and shell prompt
+- Coding agents, such as Claude Code and Codex
+- CLIs for services you use across projects, such as cloud providers and GitHub
+
+Some tools belong in a project's environment instead:
+
+- **Language toolchains pinned to a project**, such as Node.js 20 for one repository and Node.js 22 for another
+- **Services**, such as databases and message queues
+- **Libraries and build dependencies** that a project needs to compile
+
+A useful rule: if a project needs a tool to build, test, or run, put the tool in that project's environment.
+Your default environment is personal, so your teammates and CI jobs don't have it.
+When you [layer a project environment](/tutorials/layering-multiple-environments) on top of your default environment,
+the project's packages take precedence.
+
+Keep your default environment quick to activate, too.
+It activates every time you open a shell,
+so avoid slow commands and network calls in its `[hook]` and `[profile]` scripts.
+
+## Try an example
+
+Open your default environment's manifest in your editor:
+
+```bash
+flox edit -D
+```
+
+Copy in the sections you want from an example, then save and close the file.
+Flox validates the manifest when you save it.
+
+Then push the change to FloxHub so your other machines can pull it:
+
+```bash
+flox push -D
+```
+
+Each push creates a new [generation](/concepts/generations),
+so you can experiment freely.
+If you change your mind, roll back with [`flox generations rollback`](/man/flox-generations-rollback).
+
+## Everyday essentials
+
+Start here if you're replacing Homebrew, `apt`, or another system package manager.
+This environment is just a list of packages,
+so you can build it without opening the manifest at all:
+
+```bash
+flox install -D bat curl fd gh git htop jq ripgrep tree wget
+```
+
+Here's the manifest, with a `description` that explains what the environment is for:
+
+```toml title="manifest.toml"
+schema-version = "1.17.0"
+description = "Everyday command-line tools for every machine"
+
+[install]
+bat.pkg-path = "bat"
+curl.pkg-path = "curl"
+fd.pkg-path = "fd"
+gh.pkg-path = "gh"
+git.pkg-path = "git"
+htop.pkg-path = "htop"
+jq.pkg-path = "jq"
+ripgrep.pkg-path = "ripgrep"
+tree.pkg-path = "tree"
+wget.pkg-path = "wget"
+```
+
+If you're moving from Homebrew,
+the [Homebrew migration guide](/tutorials/migrations/homebrew) shows how to list the formulae you installed with `brew leaves`
+and find each one in the catalog.
+Catalog package names usually match Homebrew's, but not always,
+so use [`flox search`](/man/flox-search) to check.
+
+## Shell power user
+
+This environment takes your editor, prompt, and shell integrations to every machine,
+so you don't have to copy dotfiles around.
+
+```toml title="manifest.toml"
+schema-version = "1.17.0"
+description = "Editor, prompt, and shell integrations for every machine"
+
+[install]
+eza.pkg-path = "eza"
+fzf.pkg-path = "fzf"
+neovim.pkg-path = "neovim"
+starship.pkg-path = "starship"
+tmux.pkg-path = "tmux"
+zoxide.pkg-path = "zoxide"
+
+[vars]
+EDITOR = "nvim"
+VISUAL = "nvim"
+
+[profile]
+bash = """
+  eval "$(starship init bash)"
+  eval "$(zoxide init bash)"
+  eval "$(fzf --bash)"
+  alias ls="eza"
+"""
+zsh = """
+  eval "$(starship init zsh)"
+  eval "$(zoxide init zsh)"
+  source <(fzf --zsh)
+  alias ls="eza"
+"""
+fish = """
+  starship init fish | source
+  zoxide init fish | source
+  fzf --fish | source
+  alias ls="eza"
+"""
+```
+
+- `[vars]` sets `EDITOR` and `VISUAL` in every shell,
+  so tools such as `git` open Neovim.
+- `[profile]` has one script per shell.
+  Your shell runs only the script that matches it,
+  so the same environment works in Bash, Zsh, and Fish.
+  If you use tcsh, add a `tcsh` script the same way.
+- The scripts set up the [Starship](https://starship.rs) prompt,
+  the `z` command from `zoxide` for jumping between directories,
+  and the `fzf` key bindings.
+  They also alias `ls` to `eza`.
+
+Profile scripts run every time a shell starts,
+so keep them to quick setup like this.
+See [`[profile]`](/man/manifest.toml#profile) for details.
+
+<Note>
+  If you already set up these tools in `.bashrc`, `.zshrc`, or `config.fish`,
+  remove those lines after you move them into the manifest,
+  so the setup doesn't run twice.
+</Note>
+
+## macOS and Linux
+
+If you work on a Mac but deploy to Linux, or split your time between both,
+one default environment can serve all of your machines.
+Use a package's `systems` option to install it only where you need it.
+
+```toml title="manifest.toml"
+schema-version = "1.17.0"
+description = "The same tools on macOS and Linux"
+
+[install]
+git.pkg-path = "git"
+jq.pkg-path = "jq"
+
+# GNU core utilities on macOS, so shell scripts behave the same as on Linux
+coreutils.pkg-path = "coreutils"
+coreutils.systems = ["aarch64-darwin"]
+findutils.pkg-path = "findutils"
+findutils.systems = ["aarch64-darwin"]
+gnugrep.pkg-path = "gnugrep"
+gnugrep.systems = ["aarch64-darwin"]
+gnused.pkg-path = "gnused"
+gnused.systems = ["aarch64-darwin"]
+gnutar.pkg-path = "gnutar"
+gnutar.systems = ["aarch64-darwin"]
+
+# Debugging tools that only run on Linux
+inotify-tools.pkg-path = "inotify-tools"
+inotify-tools.systems = ["aarch64-linux", "x86_64-linux"]
+strace.pkg-path = "strace"
+strace.systems = ["aarch64-linux", "x86_64-linux"]
+```
+
+- By default, an environment supports `aarch64-darwin`, `aarch64-linux`, and `x86_64-linux`,
+  so it works on Apple silicon Macs and on ARM and x86 Linux.
+- A package's `systems` option limits that package to some of those systems.
+  Here, the GNU tools install only on macOS,
+  and Linux-only tools such as `strace` install only on Linux.
+  Without it, Flox can't resolve the environment on systems where the package isn't available.
+
+<Note>
+  Your default environment's packages come before the system's in your `PATH`,
+  so GNU `sed`, `grep`, `find`, and `tar` replace the BSD versions that ship with macOS.
+  If your scripts rely on BSD behavior, such as `sed -i ''`, leave these packages out.
+</Note>
+
+## Team baseline
+
+If your team uses FloxHub [organizations](/concepts/organizations),
+you can publish a shared baseline environment with internal CLIs and approved tool versions.
+Everyone on the team can then include it in their own default environment
+and add personal tools on top.
+
+```toml title="manifest.toml"
+schema-version = "1.17.0"
+description = "Team baseline plus personal tools"
+
+[include]
+environments = [
+  # Replace with your organization's environment on FloxHub
+  { remote = "your-org/baseline" },
+]
+
+[install]
+bat.pkg-path = "bat"
+neovim.pkg-path = "neovim"
+
+[vars]
+EDITOR = "nvim"
+```
+
+- Flox merges the baseline into your environment.
+  Your own manifest takes priority,
+  so you can add packages or override the version of a baseline package
+  without changing the baseline for everyone else.
+  You can't remove a package that the baseline installs.
+- Include the baseline with `remote`, not `dir`.
+  Your default environment lives on FloxHub,
+  and you can't push an environment that includes a local directory.
+- To see the merged manifest, run `flox list -D --config`.
+
+Changes to the baseline don't reach you automatically.
+When you're ready for the latest version, pull it in and push the result:
+
+```bash
+flox include upgrade -D && flox push -D
+```
+
+To build the baseline itself,
+see [reusing and combining developer environments](/tutorials/composition).
+For how merging works, see [composing environments](/concepts/composition).
+
+## Where to next
+
+- [Layering multiple environments](/tutorials/layering-multiple-environments)
+- [Customizing environments](/tutorials/customizing-environments)
+- [`manifest.toml` reference](/man/manifest.toml)
