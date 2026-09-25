@@ -13,7 +13,25 @@ Package 'my-package' is not signed by a trusted key.
 See https://flox.dev/docs/customer/signing-keys/ for more information.
 ```
 
-To fix this, add `floxhub-1` to your Nix configuration's trusted public keys, the same way you would [trust any other public key](#trust-a-public-key-to-install-published-artifacts) — see the [generic Nix install instructions](/install-flox/install#generic-nix) for the exact key value and the config syntax for your setup.
+To fix this, add `floxhub-1` to your Nix configuration's trusted public keys, the same way you would [trust any other public key](#trust-a-public-key-to-install-published-artifacts).
+
+If you're using a standalone Nix or Flox-installed Nix setup, add `floxhub-1` to the `extra-trusted-public-keys` line in `/etc/nix/nix.conf` (append to an existing line rather than adding a second one):
+
+```text
+extra-trusted-public-keys = <existing keys> floxhub-1:0QOAlcobcEvq1mqEf4qAYCaWnTTOXpyoRv/PmqfSixM=
+```
+
+Then [restart the Nix daemon](#add-a-new-trusted-key).
+
+If your system is managed by NixOS or nix-darwin, add it to `nix.settings` instead, then rebuild and switch into your configuration:
+
+```nix
+nix.settings.extra-trusted-public-keys = [
+  "floxhub-1:0QOAlcobcEvq1mqEf4qAYCaWnTTOXpyoRv/PmqfSixM="
+];
+```
+
+See the [generic Nix install instructions](/install-flox/install#generic-nix) for the full configuration examples, including the Flox binary cache key.
 
 However, if you're providing your own Catalog Store, then you must
 
