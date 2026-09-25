@@ -5,6 +5,19 @@ name: Changelog release stubs
 # Poll-shaped like the sibling update-flox-version.yml / sync-man-pages.yml
 # workflows: no changes or secrets needed in the source repos.
 #
+# For flox/flox, scripts/changelog-draft.py drafts the real copy from the
+# release notes with Muse Spark, through the Meta Model API (the
+# META_MUSE_CI_API_KEY secret), and checks the result. When every automated
+# check passes, the PR opens ready for review, so a human only reviews,
+# approves, and merges. When drafting is skipped or fails, the release gets
+# the placeholder stub as before, and the PR body says why. The exception is
+# an unavailable API: while the release is under three days old, the run
+# opens no PR and the next daily run drafts again.
+#
+# To test drafting, run the workflow by hand with a flox/flox release tag as
+# draft_tag. That run drafts the entry for that release again and shows it in
+# the run summary. It opens no PR.
+#
 # Lifecycle of a stub PR:
 #   - merge it        -> the changelog-id marker lands on a changelog page
 #                        and the release is never stubbed again
@@ -17,6 +30,11 @@ on:
   schedule:
     - cron: '0 8 * * *'  # daily at 08:00 UTC (offset from the 06:00/07:00 sibling jobs)
   workflow_dispatch:
+    inputs:
+      draft_tag:
+        description: "Test drafting: a flox/flox release tag (such as v1.17.0) to draft again. Opens no PR."
+        required: false
+        type: string
 
 jobs:
   stub:
@@ -43,15 +61,26 @@ jobs:
         id: release
         env:
           REPO: ${{ matrix.repo }}
+          DRAFT_TAG: ${{ inputs.draft_tag }}
         run: |
+          endpoint="repos/${REPO}/releases/latest"
+          if [ -n "$DRAFT_TAG" ]; then
+            # Drafting test: take the named flox/flox release, whether or not
+            # it already has an entry.
+            if [ "$REPO" != "flox/flox" ]; then
+              echo "new=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            endpoint="repos/${REPO}/releases/tags/${DRAFT_TAG}"
+          fi
           err="$RUNNER_TEMP/gh-err.txt"
-          if ! release=$(gh api "repos/${REPO}/releases/latest" 2> "$err"); then
+          if ! release=$(gh api "$endpoint" 2> "$err"); then
             # Only "no releases yet" is a normal no-op; anything else (bad
             # token, rate limit, outage) must fail loudly, or the automation
             # dies silently while the workflow stays green. GitHub returns
             # 404 for repos the token can't see too, so a 404 only counts as
             # "no releases" when the repo itself is visible.
-            if grep -q "HTTP 404" "$err" && gh api "repos/${REPO}" --silent; then
+            if [ -z "$DRAFT_TAG" ] && grep -q "HTTP 404" "$err" && gh api "repos/${REPO}" --silent; then
               echo "No releases in ${REPO}; nothing to do."
               echo "new=false" >> "$GITHUB_OUTPUT"
               exit 0
@@ -65,11 +94,12 @@ jobs:
           # pages themselves are the state — no state file.
           # -F plus the closing " */" keep prefix tags (v1.0 vs v1.0.0) and
           # regex dots from matching the wrong marker.
-          if grep -rqF "changelog-id: ${REPO}@${tag} */" changelog.mdx changelog/; then
+          if [ -z "$DRAFT_TAG" ] && grep -rqF "changelog-id: ${REPO}@${tag} */" changelog.mdx changelog/; then
             echo "Entry for ${REPO}@${tag} already exists; nothing to do."
             echo "new=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          jq -r '.body // ""' <<< "$release" > "$RUNNER_TEMP/release-notes.md"
           {
             echo "new=true"
             echo "tag=${tag}"
@@ -123,7 +153,13 @@ jobs:
         env:
           BRANCH: ${{ steps.mode.outputs.branch }}
           MODE: ${{ steps.mode.outputs.mode }}
+          DRAFT_TAG: ${{ inputs.draft_tag }}
         run: |
+          if [ -n "$DRAFT_TAG" ]; then
+            # Drafting test: the release's own PR has usually merged already.
+            echo "count=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           # Stub PRs: any prior PR stops recreation (open = a human may have
           # pushed real copy, never regenerate over it; closed-unmerged = the
           # release was declined). Rollover PRs carry no hand-written copy,
@@ -141,19 +177,77 @@ jobs:
             jq -r '.[] | "  #\(.number) [\(.state)] \(.title)"' <<< "$prs"
           fi
 
+      # Drafting, flox/flox only: its entries follow a house style with
+      # examples on the page, and its release notes are public. Private repos
+      # (floxhub) keep the placeholder, so their notes never reach a public PR
+      # unreviewed, or the model: the Contributor tier lets Meta train on what
+      # it receives. The script sends one request to the Meta Model API and
+      # checks the answer. The model has no tools and runs nothing here. A
+      # failure never fails the job. It falls through to the placeholder,
+      # unless the API was unavailable and the release is recent: then the
+      # script sets defer, the steps below open no PR, and the next daily run
+      # finds the release still new and drafts again.
+      - name: Draft release copy
+        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0' && steps.mode.outputs.mode == 'stub' && matrix.repo == 'flox/flox'
+        id: draft
+        continue-on-error: true
+        timeout-minutes: 30
+        env:
+          META_MUSE_CI_API_KEY: ${{ secrets.META_MUSE_CI_API_KEY }}
+          REPO: ${{ matrix.repo }}
+          TAG: ${{ steps.release.outputs.tag }}
+          URL: ${{ steps.release.outputs.url }}
+          DATE: ${{ steps.release.outputs.date }}
+        run: |
+          ./scripts/changelog-draft.py "$REPO" "$TAG" "$URL" "$DATE" \
+            "$RUNNER_TEMP/release-notes.md" "$RUNNER_TEMP/changelog-draft"
+
       - name: Insert changelog stub
-        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0'
+        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0' && steps.draft.outputs.defer != 'true'
         env:
           REPO: ${{ matrix.repo }}
           TAG: ${{ steps.release.outputs.tag }}
           NAME: ${{ steps.release.outputs.name }}
           URL: ${{ steps.release.outputs.url }}
           DATE: ${{ steps.release.outputs.date }}
+          # Empty unless the drafted copy was accepted; then it replaces the
+          # placeholder.
+          CHANGELOG_BODY_FILE: ${{ steps.draft.outputs.entry }}
         run: |
           ./scripts/changelog-stub.sh "$REPO" "$TAG" "$NAME" "$URL" "$DATE"
 
-      - name: Create draft pull request
-        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0' && steps.mode.outputs.mode == 'stub'
+      # A drafting test stops here. It shows what the PR would hold, and
+      # fails when nothing was drafted.
+      - name: Show drafting test result
+        if: steps.release.outputs.new == 'true' && inputs.draft_tag != ''
+        env:
+          ENTRY: ${{ steps.draft.outputs.entry }}
+          PR_BODY: ${{ steps.draft.outputs.pr-body }}
+          READY: ${{ steps.draft.outputs.ready }}
+          REASON: ${{ steps.draft.outputs.reason }}
+        run: |
+          if [ -z "$ENTRY" ]; then
+            echo "::error::Nothing was drafted: ${REASON:-the drafting step did not finish}."
+            exit 1
+          fi
+          {
+            echo "## Entry"
+            echo
+            cat "$ENTRY"
+            echo
+            echo "## Pull request body (opens ready for review: ${READY})"
+            echo
+            cat "$PR_BODY"
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      # A drafted entry that passed every check opens ready for review, so
+      # the maintainer's path is review, approve, merge. A placeholder or a
+      # draft with flagged problems opens as a draft PR, since it can't
+      # merge as-is. The drafted PR's body (body-path) says the copy is
+      # machine-written and lists what to check; body-path is empty
+      # otherwise, and the body below applies.
+      - name: Create changelog pull request
+        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0' && steps.mode.outputs.mode == 'stub' && inputs.draft_tag == '' && steps.draft.outputs.defer != 'true'
         uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
         with:
           token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
@@ -161,13 +255,14 @@ jobs:
             changelog.mdx
             changelog
             docs.json
-          commit-message: "docs(changelog): stub for ${{ matrix.repo }} ${{ steps.release.outputs.tag }}"
+          commit-message: "docs(changelog): ${{ steps.draft.outputs.entry && 'entry' || 'stub' }} for ${{ matrix.repo }} ${{ steps.release.outputs.tag }}"
           committer: "FloxBot <bot@flox.dev>"
           author: "FloxBot <bot@flox.dev>"
           branch: ${{ steps.mode.outputs.branch }}
           delete-branch: true
-          draft: true
+          draft: ${{ steps.draft.outputs.ready != 'true' }}
           title: "docs(changelog): ${{ matrix.repo }} ${{ steps.release.outputs.tag }}"
+          body-path: ${{ steps.draft.outputs.pr-body }}
           body: |
             [${{ matrix.repo }} ${{ steps.release.outputs.tag }}](${{ steps.release.outputs.url }}) was published on ${{ steps.release.outputs.date }}.
 
@@ -176,11 +271,13 @@ jobs:
             release doesn't merit a changelog entry, close the PR and it won't
             be recreated.
 
+            ${{ steps.draft.outputs.reason && format('The copy was not drafted automatically: {0}.', steps.draft.outputs.reason) || '' }}
+
             Created automatically by the [Changelog release stubs workflow](https://github.com/flox/docs/actions/workflows/changelog-stubs.yml).
           labels: "team-developer-support"
 
       - name: Create rollover pull request
-        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0' && steps.mode.outputs.mode == 'rollover'
+        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0' && steps.mode.outputs.mode == 'rollover' && inputs.draft_tag == ''
         uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
         with:
           token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
