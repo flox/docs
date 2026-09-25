@@ -28,6 +28,11 @@
 # changelog-stubs workflow greps to avoid opening duplicate PRs for the same
 # release.
 #
+# If CHANGELOG_BODY_FILE names a non-empty file (release copy drafted by
+# Claude and checked by scripts/changelog-draft.py), its contents become the
+# entry body in place of the placeholder. The wrapper and changelog-id marker
+# are the same either way.
+#
 # Requires: python3 (same as scripts/check-man-nav.sh)
 
 set -euo pipefail
@@ -197,16 +202,23 @@ if any(iso == date for _, iso in updates):
     note = ("\n\n  _Note: another entry shares this date — consider merging"
             "\n  this section into it._")
     print(f"warning: an entry dated {date} already exists; "
-          "the draft asks the editor to merge by hand", file=sys.stderr)
+          "consider merging the two by hand", file=sys.stderr)
+
+body_file = os.environ.get("CHANGELOG_BODY_FILE", "")
+drafted = open(body_file).read().strip("\n") if os.path.isfile(body_file) else ""
+if drafted:
+    body = "\n".join("  " + l if l.strip() else "" for l in drafted.split("\n"))
+else:
+    body = f"""  ## {product} {tag}
+
+  _Draft: summarize what changed in [{name}]({url}), leading with what it lets
+  users do rather than what was merged._{note}"""
 
 # The changelog-id marker sits AFTER the closing tag, not inside the body:
 # Mintlify's RSS generator renders MDX comments inside an <Update> as literal
 # text in the feed item, while content between entries stays out of the feed.
 stub = f"""<Update label="{label}" description="{tag}">
-  ## {product} {tag}
-
-  _Draft: summarize what changed in [{name}]({url}), leading with what it lets
-  users do rather than what was merged._{note}
+{body}
 </Update>
 {{/* changelog-id: {repo}@{tag} */}}
 """

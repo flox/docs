@@ -5,6 +5,15 @@ name: Changelog release stubs
 # Poll-shaped like the sibling update-flox-version.yml / sync-man-pages.yml
 # workflows: no changes or secrets needed in the source repos.
 #
+# For flox/flox, Claude drafts the real copy from the release notes with
+# anthropics/claude-code-action, which needs the CLAUDE_CODE_OAUTH_TOKEN
+# secret (an admin creates it by running /install-github-app for this repo).
+# scripts/changelog-draft.py prepares the model's input and checks its
+# output. When every automated check passes, the PR opens ready for review,
+# so a human only reviews, approves, and merges. When drafting is skipped or
+# fails, the release gets the placeholder stub as before, and the PR body
+# says why.
+#
 # Lifecycle of a stub PR:
 #   - merge it        -> the changelog-id marker lands on a changelog page
 #                        and the release is never stubbed again
@@ -21,6 +30,12 @@ on:
 jobs:
   stub:
     runs-on: ubuntu-latest
+    # Read-only GITHUB_TOKEN. Every write in this job uses the FloxBot token,
+    # which only the steps that call `gh` or open the PR receive. The Claude
+    # step gets this read-only token as github_token, so the action skips its
+    # OIDC app-token exchange and needs no id-token: write.
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -31,10 +46,6 @@ jobs:
           - flox/flox-plugins
           - flox/flox-skills
           - flox/flox-vscode
-    env:
-      # FloxBot token, not GITHUB_TOKEN: it can read private source repos
-      # (e.g. floxhub) and lets the created PR trigger CI.
-      GH_TOKEN: ${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}
     steps:
       - name: Checkout docs
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -43,6 +54,10 @@ jobs:
         id: release
         env:
           REPO: ${{ matrix.repo }}
+          # FloxBot token, not GITHUB_TOKEN: it can read private source repos
+          # (e.g. floxhub) and lets the created PR trigger CI. It is set per
+          # step rather than for the job, so the Claude step never sees it.
+          GH_TOKEN: ${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}
         run: |
           err="$RUNNER_TEMP/gh-err.txt"
           if ! release=$(gh api "repos/${REPO}/releases/latest" 2> "$err"); then
@@ -70,6 +85,7 @@ jobs:
             echo "new=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          jq -r '.body // ""' <<< "$release" > "$RUNNER_TEMP/release-notes.md"
           {
             echo "new=true"
             echo "tag=${tag}"
@@ -123,6 +139,7 @@ jobs:
         env:
           BRANCH: ${{ steps.mode.outputs.branch }}
           MODE: ${{ steps.mode.outputs.mode }}
+          GH_TOKEN: ${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}
         run: |
           # Stub PRs: any prior PR stops recreation (open = a human may have
           # pushed real copy, never regenerate over it; closed-unmerged = the
@@ -141,6 +158,90 @@ jobs:
             jq -r '.[] | "  #\(.number) [\(.state)] \(.title)"' <<< "$prs"
           fi
 
+      # Drafting, flox/flox only: its entries follow a house style with
+      # examples on the page, and its release notes are public. Private repos
+      # (floxhub) keep the placeholder so their notes never flow unreviewed
+      # into a public PR. Only the Claude step is model-driven. The steps
+      # around it are deterministic (scripts/changelog-draft.py), and each
+      # one falls through to the placeholder rather than failing the job.
+      - name: Prepare draft input
+        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0' && steps.mode.outputs.mode == 'stub' && matrix.repo == 'flox/flox'
+        id: draft-input
+        continue-on-error: true
+        env:
+          # Secrets can't appear in an `if:`, so the gate goes through here.
+          HAS_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+          REPO: ${{ matrix.repo }}
+          TAG: ${{ steps.release.outputs.tag }}
+          URL: ${{ steps.release.outputs.url }}
+          DATE: ${{ steps.release.outputs.date }}
+        run: |
+          ./scripts/changelog-draft.py prepare "$REPO" "$TAG" "$URL" "$DATE" \
+            "$RUNNER_TEMP/release-notes.md" "$RUNNER_TEMP/changelog-draft"
+
+      # The release notes reach Claude only as a file in the --add-dir
+      # directory. The prompt carries the house rules and the validated tag,
+      # date, and URL, never the notes. Tools are Read, Glob, and Grep
+      # (--tools), with no allow rules. In default permission mode that
+      # confines reads to the checkout and the draft directory: a bare
+      # `--allowedTools Read` would allow reads anywhere on the runner, such
+      # as /proc/self/environ. .git/ is denied too, because the action writes
+      # its token into the origin URL. --setting-sources user and
+      # --strict-mcp-config ignore any settings or MCP servers committed to
+      # the repo. The model's answer comes back as structured output, never
+      # as a file.
+      - name: Draft release copy
+        if: steps.draft-input.outputs.run == 'true'
+        id: claude
+        continue-on-error: true
+        timeout-minutes: 20
+        uses: anthropics/claude-code-action@9171db3e57d6a3140a37ddc2ba92788584e0ead6 # v1.0.234
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          prompt: ${{ steps.draft-input.outputs.prompt }}
+          classify_inline_comments: false
+          claude_args: |
+            --model opus
+            --tools Read,Glob,Grep
+            --disallowedTools "Read(./.git/**)"
+            --permission-mode default
+            --setting-sources user
+            --strict-mcp-config
+            --add-dir ${{ runner.temp }}/changelog-draft
+            --max-turns 30
+            --json-schema '{"type":"object","properties":{"body":{"type":"string"},"reviewer_notes":{"type":"array","items":{"type":"string"}}},"required":["body","reviewer_notes"],"additionalProperties":false}'
+
+      # The action points origin at a URL that carries its token and sets its
+      # own git identity. Put both back so the PR step authenticates only
+      # with the FloxBot token, as it always has.
+      - name: Reset git config
+        if: steps.claude.outcome == 'success' || steps.claude.outcome == 'failure'
+        run: |
+          git remote set-url origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git config --unset-all user.name || true
+          git config --unset-all user.email || true
+
+      - name: Check drafted copy
+        if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0' && steps.mode.outputs.mode == 'stub' && matrix.repo == 'flox/flox'
+        id: draft
+        continue-on-error: true
+        env:
+          PREP_OUTCOME: ${{ steps.draft-input.outcome }}
+          SKIP_REASON: ${{ steps.draft-input.outputs.reason }}
+          ACTION_OUTCOME: ${{ steps.claude.outcome }}
+          # Model output travels through env vars and files, never through
+          # ${{ }} in a script.
+          STRUCTURED_OUTPUT: ${{ steps.claude.outputs.structured_output }}
+          EXECUTION_FILE: ${{ steps.claude.outputs.execution_file }}
+          REPO: ${{ matrix.repo }}
+          TAG: ${{ steps.release.outputs.tag }}
+          URL: ${{ steps.release.outputs.url }}
+          DATE: ${{ steps.release.outputs.date }}
+        run: |
+          ./scripts/changelog-draft.py check "$REPO" "$TAG" "$URL" "$DATE" \
+            "$RUNNER_TEMP/changelog-draft"
+
       - name: Insert changelog stub
         if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0'
         env:
@@ -149,10 +250,19 @@ jobs:
           NAME: ${{ steps.release.outputs.name }}
           URL: ${{ steps.release.outputs.url }}
           DATE: ${{ steps.release.outputs.date }}
+          # Empty unless the check step accepted Claude's draft; then the
+          # drafted copy replaces the placeholder.
+          CHANGELOG_BODY_FILE: ${{ steps.draft.outputs.entry }}
         run: |
           ./scripts/changelog-stub.sh "$REPO" "$TAG" "$NAME" "$URL" "$DATE"
 
-      - name: Create draft pull request
+      # A drafted entry that passed every check opens ready for review, so
+      # the maintainer's path is review, approve, merge. A placeholder or a
+      # draft with flagged problems opens as a draft PR, since it can't
+      # merge as-is. The drafted PR's body (body-path) says the copy is
+      # machine-written and lists what to check; body-path is empty
+      # otherwise, and the body below applies.
+      - name: Create changelog pull request
         if: steps.release.outputs.new == 'true' && steps.existing.outputs.count == '0' && steps.mode.outputs.mode == 'stub'
         uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8
         with:
@@ -161,13 +271,14 @@ jobs:
             changelog.mdx
             changelog
             docs.json
-          commit-message: "docs(changelog): stub for ${{ matrix.repo }} ${{ steps.release.outputs.tag }}"
+          commit-message: "docs(changelog): ${{ steps.draft.outputs.entry && 'entry' || 'stub' }} for ${{ matrix.repo }} ${{ steps.release.outputs.tag }}"
           committer: "FloxBot <bot@flox.dev>"
           author: "FloxBot <bot@flox.dev>"
           branch: ${{ steps.mode.outputs.branch }}
           delete-branch: true
-          draft: true
+          draft: ${{ steps.draft.outputs.ready != 'true' }}
           title: "docs(changelog): ${{ matrix.repo }} ${{ steps.release.outputs.tag }}"
+          body-path: ${{ steps.draft.outputs.pr-body }}
           body: |
             [${{ matrix.repo }} ${{ steps.release.outputs.tag }}](${{ steps.release.outputs.url }}) was published on ${{ steps.release.outputs.date }}.
 
@@ -175,6 +286,8 @@ jobs:
             with real release copy, then mark the PR ready for review. If this
             release doesn't merit a changelog entry, close the PR and it won't
             be recreated.
+
+            ${{ steps.draft.outputs.reason && format('The copy was not drafted automatically: {0}.', steps.draft.outputs.reason) || '' }}
 
             Created automatically by the [Changelog release stubs workflow](https://github.com/flox/docs/actions/workflows/changelog-stubs.yml).
           labels: "team-developer-support"
