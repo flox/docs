@@ -4,7 +4,16 @@ description: "Create and use signing keys to sign built artifacts"
 ---
 
 In order to upload a package it must be signed, and in order to install a package published to a Flox Catalog you must configure your system to trust the public key used to sign the package.
-By default, packages are signed with a key that's included with the Flox installer, so Flox is configured to be able to install user-published packages out of the box.
+By default, packages published to FloxHub-hosted catalogs are signed with the `floxhub-1` key, which ships with the Flox installer, so Flox is configured to be able to install user-published packages out of the box.
+
+If you installed Flox with Nix instead of the Flox installer — for example with `nix profile install`, or as part of a nix-darwin or NixOS configuration — your system doesn't have the `floxhub-1` key, and installing a package published to a FloxHub-hosted catalog fails with:
+
+```text
+Package 'my-package' is not signed by a trusted key.
+See https://flox.dev/docs/customer/signing-keys/ for more information.
+```
+
+To fix this, add `floxhub-1` to your Nix configuration's trusted public keys, the same way you would [trust any other public key](#trust-a-public-key-to-install-published-artifacts) — see the [generic Nix install instructions](/install-flox/install#generic-nix) for the exact key value and the config syntax for your setup.
 
 However, if you're providing your own Catalog Store, then you must
 
@@ -91,7 +100,7 @@ For systems whose configuration is managed with Nix, you need to add the public 
 For NixOS, `nix-darwin`, and `home-manager` the configuration option is the same:
 
 ```nix
-nix.settings.trusted-public-keys = [
+nix.settings.extra-trusted-public-keys = [
   "<key contents>"
 ];
 ```
