@@ -9,6 +9,47 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 
 {/* changelog:insert */}
 
+<Update label="September 22" description="v1.17.0">
+  ## Debug Nix expression builds in a shell
+
+  `flox develop <package>` opens a shell with a Nix expression build's
+  dependencies on `PATH` and its build phases loaded. You can drive a
+  failing build by hand instead of re-running `flox build` for every
+  change, and the package doesn't have to build first.
+  `flox develop -c <cmd>` runs a command in that shell without entering
+  it. See [`flox develop`](/man/flox-develop).
+
+  ## Describe your environment in the manifest
+
+  The new top-level `description` field says what an environment is for
+  and how to use it. Interactive `flox activate` renders it as Markdown,
+  and `flox envs` shows its first line. Manifests that use the field need
+  schema version 1.17.0. New `default` environments that `flox install`
+  creates come with a description that explains how to activate them from
+  your shell's startup files. See
+  [`description`](/man/manifest.toml#description).
+
+  ## Also in this release
+
+  - `flox init -D` creates your `default` environment on FloxHub, matching
+    the `-D` shorthand on `flox activate`. See the
+    [default environment tutorial](/tutorials/default-environment).
+  - `flox upgrade --dry-run` only reports which packages have upgrades
+    available, without building or downloading them. A successful dry run
+    no longer guarantees that the upgraded environment builds.
+  - `flox auth status` warns and exits non-zero when your FloxHub token
+    has expired.
+  - Services recover on their own when a previous service manager was
+    killed without removing its socket. You no longer have to delete the
+    socket file by hand.
+  - Flox asks for keychain access once, instead of after every release.
+
+  See the
+  [v1.17.0 release notes](https://github.com/flox/flox/releases/tag/v1.17.0)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.17.0 */}
+
 <Update label="September 8" description="v1.16.0">
   ## Service start order and shutdown control
 
