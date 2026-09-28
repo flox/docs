@@ -164,7 +164,7 @@ Key terms:
 ## FloxHub on-prem: Administer: Users
 
 - [Administer users](https://flox.dev/docs/floxhub-onprem/administration/users/overview.md): Provisioning and managing the people who use your deployment.
-- [User identity](https://flox.dev/docs/floxhub-onprem/administration/users/identity.md): Connecting FloxHub to your identity provider.
+- [User identity](https://flox.dev/docs/floxhub-onprem/administration/users/identity.md): Connect your identity provider to a FloxHub on-prem deployment, and understand the sign-in flow it drives.
 
 ## FloxHub on-prem: Upgrade
 

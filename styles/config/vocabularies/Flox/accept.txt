@@ -48,6 +48,7 @@ dotenv
 dotfile
 dotfiles
 eksctl
+Entra
 env
 envs
 formatters
@@ -65,8 +66,10 @@ libiconv
 liveness
 lockfile
 lockfiles
+lowercased
 mailcap
 manpages
+misconfigured
 monorepo
 monorepos
 namespace
@@ -76,12 +79,14 @@ Nodejs
 npm
 Nvidia
 nvm
+Okta
 papercuts
 personalizations
 postgres
 rc
 repo
 repos
+rollout
 runtimes
 sandboxed
 sandboxing
