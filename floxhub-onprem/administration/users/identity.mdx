@@ -1,15 +1,59 @@
 ---
 title: "User identity"
-description: "Connecting FloxHub to your identity provider."
+description: "Choose an identity integration for FloxHub on-prem: identity providers through Dex or a deployment authentication override for Kerberos."
 ---
 
-<Info>
-  **This page is under construction.** FloxHub on-prem documentation is
-  being written section by section. This page is a placeholder so the
-  surrounding navigation and links are complete.
-</Info>
+FloxHub on-prem connects to your existing identity system. The default
+integration uses Dex, the OpenID Connect (OIDC) broker included with FloxHub.
+You can also override the deployment's authentication settings to use Kerberos.
 
-## Planned contents
+## Identity providers through Dex
 
-The identity components, connector configuration, the browser login flow,
-issuer and callback settings, identity mapping, and troubleshooting.
+Dex authenticates users against your identity provider and presents a consistent
+OIDC interface to FloxHub. You configure the connection through a Dex connector.
+The provider can use OIDC, LDAP, or another protocol that its connector supports.
+
+| Integration | Providers and systems | Configuration |
+| --- | --- | --- |
+| OpenID Connect | Okta, AD FS, and other OIDC providers | [OpenID Connect](/floxhub-onprem/administration/users/identity/oidc) |
+| Microsoft | Microsoft Entra ID | [Microsoft Entra ID](/floxhub-onprem/administration/users/identity/entra-id) |
+| LDAP | Active Directory and other LDAP directories | [LDAP and Active Directory](/floxhub-onprem/administration/users/identity/ldap) |
+| Git providers | GitHub, GitLab, Gitea, and Bitbucket Cloud | [Dex connectors](https://dexidp.io/docs/connectors/) |
+| Other Dex integrations | Google, LinkedIn, OpenShift, Atlassian Crowd, and OpenStack Keystone | [Dex connectors](https://dexidp.io/docs/connectors/) |
+
+Use the connectors available in the Dex version shipped with your FloxHub
+release. Connector maturity, refresh-token support, and available identity
+claims vary; the [Dex connector reference](https://dexidp.io/docs/connectors/)
+describes those differences.
+
+Start with [Configure identity providers](/floxhub-onprem/administration/users/identity/configure)
+for shared setup, required claims, and verification. The provider guides above
+contain the connector examples.
+
+### SAML
+
+FloxHub does not offer a SAML integration. Dex's
+[SAML connector documentation](https://dexidp.io/docs/connectors/saml/)
+warns that the connector is unmaintained. Use OIDC or LDAP when your provider
+supports it.
+
+## Custom authentication overrides
+
+You can supply deployment-specific authentication settings through your Flox
+environment. Kerberos/SPNEGO uses this override mechanism to authenticate
+requests at FloxHub's front door and resolve the verified principal to a
+FloxHub identity.
+
+This integration uses FloxHub's trusted identity path independently of Dex
+connectors. You supply the Kerberos realm, HTTP service principal, and keytab.
+See [Kerberos authentication](/floxhub-onprem/administration/users/identity/kerberos)
+for the configuration contract.
+
+## Identity and access
+
+Your identity integration establishes who a person is. FloxHub manages their
+account and access to namespaces separately. Directory groups do not currently
+map to FloxHub organizations or roles.
+
+See [Administer users](/floxhub-onprem/administration/users/overview) for account
+provisioning, handles, organization membership, and access revocation.

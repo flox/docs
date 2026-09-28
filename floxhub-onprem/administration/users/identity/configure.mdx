@@ -1,0 +1,140 @@
+---
+title: "Configure identity providers"
+description: "Shared setup, identity claims, and verification for identity providers connected through Dex."
+---
+
+Connect an identity provider through the Dex broker included with FloxHub.
+For the available integration paths, see [User identity](/floxhub-onprem/administration/users/identity).
+
+## Before your first sign-in
+
+The external URL you choose is baked into every token the deployment issues,
+and the broker advertises it as its issuer. Set `FLOXHUB_SITE_URL` to the real
+external URL **before** anyone signs in, not after — changing it later
+invalidates the tokens already issued against the old value.
+
+See [Environment variables](/floxhub-onprem/administration/environment-variables)
+for where that setting lives.
+
+## Connect your provider
+
+These steps apply to providers connected through Dex.
+
+**1. Write the connector.** Create `$FLOX_ENV_CACHE/dex/connectors.yaml`
+from inside the deployment's activation, with a top-level `connectors:` key.
+Use the example from your provider guide and replace its placeholders with
+your provider's values.
+
+**2. Register the callback URL** when your provider uses an OIDC or OAuth
+application registration. LDAP directories do not need a callback registration:
+
+```text
+${FLOXHUB_SITE_URL}/dex/callback
+```
+
+**3. Render the configuration and restart the broker:**
+
+```bash
+flox activate -- bash -c 'floxhub render && flox services restart dex'
+```
+
+The connector file is yours to protect — it holds a client secret or a bind
+password:
+
+```bash
+flox activate -c 'chmod 600 "$FLOX_ENV_CACHE/dex/connectors.yaml"'
+```
+
+<Warning>
+  Rendering refuses to proceed when a required value is unset or a required
+  file is missing, and it rejects a broker configuration that does not parse.
+  Until a render has succeeded, the front door and the broker refuse to start.
+  Run `floxhub check` to see the same report without rendering.
+</Warning>
+
+Choose a connector example:
+
+- [OpenID Connect: Okta, AD FS, and other providers](/floxhub-onprem/administration/users/identity/oidc)
+- [Microsoft Entra ID](/floxhub-onprem/administration/users/identity/entra-id)
+- [LDAP and Active Directory](/floxhub-onprem/administration/users/identity/ldap)
+
+## What the deployment takes from your provider
+
+On a successful sign-in, the deployment reads three things from the identity
+your provider asserts:
+
+| Claim | What it becomes |
+| --- | --- |
+| Issuer and subject | The stable link between the person and their FloxHub user |
+| `preferred_username`, or `name` if absent | The starting point for their FloxHub handle |
+| `email`, `name`, avatar | Their displayed profile |
+
+Because the issuer and subject are what identify the person, the FloxHub user
+survives a change of display name or email address. For how a handle is
+derived from that username claim, and what happens when it cannot be, see
+[Administer users](/floxhub-onprem/administration/users/overview).
+
+<Note>
+  Your provider must send `preferred_username` or `name`. An identity carrying
+  neither cannot be provisioned, and the sign-in fails.
+</Note>
+
+## What your provider does not decide
+
+Authenticating proves who somebody is. It does not grant them anything beyond
+their own personal namespace.
+
+Directory group membership does not currently map to FloxHub organizations or
+roles. Configure organization membership inside FloxHub separately from the
+identity-provider connection.
+
+## Verify and troubleshoot
+
+Confirm the broker is answering and advertising the issuer you expect:
+
+```bash
+curl -fsS "${FLOXHUB_SITE_URL}/dex/.well-known/openid-configuration"
+```
+
+The `issuer` in the response must match `${FLOXHUB_SITE_URL}/dex` exactly. If
+it does not, `FLOXHUB_SITE_URL` is wrong — fix it, re-render, and restart.
+
+Confirm the CLI can discover sign-in:
+
+```bash
+curl -fsS "${FLOXHUB_SITE_URL}/.well-known/oauth-protected-resource"
+```
+
+A `404` here means the deployment has the broker disabled, which the Flox CLI
+reads as "no sign-in available here".
+
+| Symptom | Where to look |
+| --- | --- |
+| Broker will not start | `floxhub check` — the render is missing or older than its inputs |
+| Sign-in reaches your provider but fails on return | The callback URL registered with your provider, and `redirectURI` in the connector |
+| Tokens rejected as issued by the wrong issuer | `FLOXHUB_SITE_URL` changed after the first sign-in |
+| Sign-in fails for one person only | Their username claim, or a handle already taken — see [Administer users](/floxhub-onprem/administration/users/overview) |
+
+Broker logs carry the provider's own error responses, which is where a
+misconfigured client secret or an unregistered callback shows up. Read the
+broker's output from the deployment environment:
+
+```bash
+flox activate -- flox services logs dex
+```
+
+See [Log system](/floxhub-onprem/administration/logs) for the wider logging
+guidance.
+
+## Re-render after any change
+
+The rendered configuration is derived from your settings, your secrets, and
+the connector file. Any change to those means rendering again — including
+after you upgrade the deployment:
+
+```bash
+flox activate -- bash -c 'floxhub render && flox services restart dex'
+```
+
+Activation warns you when the rendered files are older than their inputs, and
+the front door and broker refuse to start until you have re-rendered.

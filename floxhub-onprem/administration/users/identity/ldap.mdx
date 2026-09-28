@@ -1,0 +1,41 @@
+---
+title: "LDAP and Active Directory"
+description: "Connect an LDAP directory or Active Directory through Dex."
+---
+
+Complete the [shared setup](/floxhub-onprem/administration/users/identity/configure) and provide a
+read-only directory account for the connector.
+
+## Write the connector
+
+The LDAP connector binds with a read-only service account and authenticates
+users by search-then-bind.
+
+```yaml
+connectors:
+  - type: ldap
+    id: ldap
+    name: Directory
+    config:
+      host: ldap.example.com:636
+      bindDN: cn=floxhub,ou=services,dc=example,dc=com
+      bindPW: <service account password>
+      userSearch:
+        baseDN: ou=people,dc=example,dc=com
+        filter: "(objectClass=person)"
+        username: uid          # sAMAccountName for Active Directory
+        idAttr: uid
+        emailAttr: mail
+        nameAttr: cn
+```
+
+Group search is deliberately omitted. Group membership from your directory
+does not currently drive authorization in FloxHub; see
+[What your provider does not decide](/floxhub-onprem/administration/users/identity/configure#what-your-provider-does-not-decide).
+
+## Apply and verify
+
+Follow the [render and verification steps](/floxhub-onprem/administration/users/identity/configure#connect-your-provider).
+
+See the [Dex LDAP connector reference](https://dexidp.io/docs/connectors/ldap/)
+for TLS, directory search, and attribute-mapping options.

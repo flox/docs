@@ -1,0 +1,60 @@
+---
+title: "OpenID Connect"
+description: "Connect Okta, AD FS, or another OpenID Connect identity provider through Dex."
+---
+
+Use Dex's `oidc` connector for an OpenID Connect provider. Complete the
+[shared setup](/floxhub-onprem/administration/users/identity/configure), including registering
+`${FLOXHUB_SITE_URL}/dex/callback` with your provider.
+
+## Provider configuration
+
+You need the provider's issuer URL, a client ID, and a client secret. The
+connector must return the identity claims described in
+[Configure identity providers](/floxhub-onprem/administration/users/identity/configure#what-the-deployment-takes-from-your-provider).
+Dex's OIDC connector requests the `profile` and `email` scopes by default;
+configure additional scopes or claim mappings if your provider requires them.
+
+## Okta
+
+Create an **OIDC — Web Application** app integration in the Okta admin
+console, with the callback URL as the sign-in redirect URI.
+
+```yaml
+connectors:
+  - type: oidc
+    id: okta
+    name: Okta
+    config:
+      issuer: https://<org>.okta.com
+      clientID: <client id>
+      clientSecret: <client secret>
+      redirectURI: https://<host>/dex/callback
+```
+
+## AD FS
+
+AD FS 2016 and later expose OIDC directly, so connect through OIDC rather than
+SAML. Create an **Application Group** with a Server application, register the
+callback URL, and generate a shared secret.
+
+```yaml
+connectors:
+  - type: oidc
+    id: adfs
+    name: AD FS
+    config:
+      issuer: https://<adfs-host>/adfs
+      clientID: <client id>
+      clientSecret: <client secret>
+      redirectURI: https://<host>/dex/callback
+```
+
+## Other OpenID Connect providers
+
+Use the same connector type with your provider's issuer and client registration.
+See the [Dex OIDC connector reference](https://dexidp.io/docs/connectors/oidc/)
+for scopes, claim mapping, and additional options.
+
+After writing the connector, follow the
+[render and verification steps](/floxhub-onprem/administration/users/identity/configure#connect-your-provider).
