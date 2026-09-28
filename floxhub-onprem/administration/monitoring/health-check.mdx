@@ -1,0 +1,210 @@
+---
+title: "Health check"
+description: "The HTTP health endpoints each FloxHub service exposes, how to call them, and what each one proves."
+---
+
+Most FloxHub services expose an HTTP health endpoint, and most of those are
+liveness probes: they tell you the process is up and its HTTP stack is
+serving, and they make no call to the database or to any other service. The
+few that report more are called out below, as are the components that report
+nothing at all.
+
+Read this page alongside
+[Monitor FloxHub](/floxhub-onprem/administration/monitoring/overview) for the
+wider set of signals — logs, catalog freshness, and background jobs.
+
+## Endpoints
+
+The ports below are the defaults. If you have overridden the matching
+`FLOXHUB_SITE_*` variable, probe your own value instead.
+
+| Service | Port | Path |
+| --- | --- | --- |
+| `catalog-server` | `8010` | `/api/v1/catalog/status/healthcheck` |
+| `catalog-server` | `8010` | `/api/v1/catalog/status/catalog` |
+| `catalog-server` | `8010` | `/api/v1/catalog/status/service` |
+| `floxem` | `8040` | `/health` |
+| `floxem-gitolite` | `8050` | `/health` |
+| `accounts` | `8071` | `/api/v1/accounts/health` |
+| `factory` | `8030` | `/api/v1/factory/health` |
+| `build-coordinator` | `8031` | `/v1/coordinator/health` |
+| `web-bff` | `8070` | `/api/health/status` |
+| `web-bff` | `8070` | `/api/health/details` |
+| `openfga` | `8060` | `/healthz` |
+
+`/health`, `/healthz`, and `/api/health/status` are liveness probes: a `200`
+means the process is up and its HTTP stack is serving, and nothing more. The
+`accounts` and `factory` responses carry the service version, which is what
+tells you which generation is running after an upgrade.
+
+Three paths report more than liveness — `catalog-server`'s
+`/status/healthcheck` and `/status/catalog`, and `build-coordinator`'s
+`/health`. One reports less than it appears to: `web-bff`'s
+`/api/health/details`. All four are described below.
+
+`accounts`, `factory`, and `build-coordinator` also expose a `/ready` path
+beside their `/health` path. It returns `{"status": "ready"}` unconditionally
+and checks nothing; see [Limits](#limits).
+
+`dex` has no health endpoint. Probe its OIDC discovery document instead:
+
+```bash
+curl -fsS "${FLOXHUB_SITE_URL}/dex/.well-known/openid-configuration"
+```
+
+`nginx` has no dedicated health route. Any successful response through the
+front door shows that it is serving.
+
+`floxem-scheduler` and the catalog updater expose nothing: both are loops
+rather than servers, so no probe reports on them. The updater records each
+successful run as a Unix timestamp, which is the only positive signal it
+emits:
+
+```bash
+flox activate -- date -d "@$(cat "$CATALOG_DATA/last-update-success")"
+```
+
+The scheduler leaves only its log output. For both, see
+[Log system](/floxhub-onprem/administration/logs).
+
+### Checks that do real work
+
+**`catalog-server`'s `/api/v1/catalog/status/healthcheck`** runs a package
+show, a search, and a resolve as the anonymous user, and reports each one's
+outcome with its elapsed time in milliseconds:
+
+```json
+{
+  "search_ok": true,
+  "search_elapsed_ms": 12,
+  "resolve_ok": true,
+  "resolve_elapsed_ms": 48,
+  "show_ok": true,
+  "show_elapsed_ms": 9
+}
+```
+
+The timings make it worth polling: a catalog that is answering but slow shows
+up here and nowhere else.
+
+**`catalog-server`'s `/api/v1/catalog/status/catalog`** returns the catalog
+database's status counts, and `500` when the database does not answer. It is
+the cheapest proof that `catalog-server` has a working database connection.
+
+**`build-coordinator`'s `/v1/coordinator/health`** returns `503`, naming the
+finished tasks, when any background loop has exited:
+
+```json
+{
+  "status": "unhealthy",
+  "version": "…",
+  "dead_tasks": ["…"]
+}
+```
+
+Those loops are meant to run until shutdown cancels them, so a finished one
+means the coordinator can no longer observe builds. Only a restart brings it
+back.
+
+### web-bff details
+
+`/api/health/details` is guarded by HTTP basic auth, and returns `503` when
+any dependency is unhealthy.
+
+On-prem it reports no dependencies. Its only dependency check is against a
+service the on-prem deployment does not use, so the endpoint answers `200`
+with an empty `dependencies` list on every on-prem deployment, whatever the
+state of the identity or database components. Treat it as a second liveness
+probe, not a dependency report.
+
+## Check from the host
+
+Every service answers on `FLOXHUB_SITE_BIND_HOST` (`127.0.0.1` by default),
+so you can reach the complete set from inside an activation:
+
+```bash
+flox activate -- bash -c '
+for probe in \
+  "$FLOXHUB_SITE_CATALOG_PORT/api/v1/catalog/status/healthcheck" \
+  "$FLOXHUB_SITE_FLOXEM_PORT/health" \
+  "$FLOXHUB_SITE_GITOLITE_PORT/health" \
+  "$FLOXHUB_SITE_ACCOUNTS_PORT/api/v1/accounts/health" \
+  "$FLOXHUB_SITE_FACTORY_PORT/api/v1/factory/health" \
+  "$FLOXHUB_SITE_BUILD_COORDINATOR_PORT/v1/coordinator/health" \
+  "$FLOXHUB_SITE_WEB_BFF_PORT/api/health/status" \
+  "$FLOXHUB_SITE_OPENFGA_PORT/healthz"
+do
+  port=${probe%%/*}; path=/${probe#*/}
+  printf "%-6s %-48s " "$port" "$path"
+  curl -so /dev/null -w "%{http_code}\n" --max-time 5 \
+    "http://${FLOXHUB_SITE_BIND_HOST}:${port}${path}" || echo "unreachable"
+done
+'
+```
+
+This is the authoritative check. It reaches every service directly, including
+the ones the front door does not route.
+
+## Check through the front door
+
+One health endpoint is reachable without a credential:
+
+```bash
+curl -fsS "${FLOXHUB_SITE_URL}/web-bff/api/health/status"
+```
+
+So are the two discovery documents, which show that the front door is serving
+and that sign-in is available:
+
+```bash
+curl -fsS "${FLOXHUB_SITE_URL}/dex/.well-known/openid-configuration"
+curl -fsS "${FLOXHUB_SITE_URL}/.well-known/oauth-protected-resource"
+```
+
+The second is served from a rendered file rather than proxied, so it answers
+even when the identity broker is stopped. A `404` there means your deployment
+has the broker disabled, which the Flox CLI reads as "no login here".
+
+The catalog, factory, environment, and account prefixes all sit behind the
+front door's authentication check. An unauthenticated probe of those paths
+returns `401`. That `401` is itself useful — it shows the front door is
+serving and the credential resolver answered — but it tells you nothing about
+the service behind the prefix.
+
+`build-coordinator`, `openfga`, `floxem-gitolite`, and the credential
+verification routes are not routed through the front door at all. Probe them
+on the host.
+
+## Limits
+
+<Warning>
+  A `200` from most of these endpoints means only that a process is running.
+  Do not treat it as confirmation that the deployment is working.
+</Warning>
+
+**A `200` is not readiness.** Most endpoints return a fixed literal. They
+prove the process is running and its HTTP stack answers; they do not prove
+the database is reachable, that migrations have run, or that any downstream
+service is up. The `/ready` paths on `accounts`, `factory`, and
+`build-coordinator` are placeholders that return `ready` unconditionally —
+they carry no more information than `/health`.
+
+**`factory` answers healthy before it can build.** It depends on the base
+catalog being populated. Until that has happened,
+`/api/v1/factory/health` returns `200` while builds fail. Catalog freshness
+is a separate signal; see
+[Monitor FloxHub](/floxhub-onprem/administration/monitoring/overview).
+
+**A disabled component refuses connections by design.** Several components
+are gated on site configuration, and one whose gate is off idles instead of
+serving. Connection refused on its port is the expected state for a component
+you have turned off, not a failure.
+
+**Process supervision is a separate question.** `flox services status` tells
+you whether each service process is running, which is not what these
+endpoints answer. A service can be `Running` with its HTTP listener broken,
+and a service that crashed answers nothing at all.
+
+**Startup is not reported.** Several services wait on PostgreSQL and run
+migrations before they bind. During that window the port refuses connections,
+which looks identical to a service that failed to start.

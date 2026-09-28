@@ -117,6 +117,63 @@ Key terms:
 - [GitLab CI](https://flox.dev/docs/imageless-kubernetes/examples/gitlab-ci.md): Demo running GitLab CI with Imageless Kubernetes
 - [Web server with Redis on kind](https://flox.dev/docs/imageless-kubernetes/examples/kind-demo.md): Demo running a simple web server backed by Redis on kind
 
+## FloxHub on-prem
+
+- [Introduction to FloxHub on-prem](https://flox.dev/docs/floxhub-onprem/intro.md): Run FloxHub inside your own infrastructure: what the offering includes, how it differs from the hosted service, and what you operate yourself.
+
+## FloxHub on-prem: Install
+
+- [Install FloxHub on-prem](https://flox.dev/docs/floxhub-onprem/install/overview.md): Start here to install FloxHub in your own infrastructure.
+- [Installation requirements](https://flox.dev/docs/floxhub-onprem/install/requirements.md): Host and client prerequisites for a FloxHub on-prem deployment.
+- [Installation methods](https://flox.dev/docs/floxhub-onprem/install/methods.md): How FloxHub on-prem is installed and who supplies each component.
+- [Install FloxHub using a Flox environment](https://flox.dev/docs/floxhub-onprem/install/flox-environment.md): The end-to-end installation procedure.
+- [Offline and disconnected operation](https://flox.dev/docs/floxhub-onprem/install/offline.md): What a FloxHub deployment can do without external network access.
+- [Steps after installing](https://flox.dev/docs/floxhub-onprem/install/next-steps.md): Connect a client and confirm the deployment works end to end.
+
+## FloxHub on-prem: Reference architectures
+
+- [Reference architectures](https://flox.dev/docs/floxhub-onprem/reference-architectures/overview.md): Supported deployment topologies for FloxHub on-prem.
+- [Single-host deployment](https://flox.dev/docs/floxhub-onprem/reference-architectures/single-host.md): Every FloxHub service on one host, with the database alongside it.
+
+## FloxHub on-prem: Administer
+
+- [Administer FloxHub](https://flox.dev/docs/floxhub-onprem/administration/overview.md): Operate, configure, and maintain a FloxHub on-prem deployment.
+- [Get started administering FloxHub](https://flox.dev/docs/floxhub-onprem/administration/get-started.md): The first checks after installation and the routine operator tasks.
+- [Configure FloxHub](https://flox.dev/docs/floxhub-onprem/administration/configure.md): Where site configuration lives and how to apply it.
+- [Environment variables](https://flox.dev/docs/floxhub-onprem/administration/environment-variables.md): The site configuration contract and its defaults.
+- [Log system](https://flox.dev/docs/floxhub-onprem/administration/logs.md): Where each service writes its logs and how to read them.
+- [Object storage](https://flox.dev/docs/floxhub-onprem/administration/object-storage.md): Configuring an S3-compatible store for published packages.
+- [PostgreSQL](https://flox.dev/docs/floxhub-onprem/administration/postgresql.md): The databases FloxHub uses and how they are configured.
+- [Base catalog](https://flox.dev/docs/floxhub-onprem/administration/base-catalog.md): Populating and refreshing the package catalog.
+- [Secure FloxHub](https://flox.dev/docs/floxhub-onprem/administration/security.md): The security model of a FloxHub deployment.
+- [Factory](https://flox.dev/docs/floxhub-onprem/administration/factory.md): Building and publishing packages inside your deployment.
+- [Automatic environment upgrades](https://flox.dev/docs/floxhub-onprem/administration/environment-upgrades.md): Keeping managed environments current on a schedule.
+
+## FloxHub on-prem: Administer: Monitoring
+
+- [Monitor FloxHub](https://flox.dev/docs/floxhub-onprem/administration/monitoring/overview.md): The signals available for watching a running deployment.
+- [Health check](https://flox.dev/docs/floxhub-onprem/administration/monitoring/health-check.md): The HTTP health endpoints each FloxHub service exposes, how to call them, and what each one proves.
+
+## FloxHub on-prem: Administer: Maintain
+
+- [Maintain FloxHub](https://flox.dev/docs/floxhub-onprem/administration/maintain/overview.md): Routine and recovery procedures for a running deployment.
+- [Back up and restore](https://flox.dev/docs/floxhub-onprem/administration/maintain/backup-restore.md): Protecting deployment state and recovering it.
+- [Restart FloxHub](https://flox.dev/docs/floxhub-onprem/administration/maintain/restart.md): Stopping and starting services safely.
+- [Troubleshoot an installation](https://flox.dev/docs/floxhub-onprem/administration/maintain/troubleshooting.md): Diagnose and recover from common failures.
+
+## FloxHub on-prem: Administer: Users
+
+- [Administer users](https://flox.dev/docs/floxhub-onprem/administration/users/overview.md): Provisioning and managing the people who use your deployment.
+- [User identity](https://flox.dev/docs/floxhub-onprem/administration/users/identity.md): Connecting FloxHub to your identity provider.
+
+## FloxHub on-prem: Upgrade
+
+- [Upgrade FloxHub](https://flox.dev/docs/floxhub-onprem/upgrade/overview.md): Move a deployment to a newer FloxHub generation.
+- [Before you upgrade](https://flox.dev/docs/floxhub-onprem/upgrade/before-you-upgrade.md): Plan an upgrade and confirm you can complete it.
+- [Upgrade an instance](https://flox.dev/docs/floxhub-onprem/upgrade/instance.md): Perform the upgrade.
+- [Troubleshooting and rolling back](https://flox.dev/docs/floxhub-onprem/upgrade/troubleshooting-and-rollback.md): Recover from an upgrade that did not complete.
+- [Releases and maintenance](https://flox.dev/docs/floxhub-onprem/upgrade/maintenance-policy.md): Which FloxHub generations are supported and for how long.
+
 ## Concepts
 
 - [What is a Flox environment?](https://flox.dev/docs/concepts/environments.md): Everything you need to know about Flox environments.

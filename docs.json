@@ -110,6 +110,79 @@
             ]
           },
           {
+            "group": "FloxHub on-prem",
+            "pages": [
+              "floxhub-onprem/intro",
+              {
+                "group": "Install",
+                "pages": [
+                  "floxhub-onprem/install/overview",
+                  "floxhub-onprem/install/requirements",
+                  "floxhub-onprem/install/methods",
+                  "floxhub-onprem/install/flox-environment",
+                  "floxhub-onprem/install/offline",
+                  "floxhub-onprem/install/next-steps"
+                ]
+              },
+              {
+                "group": "Reference architectures",
+                "pages": [
+                  "floxhub-onprem/reference-architectures/overview",
+                  "floxhub-onprem/reference-architectures/single-host"
+                ]
+              },
+              {
+                "group": "Administer",
+                "pages": [
+                  "floxhub-onprem/administration/overview",
+                  "floxhub-onprem/administration/get-started",
+                  "floxhub-onprem/administration/configure",
+                  "floxhub-onprem/administration/environment-variables",
+                  {
+                    "group": "Monitoring",
+                    "pages": [
+                      "floxhub-onprem/administration/monitoring/overview",
+                      "floxhub-onprem/administration/monitoring/health-check"
+                    ]
+                  },
+                  "floxhub-onprem/administration/logs",
+                  "floxhub-onprem/administration/object-storage",
+                  "floxhub-onprem/administration/postgresql",
+                  "floxhub-onprem/administration/base-catalog",
+                  {
+                    "group": "Maintain",
+                    "pages": [
+                      "floxhub-onprem/administration/maintain/overview",
+                      "floxhub-onprem/administration/maintain/backup-restore",
+                      "floxhub-onprem/administration/maintain/restart",
+                      "floxhub-onprem/administration/maintain/troubleshooting"
+                    ]
+                  },
+                  "floxhub-onprem/administration/security",
+                  {
+                    "group": "Users",
+                    "pages": [
+                      "floxhub-onprem/administration/users/overview",
+                      "floxhub-onprem/administration/users/identity"
+                    ]
+                  },
+                  "floxhub-onprem/administration/factory",
+                  "floxhub-onprem/administration/environment-upgrades"
+                ]
+              },
+              {
+                "group": "Upgrade",
+                "pages": [
+                  "floxhub-onprem/upgrade/overview",
+                  "floxhub-onprem/upgrade/before-you-upgrade",
+                  "floxhub-onprem/upgrade/instance",
+                  "floxhub-onprem/upgrade/troubleshooting-and-rollback",
+                  "floxhub-onprem/upgrade/maintenance-policy"
+                ]
+              }
+            ]
+          },
+          {
             "group": "Concepts",
             "pages": [
               "concepts/environments",
