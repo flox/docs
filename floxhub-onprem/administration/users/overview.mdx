@@ -1,0 +1,152 @@
+---
+title: "Administer users"
+description: "How people become users of a FloxHub on-prem deployment, what access they get, and which operator controls exist today."
+---
+
+There is no screen for creating a user. A person becomes a user of your
+deployment by signing in successfully for the first time, through the identity
+provider you connected. Provisioning is a side effect of authentication.
+
+That shapes everything on this page: the control you have over who may use the
+deployment lives in your identity provider, not in FloxHub. Read
+[User identity](/floxhub-onprem/administration/users/identity) first for how
+that connection is configured.
+
+## What happens at first sign-in
+
+The deployment identifies a person by the issuer and subject your provider
+asserts. On each sign-in it looks for an existing user holding that pair:
+
+- **Found.** The sign-in resolves to that existing user. Nothing is created.
+- **Not found.** A user is provisioned: a FloxHub identifier is minted, a
+  handle is claimed, the profile is recorded, and the user is granted ownership
+  of their personal namespace.
+
+Because the identifier is minted by FloxHub rather than taken from your
+provider, a person's display name or email address can change without
+disturbing anything they own.
+
+## Handles
+
+A handle is the name that identifies a user across the deployment. It names
+their personal namespace, so it appears in every environment reference and
+catalog name they own.
+
+The handle is derived from your provider's `preferred_username` claim, falling
+back to `name`. The value is lowercased, every run of characters outside
+`a-z0-9` becomes a single hyphen, and leading and trailing hyphens are
+dropped. The result must then satisfy the handle grammar:
+
+| Rule | Value |
+| --- | --- |
+| Length | 2 to 39 characters |
+| Format | Lowercase letters and digits, single hyphens between them |
+| Reserved | Names beginning `flox` cannot be claimed |
+| Reserved | Anything that parses as a UUID cannot be claimed |
+
+So `Alice.Smith@example.com` as a username claim becomes the handle
+`alice-smith-example-com`. If that is not the shape you want your users to
+have, set the claim your provider sends rather than trying to correct it
+afterwards.
+
+Users and organizations draw from **one** namespace. A handle held by an
+organization cannot also be held by a user, and comparison ignores case, so
+`Alice` and `alice` are the same name.
+
+## When a first sign-in fails
+
+The person authenticated correctly and still has no account. Three causes,
+distinguishable from the logs:
+
+| Cause | What the operator does |
+| --- | --- |
+| The identity carries neither `preferred_username` nor `name` | Configure your provider to send one |
+| The derived handle is already taken | Change the username claim your provider sends for that person |
+| The derived handle breaks the grammar — too short, or empty after sanitizing | Same: fix the claim at the provider |
+
+<Warning>
+  A handle collision has no self-service resolution. The person cannot be
+  prompted to pick a different name, because the handle is derived rather than
+  chosen. Two directory users whose usernames sanitize to the same handle means
+  the second one cannot sign in until you change what your provider sends.
+</Warning>
+
+This is worth checking before a large rollout. If your directory usernames are
+email addresses, two people at different domains with the same local part
+collide.
+
+## What a new user can do
+
+A provisioned user owns their personal namespace and its catalog, and nothing
+else. They can push, pull, and activate their own environments, and publish
+into their own catalog.
+
+They get no access to another user's namespace, and none to a shared one.
+Shared access comes from organization membership, which is managed inside
+FloxHub and is not derived from your directory.
+
+## Organizations and roles
+
+An organization is the sharing unit: its handle names a namespace and catalog
+that its members reach. Members hold one of three roles:
+
+| Role | Intent |
+| --- | --- |
+| `owner` | Full control, including managing members and service accounts |
+| `writer` | Read and write the organization's environments and catalog |
+| `reader` | Read only |
+
+Two constraints worth knowing before you plan around them:
+
+- **An organization always keeps at least one owner.** A change or removal that
+  would leave none is refused.
+- **There is no organization deletion.** Deleting one would delete a catalog
+  and orphan every environment in its namespace, and the rules for who may do
+  that do not exist yet.
+
+Full organization and membership management, including the machine identities
+an organization can hold, is documented separately as that guidance is
+completed.
+
+## Revoking access
+
+**Revoke at your identity provider.** Removing or disabling a person there
+stops them signing in, which is the control that actually closes the door.
+
+Two things that revocation does not cover:
+
+- **Existing tokens.** A personal access token keeps working until it is
+  revoked or expires, independently of whether its owner can still sign in.
+  Treat token revocation as a separate step. See
+  [Personal access tokens](/concepts/personal-access-tokens).
+- **What they own.** Environments and published packages in their personal
+  namespace are unaffected by losing access.
+
+<Note>
+  FloxHub has no notion of a deactivated user. There is no flag to set and no
+  suspended state to put somebody in — the account either exists or it does
+  not.
+</Note>
+
+## What does not exist yet
+
+Plan around these rather than looking for the setting:
+
+- **No invite flow.** You cannot pre-create an account or send an invitation.
+  Access begins with a successful sign-in.
+- **No deactivation.** As above.
+- **No organization deletion.** As above.
+- **No directory group links.** Group membership in your provider does not map
+  to FloxHub organizations or roles. Adding somebody to a directory group gets
+  them a working sign-in and nothing more.
+- **No administrative user browser.** There is no operator screen listing every
+  user of the deployment.
+
+## Where to look
+
+| Question | Where |
+| --- | --- |
+| Why can this person not sign in at all? | [User identity](/floxhub-onprem/administration/users/identity) |
+| Why did this person's first sign-in fail? | [Log system](/floxhub-onprem/administration/logs) |
+| What is the authorization model? | [Secure FloxHub](/floxhub-onprem/administration/security) |
+| How does a user get set up on their machine? | [Steps after installing](/floxhub-onprem/install/next-steps) |

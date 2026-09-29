@@ -1,0 +1,167 @@
+---
+title: "Installation requirements"
+description: "Host, database, network, and credential prerequisites for a FloxHub on-prem deployment."
+---
+
+Check these before you provision anything. Everything here is a hard
+prerequisite: the installation either cannot start or cannot finish without it.
+
+<Note>
+  This page covers what a deployment **requires**. It does not yet give sizing
+  guidance — how much CPU, memory, and disk to allocate for a given number of
+  users or a full catalog. Those figures are being measured and will be
+  published here once they are.
+</Note>
+
+## Host
+
+| Requirement | Value |
+| --- | --- |
+| Platform | Linux on `x86_64` |
+| Flox | Installed on the host |
+| Nix | Present, with the `nix-command` and `flakes` features enabled |
+| Trusted keys | The host must trust the keys FloxHub's own packages are signed with |
+
+A deployment is a Flox environment, so [Flox](/install-flox/install) is the one
+piece of tooling you install by hand. Everything else arrives as part of the
+environment.
+
+The trusted-keys requirement is easy to miss because it is usually already
+satisfied: the Flox installer configures those keys for you. A host where Flox
+was installed through Nix instead — `nix profile install`, or a NixOS or
+nix-darwin configuration — does not have them, and installing the deployment's
+packages fails for want of a trusted key. The
+[generic Nix install instructions](/install-flox/install#generic-nix) give the
+values to add.
+
+The Nix feature requirement is not incidental and does not go away after
+installation. Populating and refreshing the catalog evaluates flake outputs and
+reads store path metadata, so both the first catalog population and every
+periodic refresh need those features enabled.
+
+<Note>
+  Generating a fresh signing key for a binary store does **not** need either
+  feature, so that step works on a host where they are unavailable.
+</Note>
+
+The host platform is separate from the systems your deployment serves. A single
+`x86_64` Linux host can serve a catalog for macOS and Linux clients on both
+architectures — see [Client systems](#client-systems).
+
+## Database
+
+The deployment does not run PostgreSQL. You supply one and you operate it.
+
+| Requirement | Detail |
+| --- | --- |
+| A reachable PostgreSQL server | Addressed by host and port in your site configuration |
+| A role and password | Supplied to the deployment as a secret file |
+| Several databases | Created by the deployment, or pre-created by you |
+
+Each component keeps its own database. The deployment creates them on first
+start **if** the role you gave it may create databases. If your policy does not
+allow that, pre-create them and grant the role access instead; the deployment
+then migrates its own schema into each one.
+
+The database is the deployment's durable state. Its availability is your
+deployment's availability, and its backups are your deployment's backups.
+
+## The external URL
+
+Choose the URL users will reach before you install, not after.
+
+The URL is baked into every token the deployment issues, and it is what the
+deployment advertises to the Flox CLI. Changing it later invalidates the tokens
+already issued against the old value, so treat it as a decision made up front.
+
+You need:
+
+- **A DNS name** resolving to the host, for the URL you chose.
+- **A TLS certificate** for that name.
+
+<Warning>
+  The deployment's front door speaks plain HTTP. It does not terminate TLS, and
+  it has no certificate configuration. You terminate TLS in front of it and
+  proxy through — the certificate is held by your own edge, not by FloxHub.
+</Warning>
+
+## Network access
+
+By default the deployment binds every component to loopback and exposes only
+the front door, so the port you publish is the front door's.
+
+Outbound, an installation reaches:
+
+| Destination | What needs it |
+| --- | --- |
+| A Nix binary cache | Package metadata collection, and fetching the deployment's own packages |
+| The upstream package source | Populating and refreshing the catalog |
+| FloxHub | Fetching the published base environment your site configuration includes |
+
+All three are configurable, so a deployment can point at mirrors you host
+instead. Doing so does not make the deployment fully disconnected — see
+[Offline and disconnected operation](/floxhub-onprem/install/offline) for what
+a locally mirrored deployment can and cannot do.
+
+## Client systems
+
+Declare which systems your deployment's catalog serves. This is the set your
+users can resolve and install packages for, and it is independent of the host's
+own platform.
+
+The four Flox supports are `x86_64-linux`, `aarch64-linux`, `x86_64-darwin`,
+and `aarch64-darwin`. Narrowing the list to the systems you actually support
+makes catalog population meaningfully cheaper, so set it deliberately rather
+than taking the default.
+
+## Identity provider
+
+Sign-in is delegated, so you need a provider before anyone can use the
+deployment.
+
+| Requirement | Detail |
+| --- | --- |
+| An OIDC-capable provider | Okta, Entra ID, AD FS, and LDAP or Active Directory are the documented configurations |
+| A registered client | Client ID and secret, or a directory bind account |
+| A username claim | The provider must send `preferred_username` or `name` |
+
+The username claim is easy to overlook and blocks sign-in when it is missing.
+See [User identity](/floxhub-onprem/administration/users/identity) for the
+connector configuration, and
+[Administer users](/floxhub-onprem/administration/users/overview) for how that
+claim becomes a user's handle.
+
+SAML is not supported. Connect through OIDC.
+
+## Credentials to prepare
+
+Have these ready before you begin. The installation procedure covers where each
+one goes.
+
+- **The database role's password.**
+- **Your identity provider's client secret**, or the bind password for a
+  directory account.
+- **Secrets for the deployment's internal service-to-service calls** and for
+  signing web session cookies. You generate these; they are not supplied by
+  anyone.
+- **Object store credentials and a signing key**, if you want published
+  packages to carry binaries. This is optional — a deployment runs without a
+  binary store, publishing package metadata only.
+
+## Optional
+
+| Component | Without it |
+| --- | --- |
+| An S3-compatible object store | Publishing records package metadata but carries no binaries |
+| A package build service | Users cannot build packages inside the deployment |
+
+## Next
+
+<CardGroup cols={2}>
+  <Card title="Reference architectures" icon="sitemap" href="/floxhub-onprem/reference-architectures/overview">
+    See how the components are laid out before provisioning the host.
+  </Card>
+  <Card title="Installation methods" icon="download" href="/floxhub-onprem/install/methods">
+    How a deployment is assembled and who supplies each part.
+  </Card>
+</CardGroup>

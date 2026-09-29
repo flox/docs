@@ -1,0 +1,94 @@
+---
+title: "Introduction to FloxHub on-prem"
+description: "Run FloxHub inside your own infrastructure: what the offering includes, how it differs from the hosted service, and what you operate yourself."
+---
+
+<Info>
+  **This section is under construction.** FloxHub on-prem documentation is
+  being written section by section. Pages marked as placeholders have not
+  been written yet.
+</Info>
+
+[FloxHub](/concepts/floxhub) is normally a cloud service that Flox operates
+for you at [hub.flox.dev](https://hub.flox.dev). **FloxHub on-prem** is the
+same product running on hardware you control, inside your own network, with
+your own identity provider and your own database.
+
+You reach for it when your environments, packages, or the identity of the
+people using them cannot leave your infrastructure — a regulated network, an
+air-gapped segment, or a security policy that rules out a third-party service
+holding your dependency graph.
+
+## What you get
+
+A FloxHub on-prem deployment runs the whole product, not a subset:
+
+- **A package catalog.** Your deployment holds its own catalog, populated
+  from upstream and refreshed on a schedule you configure. Clients resolve
+  and install packages from it without reaching the public internet.
+- **Environment hosting.** Users `flox push` and `flox pull`
+  [environments](/concepts/environments) against your deployment, with the
+  same [generations](/concepts/generations) and audit trail as the hosted
+  service.
+- **The web UI.** The same interface for browsing environments, packages,
+  and organization membership.
+- **Builds and publishing.** Your users build and
+  [publish](/tutorials/build-and-publish) packages into your own catalog.
+- **Identity and authorization.** Sign-in brokered through your existing
+  identity provider, with organizations, roles, and per-catalog access
+  control.
+
+## How it differs from hosted FloxHub
+
+| | Hosted FloxHub | FloxHub on-prem |
+| --- | --- | --- |
+| Where it runs | Flox infrastructure | Yours |
+| Sign-in | GitHub, Google, GitLab, or [Enterprise SSO](/concepts/enterprise-sso) | Your identity provider, brokered by the deployment |
+| Database | Managed by Flox | You provide and operate PostgreSQL |
+| TLS and DNS | Managed by Flox | You provide the certificate and the name |
+| Catalog refresh | Continuous, managed by Flox | Scheduled by your deployment |
+| Package binaries | Catalog store provided per organization | You supply the object store |
+| Upgrades | Continuous, no action from you | You choose when to upgrade |
+| Backups | Managed by Flox | Yours to take and to test |
+
+The client experience is intended to be the same: the same `flox` CLI, the
+same commands, pointed at your deployment instead of `hub.flox.dev`.
+
+## What you operate
+
+Installing FloxHub on-prem makes you its operator. That means:
+
+- **The host.** Provisioning it, sizing it, and keeping its operating system
+  patched.
+- **PostgreSQL.** The deployment does not ship a database. You supply one,
+  and its availability and durability are yours.
+- **The external URL, DNS, and TLS.** The URL you choose is baked into the
+  tokens the deployment issues, so it is a decision to make before the first
+  login rather than after.
+- **Identity.** Connecting your identity provider and keeping that connection
+  working.
+- **Object storage**, where you want published packages to carry binaries.
+- **Backups and recovery.** Taking them, storing them, and verifying that
+  they restore.
+- **Upgrades.** Choosing when to move to a new FloxHub generation and running
+  the upgrade.
+
+Flox supplies the software, the base environment that composes it, and the
+documentation in this section.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Installation requirements" icon="list-check" href="/floxhub-onprem/install/requirements">
+    Check your host, network, and database against the prerequisites.
+  </Card>
+  <Card title="Reference architectures" icon="sitemap" href="/floxhub-onprem/reference-architectures/overview">
+    See the supported topology before you provision anything.
+  </Card>
+  <Card title="Install FloxHub" icon="download" href="/floxhub-onprem/install/overview">
+    Work through the installation procedure.
+  </Card>
+  <Card title="Administer FloxHub" icon="gear" href="/floxhub-onprem/administration/overview">
+    Configure, monitor, and maintain a running deployment.
+  </Card>
+</CardGroup>
