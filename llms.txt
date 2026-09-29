@@ -142,7 +142,7 @@ Key terms:
 - [Configure FloxHub](https://flox.dev/docs/floxhub-onprem/administration/configure.md): Where site configuration lives and how to apply it.
 - [Environment variables](https://flox.dev/docs/floxhub-onprem/administration/environment-variables.md): The site configuration contract and its defaults.
 - [Log system](https://flox.dev/docs/floxhub-onprem/administration/logs.md): Where each service writes its logs and how to read them.
-- [Object storage](https://flox.dev/docs/floxhub-onprem/administration/object-storage.md): Configuring an S3-compatible store for published packages.
+- [Object storage](https://flox.dev/docs/floxhub-onprem/administration/object-storage.md): Configure an S3-compatible store so published packages carry binaries, sign them, and let consumers trust and substitute them.
 - [PostgreSQL](https://flox.dev/docs/floxhub-onprem/administration/postgresql.md): The databases FloxHub uses and how they are configured.
 - [Base catalog](https://flox.dev/docs/floxhub-onprem/administration/base-catalog.md): Populating and refreshing the package catalog.
 - [Secure FloxHub](https://flox.dev/docs/floxhub-onprem/administration/security.md): The security model of a FloxHub deployment.

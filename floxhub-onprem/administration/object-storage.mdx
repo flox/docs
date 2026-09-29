@@ -1,15 +1,180 @@
 ---
 title: "Object storage"
-description: "Configuring an S3-compatible store for published packages."
+description: "Configure an S3-compatible store so published packages carry binaries, sign them, and let consumers trust and substitute them."
 ---
 
-<Info>
-  **This page is under construction.** FloxHub on-prem documentation is
-  being written section by section. This page is a placeholder so the
-  surrounding navigation and links are complete.
-</Info>
+Publishing a package to your deployment records two different things: the
+package's metadata in the catalog, and the built binaries themselves. The
+catalog always takes the metadata. Binaries need somewhere to go, and that
+somewhere is an S3-compatible object store you supply.
 
-## Planned contents
+## The default: metadata only
 
-Ingress and egress URLs, publisher credentials, signing keys, consumer read
-access and trust, and how to verify that publishing and installation work.
+A new deployment has no object store, and catalogs default to **metadata
+only**. `flox publish` succeeds against such a catalog, and records everything
+the catalog needs to resolve the package — but uploads no binaries, so nothing
+can substitute the build. A consumer resolving that package has metadata and no
+artifact to fetch.
+
+That default is deliberate: publishing works out of the box without making you
+provision a bucket first. Configure a store when you want published packages to
+be installable without rebuilding.
+
+## Store types
+
+| Type | Behavior |
+| --- | --- |
+| `meta-only` | Records metadata, uploads nothing |
+| `nix-copy` | Copies the build closure to an S3-compatible store you own |
+| `null` | Unconfigured. Publishing is refused until you choose a type |
+| `publisher` | A credential-minting service. Not available on-prem |
+
+`nix-copy` is the type to use. The `publisher` type belongs to the hosted
+service, which runs a component your deployment does not.
+
+<Note>
+  A catalog left `null` refuses publishing with a `422`. The error text names an
+  internal Flox tool; configure the store with the API call below instead.
+</Note>
+
+## Configure a catalog's store
+
+Store configuration is per catalog, applied over the catalog API. Create the
+catalog if it does not exist, then set its store:
+
+```bash
+curl -fsS -X POST --oauth2-bearer "$TOKEN" \
+  "${FLOXHUB_SITE_URL}/api/v1/catalog/catalogs/?name=${CATALOG}"
+```
+
+```bash
+curl -fsS -X PUT --oauth2-bearer "$TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "store_type": "nix-copy",
+        "ingress_uri": "s3://<bucket>?endpoint=https://<s3-host>",
+        "egress_uri": "https://<s3-host>/<bucket>"
+      }' \
+  "${FLOXHUB_SITE_URL}/api/v1/catalog/catalogs/${CATALOG}/store/config"
+```
+
+Read a catalog's current store back with the same path and `GET`. Setting a
+store needs write access to that catalog.
+
+### Ingress and egress are different URLs
+
+| Field | Direction | Shape |
+| --- | --- | --- |
+| `ingress_uri` | Writes, during publish | An `s3://` URI naming the bucket, with the endpoint as a query parameter |
+| `egress_uri` | Reads, during install | A plain HTTP URL serving the same bucket as a binary cache |
+
+They address one bucket by two routes. Publishing uses the S3 protocol and
+needs credentials; installing is an ordinary cache read over HTTP. Add
+`&scheme=http` to the ingress URI when your endpoint is not TLS-terminated.
+
+## Credentials belong to whoever publishes
+
+This is the part that differs most from the hosted service.
+
+With `nix-copy`, FloxHub hands the publishing client the bucket URI and nothing
+else. It does not mint, hold, or proxy object-store credentials. **Whoever
+publishes must already be able to write to the bucket**, authenticating with
+standard AWS environment variables in their own environment:
+
+```bash
+export AWS_ACCESS_KEY_ID=<access key>
+export AWS_SECRET_ACCESS_KEY=<secret key>
+```
+
+<Warning>
+  Distributing write credentials for the store is yours to arrange, and there is
+  no per-user scoping inside FloxHub. Anyone who can publish to a catalog needs
+  bucket write access, and holds it directly.
+</Warning>
+
+Read access is separate and needs no credential if the egress URL serves the
+bucket anonymously, which is the simplest arrangement. A private bucket means
+every consumer needs read credentials too.
+
+## Sign what you publish
+
+Consumers will not substitute an unsigned artifact. Generate a binary cache key
+pair once, and keep the private half with your deployment's other secrets:
+
+```bash
+nix-store --generate-binary-cache-key <key-name> \
+  ./catalog-signing-private-key ./catalog-signing-public-key
+```
+
+```bash
+chmod 600 ./catalog-signing-private-key
+```
+
+Pick a stable `<key-name>`: it is recorded in every signature, and consumers
+trust the name. Changing it invalidates trust for everything already published
+under the old one.
+
+Point publishing at the private key, either once for an account:
+
+```bash
+flox config --set publish.signing_private_key <path to private key>
+```
+
+or per publish:
+
+```bash
+flox publish <package> --signing-private-key <path to private key>
+```
+
+The first form is what a deployment's own build machinery uses, so its
+publishes are signed without passing the flag each time.
+
+<Note>
+  Generating a key needs neither the `nix-command` nor the `flakes` feature, so
+  it works on a host where those are unavailable.
+</Note>
+
+## Let consumers trust the key
+
+A client substitutes from your store only once it trusts the signing key. Add
+the **public** key to the client's Nix configuration, alongside the store as a
+substituter:
+
+```text
+extra-trusted-public-keys = <key-name>:<public key material>
+extra-substituters = https://<s3-host>/<bucket>
+```
+
+The value is the contents of the public key file generated above. Distribute it
+however you distribute client configuration — it is not secret.
+
+## Verify it works
+
+Publishing succeeding is not proof that the store works; a metadata-only
+publish also succeeds. Prove the round trip instead, using **two machines** with
+independent Nix stores:
+
+1. On the first, publish a package to the configured catalog with a signing key.
+2. On the second — one that has never built the package — install it.
+
+If the second machine installs without building, the closure reached the store
+and came back out of it. Doing this on one machine proves nothing: a local store
+already holds the build, so the install would succeed with no object store at
+all.
+
+Check along the way:
+
+```bash
+curl -fsI "https://<s3-host>/<bucket>/nix-cache-info"
+```
+
+A readable `nix-cache-info` confirms the egress URL is serving as a binary
+cache. If publishing fails, the cause is almost always bucket credentials or an
+ingress endpoint that does not match your store.
+
+## Deployment-wide defaults
+
+Store configuration is per catalog today, so each catalog that should carry
+binaries is configured on its own. A deployment-wide default store, so new
+catalogs inherit one rather than being configured individually, is being added
+and will be documented here.
