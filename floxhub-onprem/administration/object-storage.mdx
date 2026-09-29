@@ -117,27 +117,33 @@ under the old one.
 Point publishing at the private key, either once for an account:
 
 ```bash
-flox config --set publish.signing_private_key <path to private key>
+flox config --set publish.signing_private_key /absolute/path/to/private-key
 ```
 
 or per publish:
 
 ```bash
-flox publish <package> --signing-private-key <path to private key>
+flox publish <package> --signing-private-key /absolute/path/to/private-key
 ```
 
 The first form is what a deployment's own build machinery uses, so its
 publishes are signed without passing the flag each time.
 
+<Warning>
+  The private key path must be absolute. A relative path is rejected.
+</Warning>
+
 <Note>
-  Generating a key needs neither the `nix-command` nor the `flakes` feature, so
-  it works on a host where those are unavailable.
+  `nix-store --generate-binary-cache-key` needs neither the `nix-command` nor
+  the `flakes` feature, so it works on a host where those are unavailable.
+  [Signing keys](/customer/signing-keys) shows the equivalent `nix key`
+  commands, which do need them.
 </Note>
 
 ## Let consumers trust the key
 
 A client substitutes from your store only once it trusts the signing key. Add
-the **public** key to the client's Nix configuration, alongside the store as a
+the **public** key to the client's trusted keys, and your store as a
 substituter:
 
 ```text
@@ -145,8 +151,14 @@ extra-trusted-public-keys = <key-name>:<public key material>
 extra-substituters = https://<s3-host>/<bucket>
 ```
 
-The value is the contents of the public key file generated above. Distribute it
-however you distribute client configuration — it is not secret.
+The value is the contents of the public key file, and it is not secret —
+distribute it however you distribute client configuration.
+
+Where those settings live differs by how the client installed Nix, and applying
+them needs the Nix daemon restarted.
+[Signing keys](/customer/signing-keys) covers both in full, for standalone Nix,
+NixOS, nix-darwin, and home-manager, along with how to verify a key is trusted.
+Everything there applies unchanged to an on-prem store.
 
 ## Verify it works
 

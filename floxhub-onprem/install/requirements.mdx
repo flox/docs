@@ -20,10 +20,19 @@ prerequisite: the installation either cannot start or cannot finish without it.
 | Platform | Linux on `x86_64` |
 | Flox | Installed on the host |
 | Nix | Present, with the `nix-command` and `flakes` features enabled |
+| Trusted keys | The host must trust the keys FloxHub's own packages are signed with |
 
 A deployment is a Flox environment, so [Flox](/install-flox/install) is the one
 piece of tooling you install by hand. Everything else arrives as part of the
 environment.
+
+The trusted-keys requirement is easy to miss because it is usually already
+satisfied: the Flox installer configures those keys for you. A host where Flox
+was installed through Nix instead — `nix profile install`, or a NixOS or
+nix-darwin configuration — does not have them, and installing the deployment's
+packages fails for want of a trusted key. The
+[generic Nix install instructions](/install-flox/install#generic-nix) give the
+values to add.
 
 The Nix feature requirement is not incidental and does not go away after
 installation. Populating and refreshing the catalog evaluates flake outputs and
