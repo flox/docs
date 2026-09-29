@@ -132,7 +132,7 @@ Key terms:
 
 ## FloxHub on-prem: Reference architectures
 
-- [Reference architectures](https://flox.dev/docs/floxhub-onprem/reference-architectures/overview.md): Supported deployment topologies for FloxHub on-prem.
+- [Reference architectures](https://flox.dev/docs/floxhub-onprem/reference-architectures/overview.md): The supported deployment topology for FloxHub on-prem, what each component does, and where your infrastructure meets it.
 - [Single-host deployment](https://flox.dev/docs/floxhub-onprem/reference-architectures/single-host.md): Every FloxHub service on one host, with the database alongside it.
 
 ## FloxHub on-prem: Administer
