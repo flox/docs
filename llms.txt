@@ -124,7 +124,7 @@ Key terms:
 ## FloxHub on-prem: Install
 
 - [Install FloxHub on-prem](https://flox.dev/docs/floxhub-onprem/install/overview.md): Start here to install FloxHub in your own infrastructure.
-- [Installation requirements](https://flox.dev/docs/floxhub-onprem/install/requirements.md): Host and client prerequisites for a FloxHub on-prem deployment.
+- [Installation requirements](https://flox.dev/docs/floxhub-onprem/install/requirements.md): Host, database, network, and credential prerequisites for a FloxHub on-prem deployment.
 - [Installation methods](https://flox.dev/docs/floxhub-onprem/install/methods.md): How FloxHub on-prem is installed and who supplies each component.
 - [Install FloxHub using a Flox environment](https://flox.dev/docs/floxhub-onprem/install/flox-environment.md): The end-to-end installation procedure.
 - [Offline and disconnected operation](https://flox.dev/docs/floxhub-onprem/install/offline.md): What a FloxHub deployment can do without external network access.

@@ -66,6 +66,7 @@ libiconv
 liveness
 lockfile
 lockfiles
+loopback
 lowercased
 mailcap
 manpages
