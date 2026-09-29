@@ -63,6 +63,7 @@
             "pages": [
               "tutorials/creating-environments",
               "tutorials/default-environment",
+              "tutorials/default-environment-examples",
               "tutorials/sharing-environments",
               "tutorials/layering-multiple-environments",
               "tutorials/customizing-environments",
