@@ -1,0 +1,8 @@
+# Human review for Muse configuration and ownership changes.
+/.github/workflows/opencode-*.yml @flox/internal
+/.github/scripts/muse_ci.py @flox/internal
+/.opencode/muse-ci/ @flox/internal
+/opencode.json @flox/internal
+/opencode.jsonc @flox/internal
+/AGENTS.md @flox/internal
+/.github/CODEOWNERS @flox/internal
