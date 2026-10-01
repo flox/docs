@@ -210,7 +210,7 @@ libiconv.systems = ["aarch64-darwin", "x86_64-darwin"]
 
 On Linux, Rust executables link against `libgcc` for stack unwinding.
 `libgcc` is provided as part of the `gcc` package, which means that `gcc` needs to be available to your package at runtime on Linux.
-This happens by default if the `gcc` package is installed in the `toplevel` (default) package group, i.e. there is no `pkg-group` set.
+This happens by default if the `gcc` package is installed in the Default package group (`toplevel`), i.e. there is no `pkg-group` set.
 
 ```toml title="manifest.toml"
 gcc.pkg-path = "gcc"
