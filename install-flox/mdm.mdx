@@ -1,0 +1,104 @@
+---
+title: "Unattended and MDM installs"
+description: "How to install the Flox macOS package from an MDM or a script with nobody at the keyboard"
+---
+
+The Flox `.pkg` can be installed by a device management (MDM) agent or any
+other script with the standard macOS command:
+
+```console
+$ sudo installer -pkg flox-<VERSION>.aarch64-darwin.pkg -target /
+```
+
+Use the `x86_64-darwin` package on Intel Macs. The package refuses to install
+on the wrong architecture, so a policy that ships both and lets the installer
+decide is safe. Download links for the current release are on the
+[Install](/install-flox/install#macos) page.
+
+## What the installer changes on the machine
+
+Everything happens in the package's `postinstall` script and runs as root:
+
+* Adds `nix` to `/etc/synthetic.conf` so that the read-only system volume gets
+  an empty `/nix` directory to mount on.
+* Creates an APFS volume named `Nix Store` in the same container as the boot
+  disk. When FileVault is on, the volume is encrypted with a random passphrase
+  stored in the System keychain.
+* Installs two LaunchDaemons: `org.nixos.darwin-store`, which mounts the
+  volume at `/nix` on every boot, and `org.nixos.nix-daemon`.
+* Creates the `nixbld` group and the `_nixbld1` to `_nixbld32` build users.
+* Writes `/etc/nix/nix.conf` and `/etc/nix/flox.conf`, links `flox` and `nix`
+  into `/usr/local/bin`, and patches two Apple bugs in `/etc/zshrc`.
+
+Flox 1.17.0 and later do not write `/etc/fstab`. The mount options for the
+volume are set by the mount service instead.
+
+## Older installers and `/etc/fstab`
+
+Flox 1.16.0 and earlier add a line to `/etc/fstab` with `vifs`. On a Mac that
+has never had Nix, that step fails when the install is driven by an MDM agent,
+and the install log shows:
+
+```text
+vifs: error creating /etc/fstab
+```
+
+followed by `PKInstallErrorDomain Code=112`. The same package installs fine
+when you double-click it on the same machine.
+
+The cause is macOS Transparency, Consent and Control (TCC). PackageKit runs
+package scripts with the TCC identity of the process that called
+`installer`, which under an MDM policy script is the agent itself, and
+`/etc/fstab` is a protected path. The agent has no grant for it, so the write
+is refused. Nothing inside the package can change that.
+
+<Warning>
+  The install stops after the volume has already been created. A machine that
+  hit this has a `Nix Store` volume, nothing mounted at `/nix`, no
+  LaunchDaemons and no package receipt. Delete the volume before trying again:
+
+  ```bash
+  sudo diskutil apfs deleteVolume "Nix Store"
+  ```
+</Warning>
+
+Two ways to install 1.16.0 or earlier unattended:
+
+* **Use the native package install command of the MDM** rather than a policy script
+  that calls `installer`. That keeps the agent out of the process tree, and the
+  scripts run with the identity of an Apple system process that has the grant.
+* **Grant the agent the permission** with a Privacy Preferences Policy Control
+  (PPPC) profile that allows `SystemPolicySysAdminFiles` for the agent binary.
+  The binary is the one named in the `Set responsibility to pid` line of
+  `/var/log/install.log`. A PPPC grant does not appear in System Settings, so
+  verify it by running the install rather than by looking.
+
+## Machines that already have Nix
+
+The package behaves differently when `/nix/var/nix/db/db.sqlite` exists and
+Flox is not installed:
+
+* **Flox 1.16.0 and later** refuse a command-line install and print an
+  explanation. Replacing an existing Nix installation with Flox changes the Nix
+  daemon and the default profile, so it must be confirmed in the graphical
+  installer. Alternatively, install Flox
+  [with the existing Nix](/install-flox/install#nix).
+* **Flox 1.15.0** installs nothing and reports success. Both installer choices
+  start deselected on such a machine, so an unattended run that appears to
+  work has not installed Flox. Check the result as described below.
+
+## Verifying a fleet install
+
+Do not rely on `/etc/flox-version` alone. It is written early in the install
+and can be present after a failed run. Check all of the following:
+
+```bash
+pkgutil --pkg-info com.floxdev.flox
+diskutil info /nix | grep 'Mount Point'
+launchctl print system/org.nixos.darwin-store > /dev/null && echo "mount service loaded"
+flox --version
+```
+
+A successful install has a package receipt, `/nix` mounted from the
+`Nix Store` volume, the mount service loaded, and `flox --version` printing
+the installed version.
