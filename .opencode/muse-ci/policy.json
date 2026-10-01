@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "organization": "flox",
+  "model": "model_api/muse-spark-1.3-contributor",
+  "max_diff_bytes": 60000
+}

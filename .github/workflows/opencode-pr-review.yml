@@ -1,0 +1,62 @@
+name: Muse PR review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions: {}
+
+concurrency:
+  group: muse-review-${{ github.repository }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: >-
+      vars.MUSE_CI_ENABLED == 'true' &&
+      github.event.repository.owner.type == 'Organization' &&
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.type == 'User' &&
+      github.event.sender.type == 'User' &&
+      github.event.pull_request.base.ref == github.event.repository.default_branch
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Check out trusted base configuration
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Authorize members and prepare immutable review input
+        id: prepare
+        run: python3 .github/scripts/muse_ci.py prepare review
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MUSE_MEMBERS_TOKEN: ${{ secrets.MUSE_CI_GITHUB_MEMBERS_TOKEN }}
+          MUSE_TRIGGERING_ACTOR: ${{ github.triggering_actor }}
+      - name: Check Meta credential is configured
+        run: test -n "$META_MUSE_CI_API_KEY"
+        env:
+          META_MUSE_CI_API_KEY: ${{ secrets.META_MUSE_CI_API_KEY }}
+      - name: Review with Muse Spark
+        uses: anomalyco/opencode/github@a97622c801f4ca571530ddc51076af659a9c32cd # v1.18.31 action; CLI installer moves
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
+          META_MUSE_CI_API_KEY: ${{ secrets.META_MUSE_CI_API_KEY }}
+        with:
+          model: model_api/muse-spark-1.3-contributor
+          agent: muse-review
+          share: "false"
+          use_github_token: "true"
+          prompt: ${{ steps.prepare.outputs.prompt }}
+      - name: Check reviewed commit and workspace
+        if: always() && steps.prepare.outcome == 'success'
+        run: python3 "$MUSE_CI_HELPER" finish review
+        env:
+          GH_TOKEN: ${{ github.token }}
