@@ -161,6 +161,20 @@ The [CI/CD tutorial](/tutorials/ci-cd) covers setup on specific platforms.
     takes under a minute.
   </Accordion>
 
+  <Accordion title="What usage data does the CLI send, and can I turn it off?">
+    Flox collects basic usage metrics. The
+    [documented payload](/man/flox-config#environment-variables) is a unique
+    token and the subcommand you ran. You can turn it off:
+
+    ```bash
+    flox config --set disable_metrics true
+    ```
+
+    Or set `FLOX_DISABLE_METRICS=true` in the environment, which is usually
+    easier in CI. Our [privacy policy](https://flox.dev/privacy-policy) covers
+    how we handle the data we do collect.
+  </Accordion>
+
   <Accordion title="Do you have an option that isn't public FloxHub?">
     Yes. FloxHub Enterprise runs on your own infrastructure. Email
     hello@flox.dev for more information.
