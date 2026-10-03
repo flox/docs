@@ -1,0 +1,773 @@
+---
+title: "What Flox collects"
+description: "What the Flox CLI, its install script and FloxHub collect, what is linked to your account, how long Flox keeps it, and how to turn telemetry off."
+---
+
+This page describes Flox 1.17.0, the latest release, and FloxHub at hub.flox.dev.
+The page names Flox 1.18.0 where a change affects what you need to do.
+
+## Summary
+
+**What does Flox collect?**
+The Flox CLI records telemetry about every command you run, with your search terms, package names and environment names.
+[Telemetry fields](#telemetry-fields) lists every field.
+Flox from Flox's installers, Homebrew and `flox/flox` container images also sends error reports and performance traces with your hostname to Sentry.
+FloxHub logs your IP address with every request the CLI sends it.
+When you push an environment or create one on FloxHub, FloxHub stores its manifest, lockfile and a history entry with your login name, hostname and `flox` command line.
+FloxHub makes these environments public by default.
+Your FloxHub account, the install script and the FloxHub web app also collect data.
+[Data categories](#data-categories) lists every category.
+
+**Is it linked to me?**
+Yes.
+Every telemetry event carries a random device ID that Flox stores on your machine.
+When you're signed in, events in the current telemetry stream also carry your FloxHub account ID.
+Flox's analytics data joins that account ID to your email address.
+Flox links your device ID to every account that signs in on that device.
+Flox also links your device ID to your IP address.
+[CLI telemetry](#cli-telemetry) lists every identifier.
+
+**Can I turn it off?**
+Yes.
+Set `FLOX_DISABLE_METRICS=true` in your shell profile before your first Flox command.
+This turns off CLI telemetry, error reports, performance traces and the device ID.
+[Turn off telemetry](#turn-off-telemetry) lists every setting.
+
+**What can't I turn off?**
+You can't turn off the requests that search, show, resolve or publish packages, or use FloxHub environments.
+You can't turn off FloxHub's records of those requests, which contain your IP address and, when you're signed in, your handle and account ID.
+You can't turn off the history FloxHub stores when you push an environment.
+You can't turn off the background upgrade check that `flox activate` starts, which sends the environment's package list to the catalog.
+A [self-hosted FloxHub](#self-hosted-floxhub) keeps all four on your own servers.
+[What turning it off does not stop](#what-turning-it-off-does-not-stop) lists every item.
+
+**How long is it kept?**
+Flox keeps CLI telemetry indefinitely.
+FloxHub keeps catalog request records, with your IP address and search terms, indefinitely.
+Flox doesn't delete either automatically.
+Flox keeps the manifests and lockfiles you push indefinitely, also after you delete the environment.
+[Retention](#retention) lists every store.
+
+**What never leaves my machine?**
+Your source files, the commands you run in an environment and your log files stay on your machine.
+Your manifest's `[vars]`, `[hook]`, `[profile]`, `[services]` and `[build]` sections stay on your machine until you push the environment.
+[What never leaves your machine](#what-never-leaves-your-machine) lists every item and its exceptions.
+
+## What never leaves your machine
+
+| Stays on your machine | Exceptions |
+| --- | --- |
+| Your source files and other project files | `flox push` uploads `manifest.toml` and `manifest.lock`. `flox publish` uploads the package your build produces, which contains source files only if your build copies them into it. `flox publish` also sends your git remote URL and revision. `flox build`, `flox develop` and `flox publish` send the names of the catalog packages that `.flox/pkgs/*.nix` refers to. `flox init` reads the Node.js, Python or Go version your project asks for and sends that version constraint, with the names of the Flox catalog packages it picks, to the catalog. |
+| Your manifest's `[vars]` values and its `[hook]`, `[profile]`, `[services]`, `[build]`, `[include]` and `[containerize]` sections | `flox push`, `flox init -r` and creating a default environment upload the whole manifest. Telemetry from `flox build` contains a hash of your lockfile, and the lockfile contains the whole manifest. |
+| The values of your environment variables | Telemetry contains the value of `FLOX_INVOCATION_SOURCE` as you set it, and your shell's name. Push history contains your login name. Your FloxHub token goes to FloxHub as your credential, and to Flox's package store when Nix downloads or uploads custom catalog packages. Requests to FloxHub environment storage carry the language of your locale. Performance traces contain your home directory's path inside the file paths they record. |
+| Commands you run with `flox activate -c`, after `flox activate --`, and the arguments you pass to `flox run` | Push history contains each `flox` command line in full. `flox run` and `flox search --command` send the command name to the catalog. When a crash message quotes a command-line argument, the error report contains that argument. |
+| Error message text | Error reports contain crash messages and the messages Flox printed or logged before the error. Telemetry contains only a fixed error category. |
+| Activation state, the activation trace and the shell scripts Flox generates | Error reports from the activation process contain the output of your `hook.on-deactivate` script. |
+| Log files in `.flox/log/` and `~/.cache/flox/log/` | None. |
+| Your list of environments and their paths, auto-activation and trust choices, and other local state files | Performance traces contain the absolute paths of your environment directories, of the directory you pass to `flox pull`, of Flox's data directory, and of the files a step reads or writes. |
+| The fingerprint of your FloxHub token that Flox caches | None. |
+| Your package signing key | `flox publish` uploads only the signatures. |
+
+No CLI request body contains an IP address field.
+Every server you connect to sees your IP address.
+FloxHub records your IP address with each catalog request.
+With telemetry on, that record also contains your device ID.
+
+## Data categories
+
+| Category | What | When | Linked to your account? | Can you turn it off? | Retention |
+| --- | --- | --- | --- | --- | --- |
+| [CLI telemetry](#cli-telemetry) | Command name, exit code, duration, Flox version, operating system, shell, CPU architecture, the tools that started Flox, search terms, package names, environment names, device ID, and the other fields in [Telemetry fields](#telemetry-fields) | Every command, including the prompt hook at each shell prompt where the hook is installed | Yes: your account ID on current-stream events while you're signed in, and your device ID once you sign in on that device | Yes | Kept indefinitely |
+| [Error and performance reports](#error-and-performance-reports) | Errors, crash messages, recent CLI messages, step timings with search terms, package names, environment names and file paths, hostname, device ID | Each command with a traced step, and each error, from Flox packages built by Flox's installers | No account ID; reports carry your hostname and device ID | Yes | TBD {/* OPEN: Q27 */} |
+| [Catalog and FloxHub requests](#catalog-and-floxhub-requests) | Each request with your IP address, Flox version, and the search term or package list, and FloxHub's logs of it | Every command that searches, resolves or publishes packages, or uses a FloxHub environment | Yes: your handle and account ID when you're signed in, and your device ID when telemetry is on | No | Catalog request records kept indefinitely; see [Retention](#retention) |
+| [Environments you push](#environments-you-push) | `manifest.toml` and `manifest.lock` of every generation; a history entry with your login name, hostname, `flox` command line and time; public by default | `flox push`, `flox init -r`, creating a default environment | Yes: the environment's owner | No | Manifests and lockfiles kept indefinitely, also after you delete the environment |
+| [Account data](#account-data) | Your profile from your sign-in provider, email address, handle, last sign-in IP address; a sign-up event to Amplitude; a HubSpot contact for sign-ups from the CLI and for profiles you complete or edit on the web | Sign-up and sign-in | Yes | No | Profile: until Flox deletes your account. Daily account backups: kept indefinitely. Auth0 sign-in logs, Amplitude, HubSpot: TBD {/* OPEN: Q30, Q22, Q31 */} |
+| [Installer telemetry](#installer-telemetry) | Two events per install: operating system, CPU architecture, channel, version, outcome, install path, failure reason, device ID if one exists | Each run of the get.flox.dev install script | Through the device ID | Yes, with `FLOX_DISABLE_METRICS=true` for the script | Kept indefinitely |
+| [FloxHub web app](#floxhub-web-app) | Page views, clicks, error replays, session replays, your email address as a user ID | Each visit to hub.flox.dev or the sign-in pages | Yes: when you're signed in, Amplitude, Common Room and Intercom identify you by email address. Amplitude keeps your email address in a cookie on `.flox.dev` after you sign out. | Not with Flox CLI settings; see the [privacy policy](https://flox.dev/privacy-policy/) | Request logs 90 days; each tool in [FloxHub web app](#floxhub-web-app) |
+
+### CLI telemetry
+
+Flox 1.17.0 sends telemetry in two streams.
+The current stream goes to `api.flox.dev/events` and carries your account ID when you're signed in.
+The legacy stream goes to `z7qixlmjr3.execute-api.eu-north-1.amazonaws.com` and carries no account ID.
+Both streams carry your device ID.
+[Telemetry fields](#telemetry-fields) lists every field in both streams.
+
+Flox saves each command's events to a file on your machine.
+When a command finishes and the oldest saved event is more than 2 minutes old, Flox sends all saved events, 100 per request.
+`flox activate` sends due current-stream events before it starts your shell.
+Each stream keeps fewer than 1,000 saved events, and Flox drops the oldest.
+Interactive and in-place activations install the shell prompt hook (`flox hook-env`).
+The hook records two current-stream events at every prompt, and on tcsh also at every directory change.
+When your shell startup file activates an environment in place, for example with `eval "$(flox activate -D)"` for [auto-activation](/concepts/auto-activation), the hook runs in every shell you open.
+
+The first time you run Flox with telemetry on, Flox creates the device ID and prints a one-time notice.
+If that first run uses `-q`, Flox creates the device ID and prints no notice.
+Flox doesn't show the notice later.
+
+Your account ID identifies your FloxHub account.
+After `flox auth login`, it is your sign-in provider and your user ID there, for example `github|1234567`.
+For a GitHub sign-in, it contains your numeric GitHub user ID.
+For a personal access token, it is the account ID of the person who created the token.
+For a service account token, it is the service account's ID.
+When telemetry is on and you use a personal access token or service account token, Flox looks up the account ID on FloxHub when a command starts.
+Flox caches the result for a token it stores.
+When the token is in `FLOX_FLOXHUB_TOKEN`, Flox repeats the lookup in every Flox process.
+If the lookup fails or takes longer than 2 seconds, that run's events carry no account ID.
+The shell prompt hook's events carry your account ID only when the token from `flox auth login` is in `FLOX_FLOXHUB_TOKEN` or in your `flox.toml`.
+They carry no account ID when that token is in your system keychain, or when you use a personal access token or service account token.
+
+| Identifier | Stored in | Sent in |
+| --- | --- | --- |
+| Device ID, a random UUID | `~/.local/share/flox/metrics-uuid` | Every event in both streams, every error report and performance trace, the `flox-device-uuid` header on FloxHub requests, installer telemetry |
+| Invocation ID, a random UUID for each run of `flox` | Memory | Every event in the current stream, the `flox-invocation-id` header on catalog and account requests |
+| Local environment ID, a random UUID for each local environment | `env_id` in `.flox/env.json`, which you commit with your project | Current-stream events about that environment |
+| Account ID | Your credential; cached in `~/.cache/flox/auth-state-*.json` | `auth_subject` on every current-stream event when Flox knows it |
+
+| File | Contents |
+| --- | --- |
+| `~/.local/share/flox/metrics-uuid` | Your device ID |
+| `~/.local/share/flox/events-v2.json` | Saved current-stream events, including your account ID |
+| `~/.local/share/flox/events-v2.lock` | Empty lock file |
+| `~/.cache/flox/metrics-events-v2.json` | Saved legacy-stream events |
+| `~/.cache/flox/metrics-lock` | Empty lock file |
+| `~/.cache/flox/log/send-telemetry.log` | Starting with Flox 1.18.0, the log of Flox's telemetry sender. It contains your device ID and the last batch of legacy-stream events. |
+| `.flox/log/upgrade-check.*.log` in each environment, and in `~/.cache/flox/remote/*/*/` for environments you use with `-r` | The log of the background upgrade check. With telemetry on, it contains your device ID. On Flox 1.17.0, it also contains the batches of legacy-stream events the check sends, including events from other environments. |
+
+### Error and performance reports
+
+Flox packages built by Flox's installers send error reports and performance traces to Sentry at `*.ingest.us.sentry.io`.
+These packages are:
+
+- the macOS package, which Homebrew also installs
+- the Linux deb and rpm packages
+- the Flox that the get.flox.dev install script installs
+- the `flox/flox` container images
+
+The GitHub Action and the CircleCI orb install these packages unless you use their Nix install route.
+Imageless Kubernetes nodes install these packages.
+Flox built from the Flox flake or installed by the NixOS, nix-darwin or home-manager modules sends no error reports.
+
+Every error report and performance trace contains:
+
+- your device ID, as the Sentry user ID
+- your computer's hostname
+- the Flox version and its release channel
+
+Each run of a Flox command sends one performance trace, with these exceptions:
+
+- `flox activate` sends one trace from its background upgrade check, one when the activation ends, and one for each locking, building or FloxHub step it performs.
+- `flox run` and `flox develop` send one trace for each resolving, downloading or building step they perform.
+- `flox build` and `flox publish` send a trace only when they find an environment.
+- `flox` with no command, `flox deactivate`, `flox activate allow`, `flox activate deny`, `flox help`, the shell prompt hook, Flox's internal `activation-state` and `services-socket` commands, `--help` and `--version` send none.
+
+A performance trace contains the timing of each step and the values that step works on: search terms, your system, package names and paths, flake references, Nix store paths, git revisions, environment names, `owner/name`, FloxHub and git URLs, branch names, your invocation sources, container names and tags, `flox gc` progress output, and the absolute paths of your environment directories, of Flox's data directory, and of the files a step reads or writes.
+On Flox 1.17.0, traces and error reports also carry these tags: `search_term`, `json`, `show_all`, `pkg_path`, `packages` and `list_mode`.
+The `packages` tag lists every package you named in `flox install`, or the arguments you passed to `flox uninstall`.
+
+Flox sends an error report when the CLI or the activation process crashes or logs an error, and when the update check fails for a reason other than a connection failure or timeout.
+An error report contains:
+
+- the error or crash message
+- the stack trace, with source file paths
+- the absolute path of every library loaded into the process, including the `flox` binary
+- your operating system's name, version, build and kernel version
+- your Mac's model, on macOS
+- your CPU architecture and the Rust version
+- up to 100 messages Flox printed or logged earlier in that run, each with the values of the steps it ran in, including messages that `-q` hides and output lines from the container build in `flox containerize`
+- on Flox 1.17.0, the tags listed above, when the command set them
+- for the activation process, the output of your `hook.on-deactivate` script
+- for an update check that gets an error status, the response body from `downloads.flox.dev`
+
+Sentry receives no account ID and no IP address field.
+Sentry sees your IP address from the connection.
+`disable_metrics` is the only setting that turns off error reports.
+
+### Catalog and FloxHub requests
+
+Flox sends a request to the catalog or FloxHub whenever a feature needs one.
+These requests carry these headers:
+
+| Header | Value | Sent |
+| --- | --- | --- |
+| `user-agent` | `flox-cli/` and your Flox version | Catalog, account, git and sign-in requests |
+| `authorization` | Your FloxHub token | When you're signed in |
+| `flox-invocation-source` | The labels of the tools that started Flox, and each value of `FLOX_INVOCATION_SOURCE` | When Flox detects a tool, also with telemetry off |
+| `flox-device-uuid` | Your device ID | Catalog, account and git requests, when telemetry is on |
+| `flox-invocation-id` | The invocation ID | Catalog and account requests, when telemetry is on |
+| `sentry-trace` | The Sentry trace ID | Catalog requests, when error reports are on |
+| `api-version` | `unknown` | Catalog requests |
+| `x-flox-qos-context` | `background` | Requests from the background upgrade check |
+| `accept-language` | The language of your locale | Git requests |
+
+Each request sends this content:
+
+| Request | Sent by | Content |
+| --- | --- | --- |
+| Resolve packages | `flox install` of a new catalog package, `flox upgrade`, `flox run`, `flox init` language detection, `flox pull` adding your system, and any command that locks a missing lockfile or a new or changed catalog package or system, including `flox edit`, `flox uninstall` and `flox include upgrade`; the background upgrade check | For each package and system: the package group name, install ID, package path, system, version constraint, allow-broken, allow-unfree and allow-pre-release settings, allowed licenses, and the derivation path locked before. Flox merges included environments first. |
+| Search | `flox search`; suggestions after a failed `flox install`; `flox init` for Node.js | The search term without its `@version`, your system, the page size |
+| Show | `flox show` | The package path |
+| Find a package by command | `flox run` without a saved choice; `flox search --command` | The command name as you typed it, including any path, and your system |
+| Store information | Builds and runs that need custom catalog packages; `flox publish` | Nix store paths |
+| Base catalog information | Nix expression builds; `flox publish` | Nothing |
+| Build input lookup | `flox build`, `flox develop` and `flox publish` without a committed `.flox/catalog.lock` | The catalog package references in `.flox/pkgs/*.nix` |
+| Publish | `flox publish` | Your git remote URL, revision, revision count and date, branch, the `.flox` path inside your repository, the Nixpkgs revision, the package's derivation path, name, version, description, license, outputs, system, and broken and unfree flags, the locked base catalog and inputs, the store the package uploads to, Nix metadata for every store path in the package's closure, the build type, and the built package |
+| Account lookup | Commands that use a personal access token or service account token | Your token |
+| Environment storage (git over HTTPS) | `flox push`, `flox pull`, `-r` commands, first use of a FloxHub environment, `flox list --upstream`, `flox include upgrade`, locking an environment that includes a FloxHub environment, the background upgrade check | Git requests; `flox push` uploads what [Environments you push](#environments-you-push) lists |
+| Sign-in | `flox auth login` | The client ID of the Flox CLI, the scopes `openid profile email`, and the device code |
+
+For each catalog request it accepts, FloxHub records:
+
+- the route, path, query string including search terms, method, status, duration and error class
+- every header except credential headers, including your IP address, user agent, device ID, invocation ID and invocation sources
+- your handle and account ID, and your credential type, when you're signed in
+- the organization ID, for a service account token
+- for a resolve request, the package group names, package paths, version constraints and systems you asked for, and the versions, catalogs and systems FloxHub returned
+- for a store request, the Nix store paths
+- for a search, the number of results
+
+FloxHub's git service logs your handle, the repository, whether you read or wrote, and the commit IDs you push.
+FloxHub's git service also logs the time, path, status and user agent of each git request.
+FloxHub's API gateway logs your IP address, the time, the route and the status of every request.
+FloxHub's services log the path and query string of each request, and your handle when you're signed in.
+FloxHub's own error monitoring in Sentry receives your IP address, user agent, device ID header and query string with every request.
+It also receives the search term, command name, package path or catalog the request works on.
+When FloxHub checks your access to a catalog or environment, its error monitoring receives your account ID and the catalog name or the environment's `owner/name`.
+When FloxHub denies you access, its error monitoring receives your account ID and handle.
+When you publish a package, its error monitoring receives your handle.
+When you download a custom catalog package from a Flox package store, the store logs your IP address, your FloxHub handle and the store path.
+When Flox issues storage credentials for a custom catalog download or a publish, Flox's cloud audit log records your FloxHub handle.
+
+### Environments you push
+
+`flox push`, `flox init -r` and creating a default environment upload:
+
+| Item | Content |
+| --- | --- |
+| `manifest.toml` | Your whole manifest, for every generation, including `[vars]` values, hooks, profile scripts, service commands and build commands |
+| `manifest.lock` | Your lockfile for every generation, which contains the whole manifest again |
+| History entry | The operation, the packages it changed, your login name, your hostname, the full `flox` command line, the time, and the generation numbers |
+| Commit dates | Your time zone offset |
+
+Earlier generations keep content you later remove from the manifest.
+FloxHub makes environments you push public by default.
+Anyone, signed in or not, can pull a public environment and read its manifest, lockfile and history.
+Anyone who can pull an environment, public or private, can read its history, including the login names, hostnames and command lines in it.
+`flox push` doesn't upload `.flox/env.json`, `.flox/catalog.lock`, `.flox/pkgs/`, logs or other project files.
+
+### Account data
+
+Flox uses Auth0 for sign-in.
+Auth0 stores the profile your sign-in provider (GitHub, Google, GitLab or your company's SSO) returns:
+
+- your user ID at that provider
+- your email address and whether it's verified
+- your name, given name, family name, nickname and profile picture URL
+- your username and phone number, if the provider returns them
+
+Flox sets the nickname to your FloxHub handle.
+Auth0 also records when you signed up and last signed in, your last sign-in IP address, and how many times you signed in.
+Auth0 logs each sign-in with your IP address, user agent, user ID, user name and location.
+
+Flox stores your handle, the client you signed up with, whether you completed sign-up and whether Flox recorded it, whether and when you finished onboarding, and your HubSpot contact ID with your account.
+From the profile form, Flox stores your company, your newsletter choice and how you heard about Flox.
+
+At your first sign-in, from the web or the CLI, Flox sends a "Signed Up" event to Amplitude.
+The event contains your email address, or your account ID if you have no email address, the sign-up client, and the sign-in connection and its type.
+When you sign up from the CLI, Flox creates a HubSpot contact with your email address, a FloxHub sign-up flag, and the sign-up client `Flox CLI`.
+When you complete your profile on the web, Flox sends HubSpot your email address, company, newsletter choice, how you heard about Flox, sign-up client, and whether you used a mobile device.
+When you edit your profile on the web, Flox sends HubSpot your email address, company and newsletter choice.
+If Flox has no HubSpot contact ID for you, that edit also sends how you heard about Flox and your sign-up client.
+When an organization buys a plan, Stripe receives the billing email, the organization's handle and name, the creator's handle, the seat count, the plan and the card details.
+
+When you use a personal access token or service account token, FloxHub records when the token was last used.
+
+### Installer telemetry
+
+The install script at get.flox.dev sends two events to Flox each time it runs.
+
+| Event | Fields |
+| --- | --- |
+| `installer.started` | Operating system, CPU architecture, channel, version, whether Nix is installed, whether Flox is installed |
+| `installer.completed` | Operating system, CPU architecture, channel, version, outcome, install path, failure reason |
+
+Both events also carry a random event ID, the time, a random ID for the install run, and your device ID if `~/.local/share/flox/metrics-uuid` exists.
+Set `FLOX_DISABLE_METRICS=true` for the script to turn these events off; see [Install script](#install-script).
+
+### FloxHub web app
+
+These tools run on hub.flox.dev.
+The sign-in pages at auth.flox.dev, including the page `flox auth login` opens, load HubSpot and Google Tag Manager.
+Flox CLI settings don't affect them.
+For analytics on flox.dev and this docs site, see the [privacy policy](https://flox.dev/privacy-policy/).
+
+| Tool | What it records | Retention |
+| --- | --- | --- |
+| FloxHub request logs | Your IP address, the URL including search queries, the referring page and your browser's user agent | 90 days |
+| Sentry | Browser errors; a session update on each page change; performance traces for 20% of page loads; full page URLs including search queries; your browser's user agent. When an error happens, a replay of the 60 seconds before it and the rest of the session, up to 60 minutes. The replay shows page text as you saw it, including names, handles, environment names, manifests and search terms, and shows images and link targets. The replay masks form inputs. | TBD {/* OPEN: Q27 */} |
+| LaunchDarkly | Feature flag requests with a context that carries no user ID or email address; LaunchDarkly receives your IP address and user agent | TBD {/* OPEN: Q41 */} |
+| HubSpot | On package pages and when you're signed in, and on the sign-in pages: page views with the full URL and page title, screen size, language and a visitor ID | TBD {/* OPEN: Q31 */} |
+| Amplitude | Your email address as your user ID; Amplitude receives your IP address and records the location it derives from it; page views with the full URL, page title, referrer and campaign parameters; clicks with the element's text and link target; which elements you scrolled into view; form starts and submits without field values; file downloads; failed network requests; page performance; rage clicks and dead clicks; session replays at a 30% sample rate that mask page text and form inputs and show images, image alt text and link targets. Amplitude keeps your email address in a cookie on `.flox.dev` after you sign out and records it with later visits. | TBD {/* OPEN: Q22 */} |
+| Google Analytics, through Google Tag Manager | Page views; clicks on buttons labeled Download; FloxHub events for login started and sign-up completed with the sign-in provider, onboarding steps viewed, onboarding choices and onboarding completed | TBD {/* OPEN: Q35 */} |
+| LinkedIn Insight Tag, through Google Tag Manager | Page visits with the full URL; two conversion events on every page; a conversion when you complete onboarding | LinkedIn removes direct identifiers within 7 days and deletes the data within 180 days |
+| Reddit Pixel, through Google Tag Manager | Page visits with the page title and page metadata | TBD {/* OPEN: Q36 */} |
+| OpenAI Ads pixel, through Google Tag Manager | Page loads; a conversion when you complete onboarding; an event when you click a button labeled Submit; with the onboarding and Submit events, SHA-256 hashes of the email address, phone number and name the pixel finds, and your country, city, region and postal code | TBD {/* OPEN: Q37 */} |
+| Common Room | Your email address and name; the pages you visit | TBD {/* OPEN: Q42 */} |
+| Vector, through Common Room | Advertising audience signals | TBD {/* OPEN: Q42 */} |
+| Intercom | When the support chat messenger loads while you're signed in: your account ID, name, email address, handle, sign-up date and onboarding status | TBD {/* OPEN: Q42 */} |
+| Profile pictures | Your browser loads profile pictures from your sign-in provider's image host, which sees your IP address | Not stored by Flox |
+
+### Retention
+
+| Data | Retention |
+| --- | --- |
+| CLI telemetry, both streams | Kept indefinitely; Flox does not delete it automatically |
+| Installer telemetry | Kept indefinitely |
+| FloxHub catalog request records, including your IP address, search terms, handle and account ID | Kept indefinitely |
+| FloxHub API gateway logs: IP address, time, route, status | 30 days |
+| FloxHub service logs: request path and query string, handle | 14 days |
+| FloxHub git service log: handle, repository, read or write, pushed commit IDs | Kept indefinitely |
+| FloxHub git request log: time, path, status, user agent | Flox deletes the oldest entries when the log reaches its size limit. No time limit applies. |
+| Flox package store download logs: IP address, FloxHub handle, store path | Kept indefinitely |
+| Flox's cloud audit log, with your FloxHub handle | Kept indefinitely |
+| hub.flox.dev request logs: IP address, URL, referring page, user agent | 90 days |
+| downloads.flox.dev request logs, including update checks: IP address, URL, user agent, cookies your browser sends | Kept indefinitely |
+| get.flox.dev request logs: IP address, URL, user agent | Kept indefinitely |
+| cache.flox.dev request logs in Flox's legacy analytics database: IP address, path | Kept indefinitely |
+| Network flow logs inside Flox's network | 365 days |
+| Error and performance reports in Sentry, from the CLI and from FloxHub | TBD {/* OPEN: Q27 */} |
+| Manifests and lockfiles of pushed environments | Kept indefinitely, also after you delete the environment |
+| Environment history in FloxHub's git storage | Until you delete the environment, then until FloxHub's git storage removes data that no environment uses: TBD {/* OPEN: git garbage-collection schedule for deleted environments */}. Disk snapshots keep it up to 28 days longer. |
+| Disk snapshots of FloxHub's environment storage | Daily snapshots 7 days, weekly snapshots 28 days |
+| Published packages and catalogs | Kept indefinitely; you can't delete them |
+| FloxHub database backups | 5 days |
+| Your account | Until Flox deletes it at your request |
+| Auth0 sign-in logs | TBD {/* OPEN: Q30 */} |
+| Daily account backups: user ID, email address, metadata, organizations and members | Kept indefinitely |
+| Copies of your email address in Flox's analytics data | Deleted 365 days after the last daily copy that contains it |
+| Organization member lists in Flox's legacy analytics database: email address, name, picture | Kept indefinitely |
+| Legacy telemetry database backups | 14 days |
+| Amplitude events and session replays | TBD {/* OPEN: Q22 */} |
+| HubSpot contacts and page views | TBD {/* OPEN: Q31 */} |
+| Stripe billing records | TBD {/* OPEN: Q43 */} |
+
+## Telemetry fields
+
+### Fields on every event
+
+Every event in the current stream has these fields:
+
+| Field | Content |
+| --- | --- |
+| `event_id` | A random ID for the event |
+| `event_timestamp` | When Flox recorded the event, in milliseconds since 1970 |
+| `source` | Always `cli` |
+| `invocation_id` | The invocation ID for this run of `flox` |
+| `device_id` | Your device ID |
+| `auth_subject` | Your FloxHub account ID, when Flox knows it |
+| `producer_version` | Your Flox version |
+| `event_type` | The event type |
+| `payload` | The event's own fields |
+
+### Event types
+
+The current stream has 32 event types.
+
+| Event type | Recorded when |
+| --- | --- |
+| `cli.command_run` | Every command starts |
+| `cli.command_completed` | Every command ends; `flox activate` and `flox develop` record it before they start your shell |
+| `cli.environment.activate` | `flox activate`, up to four events per activation; `flox services start` and `flox services restart` when they start services |
+| `cli.environment.create` | `flox init`, `flox init -r`, `flox install` creating your default environment, `flox pull --copy` |
+| `cli.environment.delete` | `flox delete`, before it asks you to confirm |
+| `cli.environment.push` | `flox push` |
+| `cli.environment.pull` | `flox pull` |
+| `cli.environment.containerize` | `flox containerize` |
+| `cli.environment.include.upgrade` | `flox include upgrade` |
+| `cli.environment.install` | `flox install` |
+| `cli.environment.uninstall` | `flox uninstall` |
+| `cli.environment.upgrade` | `flox upgrade` |
+| `cli.environment.list` | `flox list` |
+| `cli.environment.edit` | `flox edit`, and a second event when the manifest changed |
+| `cli.environment.publish` | `flox publish`, and a second event when publishing succeeds |
+| `cli.environment.services.start`, `.stop`, `.restart`, `.status`, `.logs`, `.persist` | The matching `flox services` command |
+| `cli.environment.generations.history`, `.list`, `.rollback`, `.switch` | The matching `flox generations` command |
+| `cli.package.install` | `flox install`, one event for each package you named |
+| `cli.package.uninstall` | `flox uninstall`, one event for each package it removes |
+| `cli.package.upgrade` | `flox upgrade`, one event for each package it upgrades for your system |
+| `cli.build` | `flox build`, unless you cancel it |
+| `cli.search` | `flox search`, except `flox search --command` |
+| `cli.authenticated` | `flox auth login` succeeds, or a command prompts you to sign in and you do |
+| `cli.update_prompted` | Flox shows an update notice, which needs `installer_channel` set |
+
+### Event fields
+
+| Field | Events | Content |
+| --- | --- | --- |
+| `subcommand` | `cli.command_run`, `cli.command_completed` | The command name, from the list below |
+| `credential_type` | `cli.command_run` | `jwt` after `flox auth login`, `pat` for a personal access token, `sat` for a service account token, `unknown` for another token, `none` when you're not signed in |
+| `flox_version` | `cli.command_run` | Your Flox version |
+| `os_family` | `cli.command_run` | `Linux` or `Mac OS` |
+| `os_family_release` | `cli.command_run` | Your kernel release |
+| `os` | `cli.command_run` | Your Linux distribution's ID from `/etc/os-release`; `null` on macOS |
+| `os_version` | `cli.command_run` | Your Linux distribution's version from `/etc/os-release`; `null` on macOS |
+| `os_platform_version` | `cli.command_run` | Your macOS version |
+| `shell` | `cli.command_run` | `bash`, `zsh`, `fish` or `tcsh` |
+| `architecture` | `cli.command_run` | The CPU architecture of your Flox build |
+| `empty_flags` | `cli.command_run` | Always empty |
+| `invocation_sources` | `cli.command_run` | The labels of the tools that started Flox, from the list below, and each comma-separated value of `FLOX_INVOCATION_SOURCE` exactly as you set it |
+| `exit_code` | `cli.command_completed` | The command's exit code |
+| `duration_ms` | `cli.command_completed` | The command's run time in milliseconds |
+| `error_kind` | `cli.command_completed` | A fixed error category from the list below, never the error message |
+| `env_kind` | Every `cli.environment.*` event | `path` for a local environment, `managed` or `remote` for a FloxHub environment |
+| `env_ref_or_name` | Every `cli.environment.*` event | For a local environment, its name, which is the name of the directory where you ran `flox init` unless you chose another, or `default` in your home directory; for a FloxHub environment, `owner/name` |
+| `local_environment_id` | `cli.environment.*` events about a local environment | The local environment ID from `.flox/env.json` |
+| `generation_number` | `cli.environment.*` events about a FloxHub environment | The generation the command used |
+| `package_count` | `cli.environment.*` events | The number of packages locked for your system |
+| `start_services` | `cli.environment.activate` | Whether you passed `--start-services` |
+| `mode` | `cli.environment.activate` | `dev` or `run` |
+| `has_includes` | `cli.environment.activate` | Whether the environment includes other environments |
+| `lockfile_version` | `cli.environment.activate` | The lockfile format version |
+| `manifest_version` | `cli.environment.activate`, `cli.environment.edit`, `cli.environment.publish` | The manifest format version |
+| `shell` | `cli.environment.activate` | The shell the activation runs |
+| `invocation_type` | `cli.environment.activate` | `interactive`, `inplace`, `shellcommand` or `execcommand`, never the command itself |
+| `edited_includes` | `cli.environment.edit` | Whether the edit changed the environment's includes |
+| `has_expression_build`, `has_manifest_build` | `cli.environment.publish`, `cli.build` | Which kinds of builds the environment defines |
+| `request_tree` | `cli.environment.generations.list` | Whether you passed `--tree` |
+| `package` | `cli.package.install` | The package as you typed it, without its version and outputs: a catalog package path, a custom catalog name and package path, a Nix store path, or a flake reference |
+| `package` | `cli.package.uninstall` | The install ID from your manifest |
+| `package` | `cli.package.upgrade` | The package path, flake reference or Nix store path, or else the install ID |
+| `install_id` | `cli.package.upgrade` | The install ID from your manifest |
+| `previous_version`, `version` | `cli.package.upgrade` | The locked version before and after the upgrade |
+| `outcome` | `cli.package.*`, `cli.build` | `success` or `failure`; when `flox install` fails, Flox records a failure for every package you named in that command |
+| `duration_ms` | `cli.build` | The build's run time in milliseconds |
+| `error_kind` | `cli.build` | A fixed build error category from the list below |
+| `lockfile_hash` | `cli.build` | An unsalted BLAKE3 hash of your lockfile |
+| `search_term` | `cli.search` | The search term exactly as you typed it |
+
+`cli.authenticated` and `cli.update_prompted` have no fields of their own.
+Neither stream contains your hostname, your computer's login name, an IP address field, your full command line, the commands you run in an environment, environment variable values other than `FLOX_INVOCATION_SOURCE` and your shell's name, your manifest's `[vars]`, `[hook]`, `[profile]`, `[services]` or `[build]` sections, or error messages.
+The search terms, packages, install IDs and command names you type appear in the fields above as you typed them.
+
+<AccordionGroup>
+  <Accordion title="Values of subcommand">
+    `help`, `init`, `envs`, `delete`, `activate`, `activate::allow`, `activate::deny`, `develop`, `deactivate`, `run`, `services::help`, `services::start`, `services::stop`, `services::restart`, `services::status`, `services::logs`, `services::persist`, `search`, `show`, `install`, `list`, `edit`, `upgrade`, `uninstall`, `include::help`, `include::upgrade`, `generations::help`, `generations::list`, `generations::history`, `generations::rollback`, `generations::switch`, `build`, `build::clean`, `build::import-nixpkgs`, `build::update-catalogs`, `publish`, `push`, `pull`, `containerize`, `auth2` (every `flox auth` command), `config`, `gc`, `reset-metrics`, `lock`, `check-for-upgrades`, `activation-state`, `services-socket`, `hook-env`, `beta-enabled`, `extension`, `factory`
+  </Accordion>
+
+  <Accordion title="Values of invocation_sources">
+    Flox checks 22 environment variables and records a fixed label for each match.
+    It never records the variables' values.
+    The labels are `ci`, `containerd`, `term.vscode`, `agentic.kiro`, `agentic.claude-code.cli`, `agentic.claude-code.plugin`, `agentic.claude-code.cowork`, `agentic.cursor`, `agentic.cursor.cli`, `agentic.codex`, `agentic.antigravity`, `agentic.augment`, `agentic.gemini`, `agentic.goose`, `agentic.replit`, `agentic.opencode` and `agentic.github-copilot`.
+    Flox also records each comma-separated value of `FLOX_INVOCATION_SOURCE` exactly as you set it.
+    The Flox VS Code extension adds `vscode.plugin`, and Imageless Kubernetes adds `containerd`.
+  </Accordion>
+
+  <Accordion title="Values of error_kind">
+    `controlled_exit`, `interrupted`, `uncategorized`.
+
+    `env_select.`: `environment_error`, `env_not_found_in_current_directory`, `env_not_found`, `remote_not_supported`, `anyhow`.
+
+    `no_environment.`: `current_directory`, `directory`, `current_directory_uninstall`.
+
+    `service.`: `generate_config`, `write_config`, `process_compose_cmd`, `logged_error`, `parse_output`, `read_log_line`, `pipe_creation`, `passthrough`.
+
+    `remote_environment.`: `open_managed_environment`, `create_gc_root_dir`, `get_latest_version`, `reset_managed_environment`, `update_upstream`, `invalid_temp_path`, `create_temp_dot_flox`, `read_internal_out_link`, `delete_old_out_link`, `write_new_outlink`, `generations`.
+
+    `environment.`: `dot_flox_not_found`, `manifest_not_found`, `manifest_error`, `install_or_uninstall`, `lockfile`, `manifest_init`, `init_env`, `env_dir_not_found`, `env_pointer_not_found`, `environment_exists`, `write_gitignore`, `write_gitattributes`, `read_environment_metadata`, `parse_env_json`, `serialize_env_json`, `write_env_json`, `start_discovery_dir`, `invalid_path`, `invalid_dot_flox`, `discover_git_directory`, `core`, `managed_environment`, `remote_environment`, `generations`, `delete_environment`, `read_manifest`, `write_manifest`, `create_gc_root_dir`, `create_cache_dir`, `create_log_dir`, `create_temp_dir`, `get_current_dir`, `canonical_dot_flox`, `registry`, `locked_manifest`, `canonicalize`, `create_services_socket_directory`, `services_socket_path_too_long`, `missing_lockfile`, `recoverable`, `auth`, `edit_with_unsupported_feature`.
+
+    `managed_environment.`: `floxmeta_branch`, `update_floxmeta`, `git`, `write_lock`, `reverse_link`, `create_links_dir`, `create_local_environment_view`, `checkout_out_of_sync`, `read_local_manifest`, `generations`, `bad_branch_name`, `project_not_found`, `diverged`, `access_denied`, `upstream_not_found`, `upstream_already_exists`, `push`, `push_with_local_includes`, `delete_branch`, `delete_environment`, `delete_environment_link`, `delete_environment_reverse_link`, `fetch_updates`, `apply_updates`, `initialize_floxmeta`, `serialize_pointer`, `write_pointer`, `create_floxmeta_dir`, `create_generation_files`, `commit_generation`, `build`, `link`, `read_manifest`, `canonicalize_path`, `invalid_floxhub_base_url`, `registry`, `manifest`, `core`, `environment`.
+
+    `build.` (`cli.build` only): `call_builder_error`, `create_build_result_file`, `read_build_result_file`, `parse_build_result_file`, `create_eval_result_file`, `read_eval_result_file`, `parse_eval_result_file`, `call_nef`, `list_nix_expressions`, `parse_license_meta_data`, `run_clean`, `build_failure`, `eval_failure`, `not_an_expression_build`, `no_such_package`.
+  </Accordion>
+</AccordionGroup>
+
+### Legacy stream fields
+
+Every event in the legacy stream has these fields.
+The request carries the `user-agent` header `flox-cli/` and your Flox version.
+
+| Field | Content |
+| --- | --- |
+| `event` | Always `cli-invocation` |
+| `uuid` | A random ID, created when Flox sends the event |
+| `timestamp` | When Flox recorded the event |
+| `properties.distinct_id`, `properties.$device_id` | Your device ID |
+| `properties.subcommand` | The command name, from the list below |
+| `properties.extras` | The fields in the next table |
+| `properties.$current_url` | `flox://` and the command name |
+| `properties.$pathname` | The command name |
+| `properties.empty_flags` | Always empty |
+| `properties.$lib` | Always `flox-cli` |
+| `properties.os`, `properties.os_version` | Your Linux distribution's ID and version; `null` on macOS |
+| `properties.os_family`, `properties.$os` | `Linux` or `Mac OS` |
+| `properties.os_family_release`, `properties.kernel_version` | Your kernel release |
+| `properties.invocation_sources` | The same values as in the current stream |
+| `properties.$set_once` | `initial_flox_version`, `initial_os`, `initial_os_version`, `initial_os_family`, `initial_os_family_release`, `$initial_os` and `initial_kernel_version`, with the values above |
+| `properties.$set` | `test` and `used_rust_preview`, both always `true`; `flox_cli_uuid`, your device ID; `flox_version`, `os`, `os_version`, `os_family`, `os_family_release`, `$os` and `kernel_version`, with the values above |
+
+| Field in `extras` | Content |
+| --- | --- |
+| `path_environment` | The name of a local environment |
+| `managed_environment`, `remote_environment` | The `owner/name` of a FloxHub environment |
+| `start_services`, `mode`, `has_includes`, `lockfile_version`, `shell`, `invocation_type` | The same values as the current stream's `cli.environment.activate` fields |
+| `has_expression_build`, `has_manifest_build` | Which kinds of builds the environment defines |
+| `edited_includes` | Whether `flox edit` changed the environment's includes |
+| `request_tree` | Whether you passed `--tree` to `flox generations list` |
+| `failed_packages` | When `flox install` fails, every package you named in that command |
+| `search_term` | The `flox search` term exactly as you typed it |
+| `command` | The command name you passed to `flox search --command`, exactly as you typed it |
+
+<Accordion title="Values of subcommand in the legacy stream">
+  `activate`, `activate#version`, `activate::allow`, `activate::deny`, `auth2`, `build`, `build::clean`, `build::import-nixpkgs`, `build::update-catalogs`, `check-upgrade`, `config`, `containerize`, `deactivate`, `delete`, `develop`, `edit`, `envs`, `extensions::install`, `extensions::list`, `extensions::remove`, `factory::cancel`, `factory::list`, `factory::logs`, `factory::status`, `gc`, `generations::history`, `generations::list`, `generations::rollback`, `generations::switch`, `hook-env`, `include::upgrade`, `init`, `install`, `list`, `lock`, `publish`, `pull`, `push`, `reset-metrics`, `run`, `run::reselect`, `search`, `services::logs`, `services::persist`, `services::restart`, `services::start`, `services::status`, `services::stop`, `show`, `uninstall`, `upgrade`
+</Accordion>
+
+## Turn off telemetry
+
+`disable_metrics = true` turns off, in the CLI and every process it starts:
+
+- both telemetry streams
+- error reports and performance traces, including those from the background upgrade check and the activation process
+- the device ID: Flox doesn't create `metrics-uuid` and doesn't print the first-run notice
+- the account ID lookup for tokens
+- the `flox-device-uuid`, `flox-invocation-id` and `sentry-trace` headers on requests to FloxHub
+
+The `FLOX_DISABLE_METRICS` environment variable accepts only `true` or `false`, in any letter case.
+In a `flox.toml` file and with `flox config --set`, write lowercase `true` or `false` without quotes.
+Any other value, for example `1`, `yes` or an empty value, makes Flox commands exit with an error.
+For `FLOX_DISABLE_METRICS=1`, Flox prints:
+
+```text
+✘ ERROR: Could not parse config: invalid type: integer `1`, expected a boolean
+```
+
+Flox reads the setting from these places, and each later place overrides the earlier ones:
+
+1. The system file `/etc/flox.toml`, or `flox.toml` in the directory that `FLOX_SYSTEM_CONFIG_DIR` names.
+2. Your user configuration file. Flox uses `flox.toml` in the directory that `FLOX_CONFIG_DIR` names, or else the first file that exists of `~/.config/flox/flox.toml` and `/etc/xdg/flox/flox.toml`. `XDG_CONFIG_HOME` and `XDG_CONFIG_DIRS` change those two locations.
+3. The `FLOX_DISABLE_METRICS` environment variable.
+
+Turn telemetry off before you run Flox for the first time, so that Flox never creates a device ID.
+
+### Environment variable
+
+```bash
+export FLOX_DISABLE_METRICS=true
+```
+
+Add this line to your shell profile to keep the setting.
+When telemetry is off, Flox sets `FLOX_DISABLE_METRICS=true` for every process it starts, including your activated shell.
+
+### User configuration
+
+```bash
+flox config --set disable_metrics true
+```
+
+This command writes `disable_metrics = true` to your user configuration file, `~/.config/flox/flox.toml` by default.
+If it is the first Flox command you run on the machine, the command itself creates a device ID and sends one performance trace to Sentry.
+Use the environment variable for that first run to prevent this.
+
+### Every user on a machine
+
+```toml title="/etc/flox.toml"
+disable_metrics = true
+```
+
+Write lowercase `true` without quotes.
+A quoted value makes Flox commands exit with an error.
+A user's own `flox.toml` and the `FLOX_DISABLE_METRICS` environment variable override `/etc/flox.toml`.
+A user's own `flox.toml` doesn't override the environment variable, so also export `FLOX_DISABLE_METRICS=true` from a system-wide shell profile.
+On macOS, installing or upgrading Flox with the `.pkg` installer or Homebrew replaces `/etc/flox.toml`, so set it again after each upgrade.
+
+Flox has no setting that a user can't override.
+To enforce the setting, block the telemetry and error-report endpoints at your network edge, as [Network endpoints](#network-endpoints) describes.
+
+### NixOS
+
+```nix title="configuration.nix"
+services.flox.metrics.enable = false;
+environment.etc."flox.toml".text = "disable_metrics = true\n";
+```
+
+`services.flox.metrics.enable` applies only to the systemd services that the Flox NixOS module runs.
+Its default, `true`, sets `FLOX_DISABLE_METRICS=false` for those services, which overrides `/etc/flox.toml`.
+The module has no telemetry option for people who run Flox themselves, so the second line writes `/etc/flox.toml` for them.
+
+### Imageless Kubernetes
+
+```yaml
+metadata:
+  annotations:
+    flox.dev/disable-metrics: "true"
+```
+
+The annotation sets `FLOX_DISABLE_METRICS=true` for the node's `flox pull` and `flox list` that prepare the pod's environment, for the container's `flox activate`, and for processes you start with `kubectl exec`.
+It doesn't cover the node bootstrap command, `flox activate -r flox/containerd-shim-flox-installer`.
+Set `FLOX_DISABLE_METRICS=true` before that command in your node startup script.
+See [Imageless Kubernetes configuration](/imageless-kubernetes/config#telemetry).
+
+### CI
+
+In GitHub Actions, set the input on the Flox install action:
+
+```yaml
+- uses: flox/install-flox-action@v2
+  with:
+    disable-metrics: "true"
+```
+
+The action sets `FLOX_DISABLE_METRICS` for the rest of the job to the exact value you write, so write `true`.
+
+In CircleCI, the Flox orb's `disable_metrics` parameter applies only to the orb's install step.
+Set the variable on the job instead:
+
+```yaml
+jobs:
+  build:
+    environment:
+      FLOX_DISABLE_METRICS: "true"
+```
+
+In other CI systems, set `FLOX_DISABLE_METRICS=true` in the job's environment.
+
+### Install script
+
+```bash
+curl -fsSL https://get.flox.dev | FLOX_DISABLE_METRICS=true sh
+```
+
+For telemetry, the install script reads only this environment variable.
+It ignores `flox.toml` and `/etc/flox.toml`.
+
+### Confirm telemetry is off
+
+`flox config` prints the value Flox uses, whichever place set it:
+
+```console
+$ flox config | grep disable_metrics
+disable_metrics = true
+```
+
+With `-vv`, Flox logs that telemetry is off:
+
+```console
+$ flox -vv config 2>&1 | grep 'Metrics collection disabled'
+19:32:48.494 DEBUG flox::commands: Metrics collection disabled
+```
+
+On a machine where telemetry has always been off, `~/.local/share/flox/metrics-uuid` doesn't exist.
+Turning telemetry off doesn't delete a device ID or events Flox saved earlier.
+Delete them from their default locations:
+
+```bash
+rm -f ~/.local/share/flox/metrics-uuid
+rm -f ~/.local/share/flox/events-v2.json ~/.local/share/flox/events-v2.lock
+rm -f ~/.cache/flox/metrics-events-v2.json ~/.cache/flox/metrics-lock
+```
+
+Starting with Flox 1.18.0, also delete the telemetry sender's log, which contains the device ID:
+
+```bash
+rm -f ~/.cache/flox/log/send-telemetry.log
+```
+
+The background upgrade check's logs also contain the device ID.
+Delete `.flox/log/upgrade-check.*.log` in each environment.
+For environments you used with `-r`, delete `~/.cache/flox/remote/*/*/.flox/log/upgrade-check.*.log`.
+
+## What turning it off does not stop
+
+| What still happens | Details |
+| --- | --- |
+| Requests a feature needs | Searching, resolving, showing and publishing packages, and FloxHub environment operations still reach the catalog and FloxHub, with the content [Catalog and FloxHub requests](#catalog-and-floxhub-requests) lists. |
+| Request headers | Those requests still carry `user-agent` with your Flox version, `api-version`, `authorization` with your FloxHub token when you're signed in, `x-flox-qos-context` from the background upgrade check, and `flox-invocation-source` with the tool labels and your `FLOX_INVOCATION_SOURCE` value. |
+| FloxHub's records | FloxHub still records each request with your IP address, search terms and package lists, and your handle and account ID when you're signed in. |
+| The background upgrade check | Each `flox activate` starts `flox check-for-upgrades`. When the last successful check is more than 24 hours old or the lockfile changed, it sends the environment's package list to the catalog. A failed check runs again at the next activation. For a FloxHub environment, it also fetches the environment from FloxHub. On Flox 1.17.0, it sends the package list whether or not you're signed in. Flox 1.18.0 skips that request when you're not signed in. `upgrade_notifications = false` hides the notice and doesn't stop the check. |
+| The update check | When you set `installer_channel` and run Flox in an interactive terminal, Flox asks `downloads.flox.dev` for the latest version at most once a day. Flox doesn't run this check unless you set `installer_channel`. |
+| Local environment IDs | `flox init` and `flox pull --copy` write a random ID to `.flox/env.json`, which you commit with your project. |
+| Push history | `flox push` uploads your login name, hostname and full `flox` command line with each generation. |
+| Account lookups | With a personal access token or service account token, `flox push`, sign-in checks, trust checks, `flox auth status` and `flox auth login --token-file` look up your account on FloxHub. |
+| Nix downloads | Nix still downloads packages from `cache.nixos.org` and any other substituters you configure, custom catalog packages from `publisher.flox.dev` and the storage hosts it returns, and sources from GitHub. Nix looks up flake references without a URL on `channels.nixos.org`. |
+| Installer telemetry | The install script ignores `flox.toml` and `/etc/flox.toml`. Set `FLOX_DISABLE_METRICS=true` for the script. |
+| The Imageless Kubernetes label | Imageless Kubernetes still sends the `containerd` invocation source on FloxHub requests. |
+| Running activations | An activation that started while telemetry was on keeps sending error reports and performance traces until it ends. |
+| Saved data | Flox keeps the device ID and saved events. If you turn telemetry back on, Flox sends the saved events with the old device ID. On Flox 1.17.0, `flox config --set disable_metrics true` sends all saved events when the oldest is more than 2 minutes old. |
+| FloxHub web app | Flox CLI settings don't affect hub.flox.dev. |
+
+## Self-hosted FloxHub
+
+When you point the Flox CLI at a self-hosted FloxHub, the CLI still sends telemetry to Flox, and error reports and performance traces to Sentry, unless you turn telemetry off.
+Flox's telemetry endpoints are built into the CLI, and `floxhub_url` doesn't change them.
+That telemetry contains the account ID your FloxHub or your identity provider assigns, the search terms you type, and the `owner/name` of your environments.
+Telemetry events don't contain your FloxHub's URL.
+Performance traces from Flox's installer-built packages do contain the FloxHub URLs that each step uses.
+
+Set `disable_metrics = true` in `/etc/flox.toml` on every machine that uses your FloxHub, and see [Turn off telemetry](#turn-off-telemetry) for the settings that override it.
+With telemetry off, the CLI sends nothing to Flox's telemetry or error-report endpoints.
+
+Serve `/.well-known/oauth-protected-resource` from your FloxHub.
+Without it, `flox auth login` signs in through Flox's hosted sign-in at `auth.flox.dev`.
+
+With its default configuration, the self-hosted FloxHub server sends no telemetry or error reports to Flox, and its web app loads no analytics tools.
+
+## Network endpoints
+
+Flox and its tools use HTTPS on port 443 for every host except your own git remote, which uses the protocol in its URL.
+
+| Host or URL | Purpose | When | Needed for |
+| --- | --- | --- | --- |
+| `api.flox.dev` | Catalog API and FloxHub account lookups | Searching, showing, resolving and publishing packages; `flox run`; the background upgrade check; commands that use a token | Every command that uses the catalog |
+| `api.flox.dev/git` | FloxHub environment storage, a path on `api.flox.dev` | `flox push`, `flox pull`, `-r` commands, first use of a FloxHub environment, the background upgrade check for a FloxHub environment, locking an environment that includes a FloxHub environment | FloxHub environments |
+| `api.flox.dev/events` | Telemetry, current stream, a path on `api.flox.dev` | When saved events are due | Nothing; it shares a hostname with the API, so blocking it needs a proxy that filters by path |
+| `z7qixlmjr3.execute-api.eu-north-1.amazonaws.com` | Telemetry, legacy stream | When saved events are due | Nothing; you can block it by hostname |
+| `*.ingest.us.sentry.io` | Error reports and performance traces | Commands with a traced step, and errors | Nothing; you can block it by hostname |
+| `hub.flox.dev` | FloxHub web app; sign-in discovery | `flox auth login` | `flox auth login`, which fails if the CLI can't connect |
+| `auth.flox.dev` | Sign-in | `flox auth login` | Signing in |
+| `cache.nixos.org` | Nix binary cache | Downloading packages that aren't on your machine | Installing and activating packages |
+| `cache.flox.dev` | Flox binary cache | When it's in your Nix `substituters`, or the catalog returns it | Packages from Flox's cache |
+| `publisher.flox.dev` and the storage hosts it returns | Custom catalog packages | Installing or activating custom catalog packages; `flox publish` | Custom catalogs and publishing |
+| `github.com`, `codeload.github.com` | Nixpkgs sources and flake references | `flox build`, `flox develop`, `flox publish`, installing flake references, building from source, `flox containerize` on macOS | Builds |
+| `channels.nixos.org` | Nix flake registry | Flake references without a URL, for example `nixpkgs#hello` | Those references |
+| `downloads.flox.dev` | Update check; deb and rpm repositories | The update check, only with `installer_channel` set; package manager upgrades | Upgrading Flox |
+| `get.flox.dev` | Install script | Running the install script | Installing Flox with the script |
+| `flox.dev` | Imageless Kubernetes node packages at `flox.dev/downloads/yumrepo/` | Creating a node | Imageless Kubernetes |
+| Docker Hub | The `nixos/nix` image; the `flox/empty` image in Imageless Kubernetes pod specs | `flox containerize` on macOS; starting an Imageless Kubernetes pod that uses `flox/empty` | `flox containerize` on macOS; Imageless Kubernetes pods that use `flox/empty` |
+| Your git remote | Revision check | `flox publish` | Publishing |
+
+The install script sends installer telemetry to a separate Flox host, not to get.flox.dev.
+Set `FLOX_DISABLE_METRICS=true` for the script to stop it.
+
+With telemetry off, a CLI user on FloxHub needs `api.flox.dev`, `cache.nixos.org`, and `auth.flox.dev` and `hub.flox.dev` to sign in.
+Add `cache.flox.dev` and `publisher.flox.dev` if you use them, and `github.com` and `codeload.github.com` for builds.
+
+Requests from the Flox CLI itself honor `HTTPS_PROXY`, `HTTP_PROXY`, `ALL_PROXY` and `NO_PROXY`, and on macOS the system proxy settings.
+Requests to Sentry honor `HTTPS_PROXY` and `HTTP_PROXY`, and ignore `NO_PROXY` and `ALL_PROXY`.
+
+## Data requests and deletion
+
+To ask for a copy of your data or to delete your account, email privacy@flox.dev.
+FloxHub has no self-service account deletion.
+Flox deletes your account manually after you ask.
+
+Before you ask, delete the FloxHub environments you no longer want with the **Delete** button on FloxHub, and [revoke your personal access tokens](/concepts/personal-access-tokens#viewing-and-revoking-tokens).
+
+Deleting your account removes your account record.
+It doesn't delete:
+
+- Auth0's sign-in logs
+- the daily account backups
+- environments you pushed, and the manifests and lockfiles of environments you deleted
+- catalogs and packages you published
+- CLI telemetry and installer telemetry Flox already received
+- FloxHub's records and logs of your requests
+- package store download logs and the cloud audit log
+- request logs for downloads.flox.dev, get.flox.dev, cache.flox.dev and hub.flox.dev
+- error reports in Sentry
+- the copies held by Amplitude, HubSpot, Intercom, Common Room, Vector, Stripe, Google Analytics, LinkedIn, Reddit and OpenAI Ads
+- the organization member lists in Flox's legacy analytics database
+- the copies of your email address in Flox's analytics data, which Flox deletes 365 days after the last daily copy
+
+## Privacy policy and compliance
+
+- [Privacy policy](https://flox.dev/privacy-policy/)
+- [Compliance](https://flox.dev/compliance/)

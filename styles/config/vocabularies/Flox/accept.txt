@@ -56,6 +56,8 @@ Gemfile
 GPUs
 hardcoded
 hardcodes
+hostname
+hostnames
 iana
 ing
 IPs
@@ -64,6 +66,7 @@ Karpenter
 libiconv
 lockfile
 lockfiles
+lookups
 mailcap
 manpages
 monorepo
@@ -75,6 +78,7 @@ Nodejs
 npm
 Nvidia
 nvm
+onboarding
 papercuts
 personalizations
 postgres

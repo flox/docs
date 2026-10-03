@@ -152,13 +152,32 @@ Run the [`flox auth logout`](/man/flox-auth) command.
 
 ## Network connectivity
 
-The Flox CLI communicates with the following domains for FloxHub functionality:
+Flox and its tools contact these hosts over HTTPS on port 443, except your own
+git remote, which uses the protocol in its URL:
 
-| Domain | Purpose |
-| --- | --- |
-| `api.flox.dev` | API requests from the Flox CLI |
-| `hub.flox.dev` | FloxHub web application and environment storage |
-| `auth.flox.dev` | Authentication services |
+| Host or URL | Purpose | Needed for |
+| --- | --- | --- |
+| `api.flox.dev` | Catalog API and FloxHub account lookups | Searching, showing, resolving and publishing packages; `flox run`; commands that use a token |
+| `api.flox.dev/git` | FloxHub environment storage, a path on `api.flox.dev` | `flox push`, `flox pull`, `-r` commands and other FloxHub environment operations |
+| `api.flox.dev/events` | Telemetry, current stream, a path on `api.flox.dev` | Nothing; turn telemetry off to stop it |
+| `z7qixlmjr3.execute-api.eu-north-1.amazonaws.com` | Telemetry, legacy stream | Nothing; turn telemetry off to stop it |
+| `*.ingest.us.sentry.io` | Error reports and performance traces | Nothing; turn telemetry off to stop it |
+| `hub.flox.dev` | FloxHub web application; sign-in discovery | `flox auth login`, which fails if the CLI can't connect |
+| `auth.flox.dev` | Sign-in | `flox auth login` |
+| `cache.nixos.org` | Nix binary cache | Downloading packages that aren't on your machine |
+| `cache.flox.dev` | Flox binary cache | Packages from Flox's cache, when it's in your Nix `substituters` or the catalog returns it |
+| `publisher.flox.dev` and the storage hosts it returns | Custom catalog packages | Custom catalogs and `flox publish` |
+| `github.com`, `codeload.github.com` | Nixpkgs sources and flake references | `flox build`, `flox develop`, `flox publish`, flake references, building from source, `flox containerize` on macOS |
+| `channels.nixos.org` | Nix flake registry | Flake references without a URL, for example `nixpkgs#hello` |
+| `downloads.flox.dev` | Update check; deb and rpm repositories | The update check, only with `installer_channel` set; upgrading Flox with a package manager |
+| `get.flox.dev` | Install script | Installing Flox with the script |
+| `flox.dev` | Imageless Kubernetes node packages | Creating an Imageless Kubernetes node |
+| Docker Hub | The `nixos/nix` image; the `flox/empty` image in Imageless Kubernetes pod specs | `flox containerize` on macOS; Imageless Kubernetes pods that use `flox/empty` |
+| Your git remote | Revision check | `flox publish` |
+
+The install script sends installer telemetry to a separate Flox host, not to
+get.flox.dev. Set `FLOX_DISABLE_METRICS=true` for the script to stop it.
 
 If your network restricts outbound traffic,
-ensure that the Flox CLI can reach these domains over HTTPS (port 443).
+allow the hosts your work needs.
+[Network endpoints](/concepts/data-collection#network-endpoints) says what each host receives and which ones you can block.

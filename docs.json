@@ -127,6 +127,7 @@
               "concepts/services",
               "concepts/composition",
               "concepts/authentication",
+              "concepts/data-collection",
               "concepts/organizations",
               "concepts/enterprise-sso",
               "concepts/service-accounts",
