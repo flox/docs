@@ -10,18 +10,44 @@ authentication with a free Flox account.
 
 Several Flox commands have always run through Flox cloud services for search,
 indexing, package resolution, and environment operations. Beginning in early
-October, these commands will require authentication to communicate with the Flox
-catalog:
+October, every command that resolves packages against the Flox catalog will
+require authentication. A command resolves packages when:
 
-- [`flox init`](/man/flox-init)
-- [`flox install`](/man/flox-install)
-- [`flox upgrade`](/man/flox-upgrade)
-- [`flox edit`](/man/flox-edit)
-- [`flox include upgrade`](/man/flox-include-upgrade)
-- [`flox run`](/man/flox-run)
+- [`flox install`](/man/flox-install) adds a package from the catalog.
+- You run [`flox upgrade`](/man/flox-upgrade), including
+  `flox upgrade --dry-run`.
+- You run [`flox run`](/man/flox-run), every time.
+- A command has to lock the environment because `manifest.lock` is missing,
+  or because you added or changed a catalog package or a system. This covers
+  [`flox activate`](/man/flox-activate), [`flox edit`](/man/flox-edit),
+  [`flox list`](/man/flox-list), [`flox uninstall`](/man/flox-uninstall),
+  `flox services`, [`flox build`](/man/flox-build),
+  [`flox develop`](/man/flox-develop),
+  [`flox containerize`](/man/flox-containerize) and
+  [`flox include upgrade`](/man/flox-include-upgrade).
 
-Other commands such as [`flox activate`](/man/flox-activate) will require
-authentication only when an environment doesn't already have a lockfile.
+Changing `[vars]`, `[hook]`, `[profile]` or `[services]` locks the environment
+without contacting the catalog, so it needs no sign-in. Installing a flake
+reference or a Nix store path doesn't use the catalog either.
+
+| Command or situation | Sign-in today | After the change |
+| --- | --- | --- |
+| `flox push`, `flox publish` | Yes | Yes |
+| `flox init -r`, and `flox install`, `flox uninstall`, `flox upgrade` or `flox edit` with `-r` | Yes | Yes |
+| Any command with `-D` or `--default` | Yes | Yes |
+| `flox pull` or `flox activate -r` of a private environment | Yes | Yes |
+| Custom catalog packages that aren't on your machine yet | Yes | Yes |
+| `flox install` of a catalog package | No | Yes |
+| `flox upgrade`, including `--dry-run` | No | Yes |
+| `flox run` | No | Yes |
+| Any command when `manifest.lock` is missing, or a catalog package or system changed | No | Yes |
+| `flox init` in a project where Flox detects Node.js, Python or Go | No | Flox creates the environment; its package suggestions need sign-in |
+| `flox pull` of a public environment | No | No, unless it adds your system to the environment |
+| `flox activate` with a current lockfile | No | No |
+| Editing `[vars]`, `[hook]`, `[profile]` or `[services]` | No | No |
+| `flox install` of a flake reference or Nix store path | No | No |
+| `flox build` with a current lockfile | No | No |
+| `flox search`, `flox show` | No | No |
 
 <Accordion title="Do I need to do anything?">
   Probably not, and if you do it's one command. Find the row closest to how you
@@ -29,17 +55,17 @@ authentication only when an environment doesn't already have a lockfile.
 
   | What you're doing | Sign in? | What to do |
   | --- | --- | --- |
-  | Activating an environment that already exists | No | Nothing |
+  | Activating an environment whose lockfile is current | No | Nothing |
   | Looking up packages with `flox search` or `flox show` | No | Nothing |
-  | Installing, upgrading, or editing your own environment | Yes | Run `flox auth login` once |
-  | CI that activates an environment with a committed lockfile | No | Nothing |
-  | CI that runs `flox install` or `flox build` each time | Yes | Give it a [token](#ci-and-automation) |
+  | Adding, upgrading, or changing packages in your own environment | Yes | Run `flox auth login` once |
+  | CI that activates an environment with a committed, current lockfile | No | Nothing |
+  | CI that installs or upgrades packages each time | Yes | Give it a [token](#ci-and-automation) |
 </Accordion>
 
 ## What stays the same
 
 [`flox activate`](/man/flox-activate) does not require authentication for an
-environment that already has a lockfile. If your daily workflow or CI pipeline
+environment that already has a current lockfile. If your daily workflow or CI pipeline
 simply activates an existing environment that relies on public packages, nothing
 changes for you.
 
@@ -50,6 +76,34 @@ environment with [`flox pull`](/man/flox-pull).
 Private packages and environments continue to require authentication as they
 do today, and so does [publishing](/concepts/publishing). Nothing about those
 changes.
+
+## Who on your team needs an account
+
+After the change, people who change packages need an account: anyone who adds
+or upgrades catalog packages, changes a catalog package's version, package
+path or package group, adds a system, locks an environment that has no
+`manifest.lock`, or runs `flox run`. People who push environments or publish
+packages need an account today.
+People who only activate an environment with a committed, current
+`manifest.lock` don't need an account, unless the environment uses custom
+catalog packages that aren't on the machine yet, or is a private FloxHub
+environment.
+
+These requests still reach Flox when they activate:
+
+- On Flox 1.17.0, each `flox activate` starts a background upgrade check that
+  sends the environment's package list to the catalog, whether or not anyone
+  is signed in. The check sends it at most once a day for each lockfile, and
+  on every activation while the check fails. After the change, that check
+  fails for people who aren't signed in, and activation still works. Flox
+  1.18.0 skips the check's catalog request when you're not signed in.
+- A FloxHub environment fetches its latest state from FloxHub on first use and
+  during the background upgrade check. A private FloxHub environment needs
+  sign-in.
+
+Without an account, Flox still receives telemetry with a device ID unless you
+turn telemetry off, and FloxHub logs each request with your IP address. See
+[What Flox collects](/concepts/data-collection).
 
 ## Why we're doing this
 
@@ -63,6 +117,11 @@ Requiring authentication for the commands that interact with those services
 gives us a better foundation for understanding those workflows, operating the
 service reliably, and investing in the parts of Flox people depend on most. It
 also gives us better standards around abuse prevention.
+
+When you're signed in, CLI telemetry events in the
+[current stream](/concepts/data-collection#cli-telemetry) carry your FloxHub
+account ID.
+[What Flox collects](/concepts/data-collection) lists everything Flox records.
 
 We're intentionally keeping `flox activate` available without an account for
 public environments. If you're consuming an environment someone else
@@ -111,9 +170,12 @@ Automation breaks quietly, so it's worth handling before anything else. Two
 ways through:
 
 - **Commit your lockfile.** A pipeline that activates an existing environment
-  against a committed `manifest.lock` never calls the catalog, so there's no
-  token to manage. You get reproducible builds and one less network dependency
-  out of it, which is worth doing anyway.
+  against a committed, current `manifest.lock` resolves no packages itself, so
+  there's no token to manage. You get reproducible builds and one less network
+  dependency out of it, which is worth doing anyway. On Flox 1.17.0, each
+  `flox activate` still starts a background upgrade check that sends the
+  environment's package list to the catalog. Flox 1.18.0 skips that request
+  when the pipeline isn't signed in.
 - **Or give the pipeline a token.** Pipelines that run `flox install`,
   `flox upgrade`, or any of the other commands above do reach the catalog. So
   does `flox build` when the lockfile it's building against is out of date.
@@ -147,8 +209,8 @@ The [CI/CD tutorial](/tutorials/ci-cd) covers setup on specific platforms.
   <Accordion title="What happens to my CI pipelines?">
     If your pipeline uses one of the commands listed above, add a personal
     access token or a service account token to your CI secrets before October.
-    Pipelines that only activate an existing environment against a committed
-    lockfile carry on unchanged.
+    Pipelines that only activate an existing environment against a committed,
+    current lockfile carry on unchanged.
   </Accordion>
 
   <Accordion title="What's the exact cutoff date?">
@@ -157,13 +219,58 @@ The [CI/CD tutorial](/tutorials/ci-cd) covers setup on specific platforms.
   </Accordion>
 
   <Accordion title="What if I miss the deadline?">
-    The commands prompt you to sign in rather than failing silently. Signing up
+    `flox push`, `flox publish`, and `flox init`, `flox install`,
+    `flox uninstall`, `flox upgrade` or `flox edit` with `-r`, and any command
+    with `-D`, prompt you to sign in when you run them in a terminal. Commands
+    that resolve packages don't prompt you. They fail with an error from the
+    catalog. Run `flox auth login`, then run the command again. Signing up
     takes under a minute.
   </Accordion>
 
   <Accordion title="Do you have an option that isn't public FloxHub?">
     Yes. FloxHub Enterprise runs on your own infrastructure. Email
     hello@flox.dev for more information.
+  </Accordion>
+
+  <Accordion title="Does Flox collect my code?">
+    Flox doesn't upload your source files, unless a `flox publish` build
+    copies them into the package. When you push an environment, FloxHub stores
+    its `manifest.toml` and `manifest.lock`, including `[vars]` values and hook
+    scripts. Each push also stores a history entry with your login name,
+    hostname and `flox` command line. FloxHub makes environments you push
+    public by default. Telemetry contains your search terms and
+    the names of your packages and environments. See
+    [What Flox collects](/concepts/data-collection).
+  </Accordion>
+
+  <Accordion title="What does signing in tell Flox?">
+    When you're signed in, CLI telemetry events in the
+    [current stream](/concepts/data-collection#cli-telemetry) carry your
+    FloxHub account ID. Flox then links your device ID to your account,
+    including events the device sent before you signed in. FloxHub records your
+    handle and account ID with each catalog request. Flox joins the account ID
+    to your account's email address in its analytics data. See
+    [What Flox collects](/concepts/data-collection#cli-telemetry).
+  </Accordion>
+
+  <Accordion title="Can our developers use Flox without accounts?">
+    Yes, if they don't change packages. Developers who activate environments
+    with a committed, current lockfile, search the catalog, or pull public
+    environments don't need an account. After the change, anyone who adds or
+    upgrades catalog packages needs one. Without an account, Flox
+    still receives telemetry with a device ID unless you turn telemetry off.
+    FloxHub logs each request with the developer's IP address. See
+    [Who on your team needs an account](#who-on-your-team-needs-an-account).
+  </Accordion>
+
+  <Accordion title="Can we turn off telemetry for everyone?">
+    Set `disable_metrics = true` in `/etc/flox.toml` on every machine, and
+    export `FLOX_DISABLE_METRICS=true` from a system-wide shell profile. A user
+    can override both, so Flox can't enforce the setting. To enforce it, block
+    Flox's telemetry and error-report endpoints at your network edge. The
+    current telemetry stream shares `api.flox.dev` with the API, so blocking it
+    needs a proxy that filters by path. See
+    [Turn off telemetry](/concepts/data-collection#turn-off-telemetry).
   </Accordion>
 
   <Accordion title="My question was not addressed here.">
