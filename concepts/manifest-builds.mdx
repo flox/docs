@@ -154,8 +154,8 @@ Your package likely has dependencies, and those dependencies have their own depe
 We call this complete set of dependencies the "transitive closure", or simply "the closure", of your package.
 A large closure for your package has no direct impact on runtime performance, but it means that your package requires more disk space to install and requires more bandwidth to copy from one place to another.
 
-By default all of the packages in the default [package group](/man/manifest.toml#package-descriptors) are included as dependencies of your packages, but these packages may only be needed by your package at _build_ time or _development_ time, not _run_ time.
-As a reminder, the default package group is called `toplevel`, and all packages installed to an environment without an explicit `pkg-group` are placed into this package group.
+By default all of the packages in the Default [package group](/man/manifest.toml#package-descriptors) (`toplevel`) are included as dependencies of your packages, but these packages may only be needed by your package at _build_ time or _development_ time, not _run_ time.
+As a reminder, all packages installed to an environment without an explicit `pkg-group` are placed into this package group.
 
 The `runtime-packages` option allows you to trim down the packages from the `toplevel` package group that are included as runtime dependencies of your package.
 This option is a list of `install-id`s from the `toplevel` package group.
