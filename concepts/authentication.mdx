@@ -115,9 +115,9 @@ gives us a better foundation for understanding those workflows, operating the
 service reliably, and investing in the parts of Flox people depend on most. It
 also gives us better standards around abuse prevention.
 
-When you're signed in, CLI telemetry events in the
-[current stream](/concepts/data-collection#cli-telemetry) carry your FloxHub
-account ID.
+When you're signed in,
+[CLI telemetry](/concepts/data-collection#cli-telemetry) events carry your
+FloxHub account ID.
 [What Flox collects](/concepts/data-collection) lists everything Flox records.
 
 We're intentionally keeping `flox activate` available without an account for
@@ -238,8 +238,8 @@ The [CI/CD tutorial](/tutorials/ci-cd) covers setup on specific platforms.
   </Accordion>
 
   <Accordion title="What does signing in tell Flox?">
-    When you're signed in, CLI telemetry events in the
-    [current stream](/concepts/data-collection#cli-telemetry) carry your
+    When you're signed in,
+    [CLI telemetry](/concepts/data-collection#cli-telemetry) events carry your
     FloxHub account ID. Flox then links your device ID to your account,
     including events the device sent before you signed in. FloxHub records your
     handle and account ID with each catalog request. Flox joins the account ID
@@ -259,10 +259,12 @@ The [CI/CD tutorial](/tutorials/ci-cd) covers setup on specific platforms.
 
   <Accordion title="Can we turn off telemetry for everyone?">
     Set `disable_metrics = true` in `/etc/flox.toml` on every machine, and
-    export `FLOX_DISABLE_METRICS=true` from a system-wide shell profile. A user
-    can override both, so Flox can't enforce the setting. To enforce it, block
-    Flox's telemetry and error-report endpoints at your network edge. The
-    current telemetry stream shares `api.flox.dev` with the API, so blocking it
+    export `FLOX_DISABLE_METRICS=true` or `DO_NOT_TRACK=1` from a system-wide
+    shell profile. `DO_NOT_TRACK` also overrides a user's
+    `FLOX_DISABLE_METRICS=false` and `disable_metrics = false`. A user can
+    override or unset each of these, so Flox can't enforce the setting. To
+    enforce it, block Flox's telemetry and error-report endpoints at your
+    network edge. Telemetry shares `api.flox.dev` with the API, so blocking it
     needs a proxy that filters by path. See
     [Turn off telemetry](/concepts/data-collection#turn-off-telemetry).
   </Accordion>
