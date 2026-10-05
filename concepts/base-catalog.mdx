@@ -76,22 +76,21 @@ you can use this site: [Nixpkgs PR Tracker](https://nixpkgs-tracker.ocfox.me).
 
 Flox maintains a fork of [nixpkgs](https://github.com/flox/nixpkgs)
 and maintains several branches.
-These branches
-relate to a Flox concept of "stabilities"
-that is not yet fully exposed.
 These are not to be confused with upstream branches of the same name,
 and all derive from the `unstable` branch
 of our [fork](https://github.com/flox/nixpkgs)
 (which, again, is not the same thing as `nixos-unstable`).
 
 - `unstable` is reset to upstream `unstable` daily
-- `staging` is reset to the `unstable` branch of our [fork](https://github.com/flox/nixpkgs) each Saturday
-- `stable` is reset to the `staging` branch of our [fork](https://github.com/flox/nixpkgs) on the first Saturday of the month
-- `lts` is reset to the `stable` branch of our [fork](https://github.com/flox/nixpkgs) on the first Saturday in January and July (every 6 months)
+- `staging` is reset to the `unstable` branch of our [fork](https://github.com/flox/nixpkgs) each Saturday, so it trails `unstable` by up to a week
+- `stable` is reset to the `staging` branch of our [fork](https://github.com/flox/nixpkgs) on the first Saturday of the month, so it trails `staging` by up to a month
+- `lts` is reset to the `stable` branch of our [fork](https://github.com/flox/nixpkgs) on the first Saturday in January and July (every 6 months), so it trails `stable` by up to 5 months
 
-These "stability" channels
-will be exposed in the future,
-allowing users to select a varying frequency of updates.
+You can choose the stability each package group resolves against,
+and so how often its packages update,
+with `stability` in the manifest.
+See [`[pkg-groups]`](/man/manifest.toml#pkg-groups) in `manifest.toml`.
+
 This architecture
 also allows for patches
 and backporting of fixes

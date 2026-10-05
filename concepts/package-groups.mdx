@@ -103,6 +103,29 @@ scipy.pkg-group = "ml"
 
 `bash`, `git`, `curl`, and `jq` share the same `nixpkgs` commit (as members of `toplevel`), while `python3`, `numpy`, and `scipy` share another (as members of `ml`). These commits may be the same _or_ different: i.e., _if_ the `ml` packages are in fact satisfiable at the same `nixpkgs` commit as `toplevel`, _then_ the resolver selects that commit for both groups. The Flox resolver selects different `nixpkgs` commits only when one or more packages in a group actually require this. For this reason, you can use package groups to organize a Flox environment's manifest, e.g., grouping related packages together for legibility.
 
+### Choosing a stability
+
+Each package group resolves against catalog revisions of a single **stability**. A stability is a branch of the Flox fork of `nixpkgs` that updates on its own schedule, from `unstable`, which updates daily, to `lts`, which updates every 6 months. See [Flox branches](/concepts/base-catalog#flox-branches) for the available stabilities and their schedules.
+
+Set `stability` for a package group in the `[pkg-groups]` section, or for every package group with `options.stability`:
+
+```toml
+[install]
+curl.pkg-path = "curl"
+python3.pkg-path = "python3"
+python3.pkg-group = "legacy"
+
+[options]
+stability = "stable"
+
+[pkg-groups]
+legacy.stability = "lts"
+```
+
+Here `python3` resolves against `lts`, and `curl`, in `toplevel`, resolves against `stable`. A package group's own `stability` takes precedence over `options.stability`. If neither is set, the package group resolves against the catalog's default stability, which is currently `unstable`.
+
+All packages in a package group share its stability, so changing the stability can change the version of every package in the group. The next time Flox locks the environment, for example after `flox edit`, all of the group's packages resolve again against the new stability. Package groups whose stability didn't change stay locked.
+
 ### Resolution
 
 When you run `flox install`, `flox edit`, `flox push`, `flox pull`, or `flox activate`, Flox attempts to resolve the environment and materialize its closure at `$FLOX_ENV` if it has not already done so.
@@ -110,7 +133,7 @@ When you run `flox install`, `flox edit`, `flox push`, `flox pull`, or `flox act
 During resolution, the Flox resolver performs the following actions for each package group:
 
 1. **Collects constraints**. Gathers every package descriptor in the group (`pkg-path`, version constraints, system requirements).
-2. **Searches catalog revisions**. Iterates through available `nixpkgs` revisions (newest first) to find a single revision where _all_ packages in the group can be satisfied.
+2. **Searches catalog revisions**. Iterates through available `nixpkgs` revisions of the group's [stability](#choosing-a-stability) (newest first) to find a single revision where _all_ packages in the group can be satisfied.
 3. **Applies per-package filters**. Checks `pkg-path` match, `version` constraint, `broken`/`unfree` flags, and `systems` constraint.
 4. **Locks the result**. Writes every package entry to `manifest.lock` with the same `rev` and `locked_url`.
 
@@ -361,7 +384,7 @@ The `runtime-packages` list accepts `install-id` values (i.e., the key before `.
 
 ### Atomic Group Advancement
 
-`flox upgrade` advances groups to newer catalog revisions. The key property: **all packages in a group move together** to the same new revision.
+`flox upgrade` advances groups to newer catalog revisions of their [stability](#choosing-a-stability). The key property: **all packages in a group move together** to the same new revision.
 
 ```bash
 # Upgrade all groups
@@ -374,7 +397,7 @@ flox upgrade cuda
 flox upgrade toplevel
 ```
 
-Groups upgrade independently so advancing `cuda` to a newer revision doesn't change `toplevel` or any other group. Individual packages can be targeted by install ID only if they are the **sole member** of their group. If a group has multiple packages, you must upgrade the entire group.
+Groups upgrade independently so advancing `cuda` to a newer revision doesn't change `toplevel` or any other group. A group's stability limits how often it receives updates: for example, a group with the `stable` stability is upgraded at most once per month. Upgrading never moves a group to another stability; to do that, change its `stability` with `flox edit`. Individual packages can be targeted by install ID only if they are the **sole member** of their group. If a group has multiple packages, you must upgrade the entire group.
 
 ### What Triggers a Change
 
