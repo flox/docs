@@ -82,6 +82,15 @@ Mintlify serves it from the repo rather than building it.
   no longer matches what the generator produces. The daily man-page sync
   regenerates it too, so bot PRs arrive correct.
 
+## Changes that depend on an unreleased CLI version
+
+Docs for a feature that hasn't shipped yet must wait for the release that
+includes it. Open these as draft PRs:
+
+- Add the `for-release` label.
+- Prefix the title with `HOLD for <DATE> RC: `, where `<DATE>` is the date
+  (`YYYY-MM-DD`) of the first release candidate that includes the change.
+
 ## Content boundaries
 
 This is a **public repository**. Keep that in mind when adding or editing content:
