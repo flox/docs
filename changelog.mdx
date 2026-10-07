@@ -9,6 +9,55 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 
 {/* changelog:insert */}
 
+<Update label="October 6" description="v1.18.0">
+  ## Prepare for FloxHub sign-in for package resolution
+
+  Starting with the next release, commands that resolve packages from the
+  Flox Catalog will require a free FloxHub account. Run `flox auth login`
+  to get ready, or set `FLOX_FLOXHUB_TOKEN` in CI. You can still search
+  for packages and activate already locked environments without signing
+  in. See [Authentication](/concepts/authentication).
+
+  ## Build Nix expression packages against the catalog's current nixpkgs
+
+  `flox build`, `flox develop` and `flox publish` build Nix expression
+  packages against the catalog's current nixpkgs instead of the revision
+  the environment is locked to. Pass `--stability` to build against a
+  different stability. See
+  [the nixpkgs revision a Nix expression build uses](/man/flox-build#the-nixpkgs-revision-a-nix-expression-build-uses).
+
+  ## Turn off upgrade notifications for an environment
+
+  Set `options.activate.upgrade-notifications = false` in your manifest to
+  turn off upgrade notifications for everyone who activates that
+  environment. The manifest must use `schema-version = "1.18.0"`. See
+  [`manifest.toml`](/man/manifest.toml#options).
+
+  ## Also in this release
+
+  - `flox publish` asks for confirmation before replacing a package's
+    registered source repository or ref, and `--allow-lineage-change`
+    allows the change in non-interactive use.
+  - `flox edit` upgrades a manifest to the lowest schema version that
+    supports the fields it uses and prints a notice, instead of failing.
+  - `install-flox-action` has a new `floxhub-token` input for signing in
+    to CI with a service account token or a personal access token. See
+    [Authenticating with FloxHub](/tutorials/ci-cd#authenticating-with-floxhub).
+  - The Flox container image is now published to Docker Hub as
+    `flox/flox`.
+  - Activating an environment from inside its own activation no longer
+    corrupts variables that a hook extended without a separator such as
+    `TMPDIR` and no longer adds duplicate entries to list variables such
+    as `PATH`.
+  - `flox build` accepts a namespaced catalog package such as `owner/pkg`
+    in a build's `runtime-packages` list.
+
+  See the
+  [v1.18.0 release notes](https://github.com/flox/flox/releases/tag/v1.18.0)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.18.0 */}
+
 <Update label="September 22" description="v1.17.0">
   ## Debug Nix expression builds in a shell
 
