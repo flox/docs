@@ -134,6 +134,7 @@ Key terms:
 - [Services](https://flox.dev/docs/concepts/services.md): Using services with your environment
 - [Composing environments](https://flox.dev/docs/concepts/composition.md): How to combine and reuse environments.
 - [Authentication](https://flox.dev/docs/concepts/authentication.md): Which Flox commands need a free account, what stays open, and how to keep CI running.
+- [What Flox collects](https://flox.dev/docs/concepts/data-collection.md): What the Flox CLI, its install script and FloxHub collect, what is linked to your account, how long Flox keeps it, and how to turn telemetry off.
 - [Understanding Organizations in FloxHub](https://flox.dev/docs/concepts/organizations.md): Roles, access control, and shared ownership of environments across a team
 - [Enterprise SSO](https://flox.dev/docs/concepts/enterprise-sso.md): Let your organization's members sign in to Flox through your own identity provider.
 - [Service accounts](https://flox.dev/docs/concepts/service-accounts.md): Give CI and other automation an identity that belongs to your organization rather than to a person.

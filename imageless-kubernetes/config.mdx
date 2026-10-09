@@ -66,24 +66,17 @@ spec:
 
 ## Telemetry
 
-Since Imageless Kubernetes uses the Flox CLI to perform certain operations such as activating your environment, Imageless Kubernetes will report the same telemetry by default that the Flox CLI reports.
-This includes information such as:
-
-- Which subcommands were run
-- Which shell was used for the activation (Bash, Zsh, etc)
-- Whether the environment was remote (e.g. stored on FloxHub) or not
-- etc
-
-We also use Sentry for error reporting.
-This information helps us focus feature development and maintenance on the areas that deliver the most value for our users.
-
-However, we understand that some users either don't want any information collected or work in an environment that does not allow this kind of information to be collected.
-For this reason we offer the ability to disable telemetry.
+Imageless Kubernetes runs the Flox CLI on the node to pull your environment and in the container to activate it.
+Each of those runs sends the telemetry, error reports and performance traces that [What Flox collects](/concepts/data-collection) lists.
+Imageless Kubernetes always sets the invocation source `containerd`, so its telemetry and its requests to FloxHub carry that label.
+If you mount a FloxHub token, telemetry events in the [current stream](/concepts/data-collection#cli-telemetry) carry that token's account ID.
+The Flox package that Imageless Kubernetes nodes install sends error reports and performance traces to Sentry.
+Reports from the node's commands contain the node's hostname.
+Reports from the container contain the pod's hostname, which is the pod's name unless you set `spec.hostname`.
 
 ### Disabling telemetry
 
-When using the Flox CLI directly you can set `FLOX_DISABLE_METRICS=1` in your environment.
-With Imageless Kubernetes, you can set an annotation on the pod specification to accomplish the same goal.
+Set the `flox.dev/disable-metrics: "true"` annotation on the pod:
 
 ```yaml
 apiVersion: v1
@@ -101,6 +94,17 @@ spec:
       image: flox/empty:1.0.0
       command: ["echoip"]
 ```
+
+The annotation sets `FLOX_DISABLE_METRICS=true` for the node's `flox pull` and `flox list` that prepare the pod's environment, for the container's `flox activate`, and for processes you start with `kubectl exec`.
+A `FLOX_DISABLE_METRICS=true` entry in the pod's `env` covers the container and `kubectl exec`, and doesn't cover the node's commands.
+
+The annotation doesn't cover the node bootstrap command, `flox activate -r flox/containerd-shim-flox-installer`.
+Set `FLOX_DISABLE_METRICS=true` before that command in your node startup script.
+
+When you run the Flox CLI directly, set `FLOX_DISABLE_METRICS=true`.
+`FLOX_DISABLE_METRICS` accepts only `true` or `false`.
+Any other value, for example `1`, makes Flox commands exit with an error.
+See [Turn off telemetry](/concepts/data-collection#turn-off-telemetry) for every setting.
 
 ## Activation mode
 
