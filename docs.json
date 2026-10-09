@@ -284,5 +284,162 @@
     "playground": {
       "proxy": false
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/reference/command-reference/README",
+      "destination": "/man/flox",
+      "permanent": true
+    },
+    {
+      "source": "/reference/command-reference/flox-update",
+      "destination": "/man/flox-upgrade",
+      "permanent": true
+    },
+    {
+      "source": "/reference/command-reference/flox-rollback",
+      "destination": "/man/flox-generations-rollback",
+      "permanent": true
+    },
+    {
+      "source": "/reference/command-reference/flox-wipe-history/flox-rollback",
+      "destination": "/man/flox-generations-rollback",
+      "permanent": true
+    },
+    {
+      "source": "/reference/command-reference",
+      "destination": "/man/flox",
+      "permanent": true
+    },
+    {
+      "source": "/reference/command-reference/:slug*",
+      "destination": "/man/:slug*",
+      "permanent": true
+    },
+    {
+      "source": "/reference",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/cookbook/languages/:slug*",
+      "destination": "/languages/:slug*",
+      "permanent": true
+    },
+    {
+      "source": "/cookbook/language-guides/:slug*",
+      "destination": "/languages/:slug*",
+      "permanent": true
+    },
+    {
+      "source": "/cookbook/publish/flox-store",
+      "destination": "/customer/catalog-store",
+      "permanent": true
+    },
+    {
+      "source": "/cookbook/publish/catalog-store",
+      "destination": "/customer/catalog-store",
+      "permanent": true
+    },
+    {
+      "source": "/cookbook/publish/signing-keys",
+      "destination": "/customer/signing-keys",
+      "permanent": true
+    },
+    {
+      "source": "/cookbook/builds/examples",
+      "destination": "/tutorials/build-and-publish",
+      "permanent": true
+    },
+    {
+      "source": "/cookbook/managed-environments",
+      "destination": "/concepts/floxhub-environments",
+      "permanent": true
+    },
+    {
+      "source": "/tutorials/managed-environments",
+      "destination": "/concepts/floxhub-environments",
+      "permanent": true
+    },
+    {
+      "source": "/concepts/manifest",
+      "destination": "/concepts/environments",
+      "permanent": true
+    },
+    {
+      "source": "/concepts/catalog",
+      "destination": "/concepts/packages-and-catalog",
+      "permanent": true
+    },
+    {
+      "source": "/catalog",
+      "destination": "/concepts/packages-and-catalog",
+      "permanent": true
+    },
+    {
+      "source": "/environments",
+      "destination": "/concepts/environments",
+      "permanent": true
+    },
+    {
+      "source": "/generations",
+      "destination": "/concepts/generations",
+      "permanent": true
+    },
+    {
+      "source": "/tutorials/projects",
+      "destination": "/tutorials/creating-environments",
+      "permanent": true
+    },
+    {
+      "source": "/projects",
+      "destination": "/tutorials/creating-environments",
+      "permanent": true
+    },
+    {
+      "source": "/tutorials/custom-packages",
+      "destination": "/tutorials/build-and-publish",
+      "permanent": true
+    },
+    {
+      "source": "/tutorials/publish-custom-packages",
+      "destination": "/tutorials/build-and-publish",
+      "permanent": true
+    },
+    {
+      "source": "/custom-packages",
+      "destination": "/tutorials/build-and-publish",
+      "permanent": true
+    },
+    {
+      "source": "/publish-custom-packages",
+      "destination": "/tutorials/build-and-publish",
+      "permanent": true
+    },
+    {
+      "source": "/tutorials/build-container-images",
+      "destination": "/man/flox-containerize",
+      "permanent": true
+    },
+    {
+      "source": "/build-container-images",
+      "destination": "/man/flox-containerize",
+      "permanent": true
+    },
+    {
+      "source": "/integrations/github-actions",
+      "destination": "/tutorials/ci-cd",
+      "permanent": true
+    },
+    {
+      "source": "/github-actions",
+      "destination": "/tutorials/ci-cd",
+      "permanent": true
+    },
+    {
+      "source": "/integrations",
+      "destination": "/",
+      "permanent": true
+    }
+  ]
 }
