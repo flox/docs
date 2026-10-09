@@ -3,25 +3,37 @@ title: "Authentication"
 description: "Which Flox commands need a free account, what stays open, and how to keep CI running."
 ---
 
-Starting in **early October 2026**, several Flox CLI commands will require
-authentication with a free Flox account.
+Starting **Tuesday, October 20, 2026**, Flox CLI commands that resolve packages
+will require authentication with a free Flox account. The change arrives with
+Flox 1.19.0 and applies to [older versions](#older-flox-versions) too.
 
 ## What's changing
 
 Several Flox commands have always run through Flox cloud services for search,
-indexing, package resolution, and environment operations. Beginning in early
-October, these commands will require authentication to communicate with the Flox
-catalog:
+indexing, package resolution, and environment operations. Beginning October
+20, every command that resolves packages against the Flox catalog will
+require authentication. A command resolves packages when:
 
-- [`flox init`](/man/flox-init)
-- [`flox install`](/man/flox-install)
-- [`flox upgrade`](/man/flox-upgrade)
-- [`flox edit`](/man/flox-edit)
-- [`flox include upgrade`](/man/flox-include-upgrade)
-- [`flox run`](/man/flox-run)
+- [`flox install`](/man/flox-install) adds a package from the catalog.
+- You run [`flox upgrade`](/man/flox-upgrade), including
+  `flox upgrade --dry-run`.
+- You run [`flox run`](/man/flox-run).
+- A command has to lock the environment because `manifest.lock` is missing,
+  or because you added or changed a catalog package or a system. This covers
+  [`flox activate`](/man/flox-activate), [`flox edit`](/man/flox-edit),
+  [`flox list`](/man/flox-list), [`flox uninstall`](/man/flox-uninstall),
+  `flox services`, [`flox build`](/man/flox-build),
+  [`flox develop`](/man/flox-develop),
+  [`flox containerize`](/man/flox-containerize) and
+  [`flox include upgrade`](/man/flox-include-upgrade).
 
-Other commands such as [`flox activate`](/man/flox-activate) will require
-authentication only when an environment doesn't already have a lockfile.
+Changing `[vars]`, `[hook]`, `[profile]` or `[services]` locks the environment
+without contacting the catalog, so it needs no sign-in. Installing a flake
+reference or a Nix store path doesn't use the catalog either.
+
+[`flox init`](/man/flox-init) creates an environment without a sign-in. In a
+project where Flox detects Node.js, Python or Go, its package suggestions need
+one.
 
 <Accordion title="Do I need to do anything?">
   Probably not, and if you do it's one command. Find the row closest to how you
@@ -29,23 +41,24 @@ authentication only when an environment doesn't already have a lockfile.
 
   | What you're doing | Sign in? | What to do |
   | --- | --- | --- |
-  | Activating an environment that already exists | No | Nothing |
+  | Activating an environment whose lockfile is current | No | Nothing |
   | Looking up packages with `flox search` or `flox show` | No | Nothing |
-  | Installing, upgrading, or editing your own environment | Yes | Run `flox auth login` once |
-  | CI that activates an environment with a committed lockfile | No | Nothing |
-  | CI that runs `flox install` or `flox build` each time | Yes | Give it a [token](#ci-and-automation) |
+  | Adding, upgrading, or changing packages in your own environment | Yes | Run `flox auth login` once |
+  | CI that activates an environment with a committed, current lockfile | No | Nothing |
+  | CI that installs or upgrades packages each time | Yes | Give it a [token](#ci-and-automation) |
 </Accordion>
 
 ## What stays the same
 
 [`flox activate`](/man/flox-activate) does not require authentication for an
-environment that already has a lockfile. If your daily workflow or CI pipeline
+environment that already has a current lockfile. If your daily workflow or CI pipeline
 simply activates an existing environment that relies on public packages, nothing
 changes for you.
 
 [`flox search`](/man/flox-search) and [`flox show`](/man/flox-show) stay open
 too, so browsing the catalog needs no account. So does pulling a public
-environment with [`flox pull`](/man/flox-pull).
+environment with [`flox pull`](/man/flox-pull), and so does
+[`flox build`](/man/flox-build) when the environment's lockfile is current.
 
 Private packages and environments continue to require authentication as they
 do today, and so does [publishing](/concepts/publishing). Nothing about those
@@ -133,8 +146,39 @@ The [CI/CD tutorial](/tutorials/ci-cd) covers setup on specific platforms.
   Service account and personal access tokens need **Flox CLI 1.14.0 or newer**.
   Older releases reject the token as invalid and clear it, so the pipeline
   fails as though it were never set. Check with `flox --version`, and see
-  [installing Flox](/install-flox/install) to upgrade.
+  [installing Flox](/install-flox/install) to upgrade. If the pipeline can't
+  upgrade, commit its lockfile instead.
 </Warning>
+
+### GitHub Actions
+
+On GitHub Actions, pass the token to
+[`flox/install-flox-action`](https://github.com/flox/install-flox-action) as
+`floxhub-token`. The action logs Flox in before it runs any other Flox command,
+and logs out when the job ends.
+
+```yaml title=".github/workflows/ci.yml"
+steps:
+  - uses: "flox/install-flox-action@v2"
+    with:
+      floxhub-token: ${{ secrets.FLOXHUB_TOKEN }}
+```
+
+The `floxhub-token` input needs `install-flox-action` v2.7.0 or newer. The
+`@v2` tag already includes it. If you pin an exact version or a commit, move
+the pin forward.
+
+## Older Flox versions
+
+The Flox catalog enforces the requirement, so from October 20 it applies to
+every Flox version, not only 1.19.0. Staying on an older release doesn't
+postpone it. What you need depends on the version you run:
+
+| Flox version | What you need |
+| --- | --- |
+| 1.14.0 and newer | Run `flox auth login`, or set a token in `FLOX_FLOXHUB_TOKEN` |
+| 1.3.5 through 1.13 | Run `flox auth login`. Personal access tokens and service account tokens need 1.14.0 |
+| Before 1.3.5 | [Upgrade](/install-flox/install) first. These versions never send your login to the catalog, so they can't resolve packages even when you're logged in |
 
 ## FAQ
 
@@ -146,19 +190,35 @@ The [CI/CD tutorial](/tutorials/ci-cd) covers setup on specific platforms.
 
   <Accordion title="What happens to my CI pipelines?">
     If your pipeline uses one of the commands listed above, add a personal
-    access token or a service account token to your CI secrets before October.
-    Pipelines that only activate an existing environment against a committed
-    lockfile carry on unchanged.
+    access token or a service account token to your CI secrets before
+    October 20. Pipelines that only activate an existing environment against a
+    committed, current lockfile carry on unchanged.
   </Accordion>
 
   <Accordion title="What's the exact cutoff date?">
-    Early October 2026. We'll follow up with the specific date and send a
-    reminder before the change takes effect.
+    Tuesday, October 20, 2026, the day Flox 1.19.0 ships. The requirement
+    applies to every Flox version from that date, so
+    [older versions](#older-flox-versions) need a sign-in too.
   </Accordion>
 
   <Accordion title="What if I miss the deadline?">
-    The commands prompt you to sign in rather than failing silently. Signing up
-    takes under a minute.
+    Commands that resolve packages fail with an error that tells you to run
+    `flox auth login`. Run it, then run the command again. Signing up takes
+    under a minute.
+  </Accordion>
+
+  <Accordion title="How do I turn off the login reminders?">
+    When you aren't logged in, Flox reminds you to run `flox auth login`. To
+    turn the reminder off:
+
+    ```bash
+    flox config --set auth_notifications false
+    ```
+
+    Or set `FLOX_AUTH_NOTIFICATIONS=false` in the environment, which is usually
+    easier in CI. Both need Flox 1.15.0 or newer. They silence the reminder
+    only. A command that needs a sign-in still fails with an error until you
+    log in.
   </Accordion>
 
   <Accordion title="Do you have an option that isn't public FloxHub?">
