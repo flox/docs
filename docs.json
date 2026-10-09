@@ -138,6 +138,7 @@
               "concepts/publishing",
               "concepts/secrets-management",
               "concepts/plugins",
+              "concepts/sandboxing",
               "concepts/flox-vs-containers"
             ]
           },
