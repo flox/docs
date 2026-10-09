@@ -9,6 +9,23 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 
 {/* changelog:insert */}
 
+<Update label="October 7" description="v1.18.1">
+  ## Deactivate environments in the current shell without errors
+
+  You can deactivate an environment you activated in the current shell
+  without seeing
+  `profile-scripts-deactivate is not expected in this context`, and your
+  `profile.deactivate` scripts run again. Activating the same environment
+  again in the same shell sources its `[profile]` scripts again. Restart
+  your active shell sessions to pick up the new prompt hook. See
+  [`flox deactivate`](/man/flox-deactivate).
+
+  See the
+  [v1.18.1 release notes](https://github.com/flox/flox/releases/tag/v1.18.1)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.18.1 */}
+
 <Update label="October 6" description="v1.18.0">
   ## Prepare for FloxHub sign-in for package resolution
 
