@@ -48,6 +48,7 @@ dotenv
 dotfile
 dotfiles
 eksctl
+Entra
 env
 envs
 formatters
@@ -62,10 +63,14 @@ IPs
 json
 Karpenter
 libiconv
+liveness
 lockfile
 lockfiles
+loopback
+lowercased
 mailcap
 manpages
+misconfigured
 monorepo
 monorepos
 namespace
@@ -75,12 +80,14 @@ Nodejs
 npm
 Nvidia
 nvm
+Okta
 papercuts
 personalizations
 postgres
 rc
 repo
 repos
+rollout
 runtimes
 sandboxed
 sandboxing
@@ -98,6 +105,7 @@ subproblems
 subprojects
 subshell
 subshells
+substituter
 systemd
 tcsh
 toolchain
@@ -106,6 +114,7 @@ toplevel
 transactionally
 tzdata
 UIDs
+unconfigured
 uninstallation
 unintuitive
 unmerged
