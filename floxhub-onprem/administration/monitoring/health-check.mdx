@@ -35,7 +35,7 @@ The ports below are the defaults. If you have overridden the matching
 `/health`, `/healthz`, and `/api/health/status` are liveness probes: a `200`
 means the process is up and its HTTP stack is serving, and nothing more. The
 `accounts` and `factory` responses carry the service version, which is what
-tells you which generation is running after an upgrade.
+tells you which version is running after an upgrade.
 
 Three paths report more than liveness — `catalog-server`'s
 `/status/healthcheck` and `/status/catalog`, and `build-coordinator`'s

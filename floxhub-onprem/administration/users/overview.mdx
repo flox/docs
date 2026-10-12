@@ -71,9 +71,10 @@ distinguishable from the logs:
   the second one cannot sign in until you change what your provider sends.
 </Warning>
 
-This is worth checking before a large rollout. If your directory usernames are
-email addresses, two people at different domains with the same local part
-collide.
+This is worth checking before a large rollout. Usernames that differ only in
+case or punctuation collide: `alice.smith` and `Alice_Smith` both become
+`alice-smith`. So do two people at different domains with the same local part,
+if your provider sends only the part before the `@`.
 
 ## What a new user can do
 
