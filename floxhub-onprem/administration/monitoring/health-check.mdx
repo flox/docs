@@ -61,7 +61,7 @@ successful run as a Unix timestamp, which is the only positive signal it
 emits:
 
 ```bash
-flox activate -- date -d "@$(cat "$CATALOG_DATA/last-update-success")"
+flox activate -c 'date -d "@$(cat "$CATALOG_DATA/last-update-success")"'
 ```
 
 The scheduler leaves only its log output. For both, see
