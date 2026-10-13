@@ -47,6 +47,7 @@
             "group": "Install Flox",
             "pages": [
               "install-flox/install",
+              "install-flox/mdm",
               "install-flox/uninstall",
               "install-flox/troubleshooting",
               "install-flox/ide-extensions"
