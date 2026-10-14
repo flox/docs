@@ -9,6 +9,22 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 
 {/* changelog:insert */}
 
+<Update label="October 14" description="v1.18.2">
+  ## Upgrade to address a Nix privilege escalation
+
+  You should upgrade to 1.18.2 to address the October 2026 Nix and Lix
+  security advisory. The release updates the bundled Nix to 2.31.6, and
+  all releases before 1.18.2 are affected. On multi-user installations,
+  which are Flox's default, several of the issues can combine into local
+  root privilege escalation. See
+  [Upgrade existing Flox installation](/install-flox/install#upgrade-existing-flox-installation).
+
+  See the
+  [v1.18.2 release notes](https://github.com/flox/flox/releases/tag/v1.18.2)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.18.2 */}
+
 <Update label="October 7" description="v1.18.1">
   ## Deactivate environments in the current shell without errors
 
