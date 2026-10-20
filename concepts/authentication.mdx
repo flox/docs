@@ -307,11 +307,13 @@ postpone it. What you need depends on the version you run:
 
   <Accordion title="Can we turn off telemetry for everyone?">
     Set `disable_metrics = true` in `/etc/flox.toml` on every machine, and
-    export `FLOX_DISABLE_METRICS=true` from a system-wide shell profile. A user
-    can override both, so Flox can't enforce the setting. To enforce it, block
-    Flox's telemetry and error-report endpoints at your network edge. One
-    telemetry endpoint shares `api.flox.dev` with the catalog API, so blocking
-    it needs a proxy that filters by path. See
+    export `FLOX_DISABLE_METRICS=true` or `DO_NOT_TRACK=1` from a system-wide
+    shell profile. `DO_NOT_TRACK` also overrides a user's
+    `FLOX_DISABLE_METRICS=false` and `disable_metrics = false`. A user can
+    override or unset each of these, so Flox can't enforce the setting. To
+    enforce it, block Flox's telemetry and error-report endpoints at your
+    network edge. Telemetry shares `api.flox.dev` with the catalog API, so
+    blocking it needs a proxy that filters by path. See
     [Enforce it](/concepts/data-collection#enforce-it).
   </Accordion>
 
