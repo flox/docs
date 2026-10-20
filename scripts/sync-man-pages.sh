@@ -19,6 +19,8 @@ sync_man_pages() {
 
   local src_doc_dir="$flox_src_dir/cli/flox/doc"
   local lua_filter="$flox_src_dir/pkgs/flox-manpages/pandoc-filters/include-files.lua"
+  local mdx_filter
+  mdx_filter="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/mdx-compat.lua"
 
   [ -d "$src_doc_dir" ] || { echo "error: man page source dir not found: $src_doc_dir" >&2; return 1; }
   [ -f "$lua_filter" ] || { echo "error: pandoc include filter not found: $lua_filter" >&2; return 1; }
@@ -43,6 +45,8 @@ sync_man_pages() {
     {
       printf -- '---\ntitle: "%s"\n---\n\n' "$title"
       # - include-files.lua expands the shared ./include/*.md snippets
+      # - mdx-compat.lua rewrites autolinks and unlabelled code blocks, which
+      #   the gfm writer emits in forms MDX cannot parse
       # - --shift-heading-level-by=1 demotes '# NAME' -> '## NAME'
       #   (the page title comes from frontmatter in Mintlify)
       # - --strip-comments drops source HTML comments (maintainer notes that
@@ -50,6 +54,7 @@ sync_man_pages() {
       ( cd "$src_doc_dir" &&
           pandoc --from markdown --to gfm \
             --lua-filter "$lua_filter" \
+            --lua-filter "$mdx_filter" \
             --shift-heading-level-by=1 \
             --strip-comments \
             "./$name.md" ) |
