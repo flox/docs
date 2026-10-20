@@ -52,8 +52,10 @@ built, and reproduced in the future.
 Possible values for `<package>` are all keys under the `build` attribute
 in `manifest.toml`. If only one build is defined in `manifest.toml`,
 specifying the `<package>` is unnecessary. If there are multiple builds
-defined, you may only publish a single package at a time and must
-specify the name when calling `flox publish`.
+defined, you may only publish a single package at a time. When
+`<package>` is omitted, `flox publish` prompts you to select one if it
+is running interactively, and otherwise fails with a list of the
+available packages.
 
 Flox will then perform a clone of the repository to a temporary location
 and perform a clean `flox build` operation. This ensures that all files
@@ -105,6 +107,13 @@ must create an organization. See [the organizations concept
 page](https://flox.dev/docs/concepts/organizations/) for more details on
 organizations and how to create them. Note that this is a paid feature
 available with Flox for Teams.
+
+## AUTHENTICATION
+
+Publishing packages to the Flox Catalog requires a free FloxHub account.
+Log in with `flox auth login` (see [`flox-auth`](/man/flox-auth)). In
+CI or other non-interactive environments, supply a token instead; see
+[https://go.flox.dev/auth](https://go.flox.dev/auth).
 
 ## OPTIONS
 
