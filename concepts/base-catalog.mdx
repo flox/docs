@@ -20,9 +20,9 @@ This makes it available to users of Flox.
 
 An additional process continuously checks newly added packages
 and records actual build information (narinfo) from `cache.nixos.org`.
-This along, with considerations for packages flagged as _unfree_ and _broken_,
-allows flox to make attempts to serve up known good builds.
-If you encounter a difference between `flox show` (meta data only),
+This, along with considerations for packages flagged as _unfree_ and _broken_,
+allows Flox to make attempts to serve up known good builds.
+If you encounter a difference between `flox show` (metadata only),
 and what `flox install` gives you, it may be due to this logic.
 Refer to `allow_broken`, `allow_unfree`, and `allow_missing_builds`
 in the [environment manifest](/concepts/environments#manifesttoml) to override the defaults.
