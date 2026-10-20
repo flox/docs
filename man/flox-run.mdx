@@ -107,6 +107,14 @@ Downloaded store paths are registered as GC roots under
 `$FLOX_CACHE_DIR/run-gc-roots/`. Repeated invocations of the same
 package skip the download step.
 
+## AUTHENTICATION
+
+This command resolves packages from the Flox Catalog, which requires a
+free FloxHub account. Log in with `flox auth login` (see
+[`flox-auth`](/man/flox-auth)). In CI or other non-interactive
+environments, supply a token instead; see
+[https://go.flox.dev/auth](https://go.flox.dev/auth).
+
 ## OPTIONS
 
 ### Run Options
