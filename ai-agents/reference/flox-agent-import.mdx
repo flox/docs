@@ -1,0 +1,102 @@
+---
+title: "flox agent import"
+description: "Generate a pinned agent plugin package from a GitHub repository of skills."
+---
+
+## Synopsis
+
+```text
+flox agent import <path|url> [--out <dir>] [--plugin <path[=name]>]...
+                  [--path-ignore <glob>]... [--dependency <attr>]...
+                  [--no-auto-discovery]
+flox agent import <path|url> [--out <dir>] --replay
+```
+
+## Description
+
+Reads a skill repository, finds the plugins in it, and writes one package definition per plugin, pinned to a single commit.
+
+`<path|url>` is an `owner/repo` shorthand, a GitHub URL, or a local git clone.
+Only GitHub is supported.
+A local clone is imported at its committed `HEAD`, and its `origin` remote must point at GitHub; uncommitted changes are never imported.
+
+Import:
+
+1. Clones the repository and pins the commit.
+2. Finds every plugin and its skills.
+3. Computes the hash of the source the build will fetch.
+4. Validates each plugin with the [`check-plugin`](/ai-agents/reference/flox-agent-check-plugin) rules. A plugin with errors is not written; the others are.
+5. Writes `agent-plugin-<name>/source.json` and `agent-plugin-<name>/default.nix` under the output folder, and prints a summary.
+
+The summary is `new plugin` on a first import.
+On a re-import it is `unchanged at <rev>`, `regenerated at <rev>`, or `<old> -> <new>` with the skills added and removed.
+There is no separate update command; re-importing is how a package moves to a newer commit.
+
+`source.json` records the source, the skills, the flags given, and every warning.
+`default.nix` is the same in every package, apart from a block between its `BEGIN custom` and `END custom` markers that a re-import keeps.
+
+## Finding plugins
+
+Import tries these in order, and the first that matches declares the repository's plugins:
+
+1. Agent Plugins manifests (`plugin.json`).
+2. A marketplace listing, such as `.claude-plugin/marketplace.json`.
+3. Claude plugin manifests (`.claude-plugin/plugin.json`).
+4. The whole repository as one plugin.
+
+The later cases still run for folders nothing has claimed, and a plugin they find there is added beside the declared ones.
+The last case runs only when nothing else matched.
+Within each plugin, import searches for `SKILL.md` files and records anything it does not package as a warning.
+
+## Options
+
+| Option | Repeatable | Effect |
+| ------ | ---------- | ------ |
+| `--out <dir>` | No | Where to write packages. Default `.flox/pkgs/` |
+| `--plugin <path[=name]>` | Yes | Treat `<path>` as a plugin, named `<name>` or after its folder |
+| `--path-ignore <glob>` | Yes | Never read or package anything matching `<glob>` |
+| `--dependency <attr>` | Yes | A Nixpkgs package the build may link a script's interpreter from, such as `R` for `Rscript` |
+| `--no-auto-discovery` | No | Import only the `--plugin` folders |
+| `--replay` | No | Repeat the flags recorded in the existing packages for this repository |
+
+Every option except `--out` and `--replay` is recorded in `source.json`.
+`--replay` can be combined only with `--out`.
+
+A default output under `.flox` needs that `.flox` to be a Flox environment.
+Run `flox init` first, or pass `--out` with a folder outside `.flox`.
+
+A package folder belongs to the repository that wrote it.
+Import refuses to overwrite a package recorded from a different repository.
+
+## Exit status
+
+| Status | Meaning |
+| ------ | ------- |
+| `0` | Every plugin was imported |
+| `1` | A plugin failed, or the clone or a write failed; the other plugins are still written |
+| `2` | Usage error, including `--replay` with a flag other than `--out` |
+
+## Examples
+
+Import a repository into an agent-pkgs checkout:
+
+```bash
+flox agent import juliusbrussee/caveman --out pkgs
+```
+
+Import a folder of skills that discovery misses, under a chosen name:
+
+```bash
+flox agent import owner/repo --out pkgs --plugin skills=my-skills
+```
+
+Update a package, repeating the flags it was first imported with:
+
+```bash
+flox agent import juliusbrussee/caveman --out pkgs --replay
+```
+
+## See also
+
+- [Package a skill repository](/ai-agents/guides/package-a-skill-repository)
+- [`flox agent check-plugin`](/ai-agents/reference/flox-agent-check-plugin)
