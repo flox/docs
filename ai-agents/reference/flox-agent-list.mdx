@@ -1,0 +1,63 @@
+---
+title: "flox agent list"
+description: "Show the harnesses and agent plugins an environment gives its AI agent."
+---
+
+## Synopsis
+
+```text
+flox agent list [--long | --longer]
+```
+
+## Description
+
+Prints what the environment gives its agent: the harnesses installed and the agent plugins they receive, each with the package and version it came from.
+`flox agent list` changes nothing and never runs a build.
+
+It reads the same plugin folder `flox agent launch` reads, `$FLOX_ENV/share/agent-plugins/`, and looks for harnesses in the environment's `bin` folder.
+
+Each harness row says what launch hands it.
+Claude Code receives whole plugins (`skills, MCP, hooks`).
+Codex, opencode, and pi receive `skills only`.
+A harness that would fail launch's own check shows `⚠` and the reason instead of `✔`.
+Agent Deck is not listed, because the Claude Code sessions it starts get their plugins through `flox agent launch claude`.
+
+An environment with no harness or no plugins is not an error.
+`flox agent list` says what is missing and exits with status 0.
+
+## Options
+
+| Option | Effect |
+| ------ | ------ |
+| `--long` | Also list each plugin's skills and MCP servers |
+| `--longer` | Also list every part, with its approximate size in tokens and its store path |
+
+## Global options
+
+| Option | Effect |
+| ------ | ------ |
+| `--dir <path>` | Read plugins from `<path>/agent-plugins` instead of `$FLOX_ENV/share/agent-plugins` |
+
+Global options go before the command name: `flox agent --dir ./share list`.
+
+## Example
+
+```console
+$ flox agent list --long
+Agent stack
+1 harness · 1 plugin · 1 skill · 0 MCP servers
+
+Harnesses
+ ✔ claude            claude-code 2.1.304 · skills, MCP, hooks
+
+Plugins
+ ✔ frontend-design   agent-plugin-frontend-design 0.0.0-unstable.2026-10-19.ga0b04d9
+   skills  frontend-design
+
+Shows what launch gives each harness; agent-stacks writes nothing to a harness's own config.
+```
+
+## See also
+
+- [`flox agent launch`](/ai-agents/reference/flox-agent-launch)
+- [AI agent quickstart](/ai-agents/quickstart)

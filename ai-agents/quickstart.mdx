@@ -1,0 +1,104 @@
+---
+title: "AI agent quickstart"
+sidebarTitle: "Quickstart"
+description: "Install Claude Code and an agent plugin into a Flox environment, then launch the agent with that plugin."
+---
+
+In this guide you create an environment holding Claude Code and the `frontend-design` plugin, check what the agent will get, and launch it.
+You need [Flox installed](/install-flox/install) and a Claude account.
+
+## Enable the extension
+
+`flox agent` is a beta Flox extension.
+Turn on beta features once:
+
+```bash
+flox config --set features.beta true
+```
+
+## Create the environment
+
+Make a folder for your project and create an environment in it:
+
+```bash
+mkdir my-agent && cd my-agent && flox init
+```
+
+Install the harness, a plugin, and the `flox agent` extension:
+
+```bash
+flox install agent-stacks/claude-code agent-stacks/agent-plugin-frontend-design flox/flox-agent
+```
+
+- `agent-stacks/claude-code` is the harness: the Claude Code program.
+- `agent-stacks/agent-plugin-frontend-design` is an agent plugin with a skill for building polished web interfaces.
+- `flox/flox-agent` provides the `flox agent` command.
+
+## See what the agent gets
+
+Activate the environment:
+
+```bash
+flox activate
+```
+
+Then list the stack:
+
+```console
+$ flox agent list
+Agent stack
+1 harness · 1 plugin · 1 skill · 0 MCP servers
+
+Harnesses
+ ✔ claude            claude-code 2.1.304 · skills, MCP, hooks
+
+Plugins
+ ✔ frontend-design   agent-plugin-frontend-design 0.0.0-unstable.2026-10-19.ga0b04d9 · 1 skill
+
+--long shows each plugin's skills and MCP servers.
+Shows what launch gives each harness; agent-stacks writes nothing to a harness's own config.
+```
+
+Each row names the package and version it came from.
+Run `flox agent list --long` to see the skills each plugin provides.
+
+## Launch the agent
+
+```bash
+flox agent launch claude
+```
+
+Claude Code starts with the `frontend-design` skill loaded.
+Ask it to build a page, and it uses the skill.
+
+To pass flags to Claude Code, put them after `--`:
+
+```bash
+flox agent launch claude -- --continue
+```
+
+## Add or remove plugins
+
+Plugins are packages, so you manage them with the usual commands.
+Browse the available plugins with [`flox search`](/man/flox-search):
+
+```bash
+flox search agent-plugin
+```
+
+Install another one with [`flox install`](/man/flox-install), or remove one with [`flox uninstall`](/man/flox-uninstall).
+The next `flox agent launch` picks up the change.
+
+## If something is missing
+
+`flox agent doctor` reports the plugins it found, each harness's readiness, and the package to install for a harness that is missing:
+
+```bash
+flox agent doctor
+```
+
+## Next steps
+
+- [Launch an agent in a sandbox](/ai-agents/guides/launch-in-a-sandbox)
+- [Audit an agent plugin](/ai-agents/guides/audit-a-plugin) before you install it
+- [`flox agent launch`](/ai-agents/reference/flox-agent-launch) reference

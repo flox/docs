@@ -1,0 +1,70 @@
+---
+title: "flox agent check-plugin"
+description: "Validate an agent plugin folder against the Agent Plugins and Agent Skills specifications."
+---
+
+## Synopsis
+
+```text
+flox agent check-plugin <path> [--json] [--strict]
+```
+
+## Description
+
+Validates a plugin folder against the [Agent Plugins specification](https://agent-plugins.org), and each of its skills against the [Agent Skills specification](https://agentskills.io).
+It reports problems and never changes the folder.
+
+The same check runs when `flox agent import` writes a package and when that package is built.
+
+`<path>` is a plugin folder:
+
+```text
+<plugin-name>/
+├── plugin.json     # required manifest
+├── skills/         # required, one folder per skill
+│   └── <skill>/SKILL.md
+└── mcp.json        # optional MCP server configuration
+```
+
+## Options
+
+| Option | Effect |
+| ------ | ------ |
+| `--json` | Print the result as JSON: `valid`, `specVersion`, `errors`, and `warnings`, each issue with a `path` and a `message` |
+| `--strict` | Treat warnings as errors |
+
+## What is checked
+
+- `plugin.json` exists, is valid JSON, and matches the schema its `$schema` names.
+- The folder's name matches the manifest's `name`.
+- `skills/` holds at least one skill: a folder directly under it with a file named exactly `SKILL.md`. Symbolic links are not followed.
+- Each `SKILL.md` has frontmatter with a `name` and a `description` that follow the Agent Skills rules.
+- `mcp.json`, when present, matches the MCP schema for the same specification version as `plugin.json`.
+- Each local MCP server's `command` is a bare program name or a `./` path inside the plugin.
+
+## Warnings and errors
+
+A deviation that agents load anyway is a warning, and the plugin stays valid.
+Common warnings are unknown frontmatter fields, such as `version:`, a skill `name` that does not match its folder, and a missing `description`.
+Claude Code components such as `agents/` or `hooks/hooks.json` at the plugin root also warn, because packages keep them under `com.anthropic.claude-code/`.
+
+Everything else is an error, including any schema violation and a symbolic link under `skills/`.
+
+## Exit status
+
+| Status | Meaning |
+| ------ | ------- |
+| `0` | Valid; warnings are allowed unless `--strict` is given |
+| `1` | Invalid: one or more errors, or warnings under `--strict` |
+| `2` | Usage error, or the path is missing or unreadable |
+
+## Example
+
+```bash
+flox agent check-plugin "$FLOX_ENV/share/agent-plugins/frontend-design"
+```
+
+## See also
+
+- [`flox agent audit`](/ai-agents/reference/flox-agent-audit), which checks a plugin for security issues
+- [Package a skill repository](/ai-agents/guides/package-a-skill-repository)
