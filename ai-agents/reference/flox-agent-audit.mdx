@@ -1,0 +1,123 @@
+---
+title: "flox agent audit"
+description: "Security-audit an agent plugin, by path or by catalog package, with NVIDIA SkillSpector."
+---
+
+## Synopsis
+
+```text
+flox agent audit <target> [--json] [--threshold N] [--raw] [--scan-timeout D]
+```
+
+## Description
+
+Finds the plugin `<target>` names, validates it, lists what it will and will not look at, scans each skill with SkillSpector, and scores the plugin from 0 to 100 by its worst skill.
+Higher is better.
+
+`audit` measures security only.
+Whether a plugin follows the specification is [`flox agent check-plugin`](/ai-agents/reference/flox-agent-check-plugin)'s job.
+
+SkillSpector always runs statically, as `skillspector scan <skill> --no-llm --format json`.
+Nothing in the plugin is executed.
+
+## The target
+
+A target is a path or a package, decided by how it is written.
+
+A **path** is `.`, `..`, or anything starting with `./`, `../`, `/`, or `~/`.
+If the path holds `plugin.json`, it is the plugin.
+Otherwise every plugin under its `share/agent-plugins/` is audited, so `$FLOX_ENV` and a `./result` from a build both work.
+
+Anything else is a **catalog package**, with `@<version>` allowed.
+`audit` installs it into a temporary environment, audits it, and deletes the environment when it finishes or is interrupted.
+A flake reference, which holds `:` or `#`, is refused.
+
+There is no shorthand for an installed plugin.
+`flox agent audit caveman` audits the catalog package `caveman`; audit an installed plugin by its path, such as `"$FLOX_ENV/share/agent-plugins/caveman"`.
+
+## Options
+
+Options can go on either side of `<target>`.
+
+| Option | Effect |
+| ------ | ------ |
+| `--json` | Print the result as JSON instead of the summary |
+| `--threshold N` | Exit with status 1 when the score is below `N` |
+| `--raw` | Include SkillSpector's own report for each skill |
+| `--scan-timeout D` | Stop a skill's scan after `D`, such as `90s` or `15m` (default `5m`) |
+
+## What is checked
+
+| Entry | Treatment |
+| ----- | --------- |
+| Each `skills/<name>` with a `SKILL.md` | Scanned |
+| `plugin.json` | Validated only |
+| `mcp.json` | Not checked |
+| `bin/` | Not checked |
+| Client folders such as `com.anthropic.claude-code/`, which hold hooks, agents, and commands | Not checked |
+| Anything else | Not checked |
+
+The summary lists every entry under one of these headings.
+The score says nothing about the entries that were not checked.
+
+## Score
+
+Each skill scores `100 - risk`, using SkillSpector's risk model.
+The plugin scores its worst skill, and several plugins score their worst plugin.
+
+| Score | Status |
+| ----- | ------ |
+| 80–100 | `safe` |
+| 50–79 | `caution` |
+| 0–49 | `do not install` |
+
+A scan SkillSpector reports as partial is still scored and marked `partial`.
+When a partial scan covered less than 100% of a skill, the skill is `incomplete` rather than `safe`, and the result fails any `--threshold`.
+
+## Exit status
+
+| Status | Meaning |
+| ------ | ------- |
+| `0` | Scored, and met `--threshold` if one was given |
+| `1` | Scored below `--threshold`, or a skill is incomplete under `--threshold`; the result is still printed |
+| `2` | Usage error |
+| `3` | Could not audit, such as a target that does not resolve or a missing prerequisite; nothing is printed on standard output |
+| `130` | Interrupted |
+
+## Requirements
+
+- `skillspector` on `PATH`, from the `agent-stacks/skillspector` package.
+- Network access to `api.osv.dev`, for live vulnerability data.
+
+`flox agent doctor` shows the SkillSpector version `audit` will use.
+
+## Examples
+
+Audit a catalog package before installing it:
+
+```bash
+flox agent audit agent-stacks/agent-plugin-frontend-design
+```
+
+Audit a specific version:
+
+```bash
+flox agent audit agent-stacks/agent-plugin-caveman@4.0.1
+```
+
+Audit every plugin in the active environment:
+
+```bash
+flox agent audit "$FLOX_ENV"
+```
+
+Fail a CI job on anything below `safe`:
+
+```bash
+flox agent audit "$FLOX_ENV" --threshold 80
+```
+
+## See also
+
+- [Audit an agent plugin](/ai-agents/guides/audit-a-plugin)
+- [`flox agent check-plugin`](/ai-agents/reference/flox-agent-check-plugin)

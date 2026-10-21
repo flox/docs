@@ -1,0 +1,115 @@
+---
+title: "Package a skill repository"
+sidebarTitle: "Package a skill repository"
+description: "Turn a GitHub repository of agent skills into a pinned agent plugin package and install it into a Flox environment."
+---
+
+Many skill collections live in GitHub repositories rather than in the catalog.
+`flox agent import` reads such a repository, finds its plugins and skills, and writes a package definition pinned to one commit.
+This guide imports a repository, builds the package, checks it, and installs it into an environment.
+
+The agent plugin packages in the `agent-stacks` catalog are generated this way, in the [agent-pkgs](https://github.com/agent-stacks/agent-pkgs) repository.
+The steps below build in a checkout of that repository, which provides the builder the generated package needs.
+
+## Prerequisites
+
+- An environment with `flox/flox-agent` installed, as in the [quickstart](/ai-agents/quickstart).
+- Nix, to build the package.
+- A clone of agent-pkgs:
+
+```bash
+git clone https://github.com/agent-stacks/agent-pkgs.git && cd agent-pkgs
+```
+
+Run the commands below in a shell where your environment is active, so `flox agent` is available.
+
+## Import the repository
+
+Pass the repository as `owner/repo`, a GitHub URL, or a local clone whose `origin` is on GitHub.
+Write the package into the `pkgs` folder:
+
+```bash
+flox agent import juliusbrussee/caveman --out pkgs
+```
+
+Import pins the current commit, finds every plugin in the repository, and validates each one.
+It prints a warning for anything it packages with a deviation and for anything it leaves out, then a summary per plugin:
+
+```console
+caveman: new plugin at bad48a0e1df5 (22 skills)
+  written to pkgs/agent-plugin-caveman
+```
+
+Each plugin becomes a folder holding two files:
+
+- `source.json` records the pinned source, the skills, and the import that produced them, including its warnings.
+- `default.nix` reads `source.json` and is the same in every package.
+
+Import only reads from GitHub.
+Repositories hosted elsewhere are rejected.
+
+### Choose what gets imported
+
+Most repositories need no flags.
+When discovery finds the wrong thing, these flags adjust it, and import records them in `source.json` so a later re-import repeats them:
+
+| Flag | Use it to |
+| ---- | --------- |
+| `--plugin PATH[=NAME]` | Treat a folder as a plugin, and optionally name it |
+| `--path-ignore GLOB` | Skip matching paths, such as test fixtures |
+| `--no-auto-discovery` | Import only the `--plugin` folders |
+| `--dependency ATTR` | Name a Nixpkgs package a script's interpreter comes from |
+
+See the [`flox agent import`](/ai-agents/reference/flox-agent-import) reference for how discovery works.
+
+## Build and check the package
+
+The build fetches only tracked files, so add the new folder to git first:
+
+```bash
+git add pkgs/agent-plugin-caveman && nix build .#agent-plugin-caveman
+```
+
+Check the built plugin against the Agent Plugins specification:
+
+```bash
+flox agent check-plugin result/share/agent-plugins/caveman
+```
+
+Scan it for security issues:
+
+```bash
+flox agent audit ./result
+```
+
+See [Audit an agent plugin](/ai-agents/guides/audit-a-plugin) for how to read the score.
+
+## Install it into your environment
+
+From your project's environment, install the package from the agent-pkgs checkout:
+
+```bash
+flox install "git+file://$HOME/agent-pkgs#agent-plugin-caveman"
+```
+
+Replace `$HOME/agent-pkgs` with the path to your clone.
+`flox agent list` now shows the plugin, and the next `flox agent launch` loads it.
+
+## Update the package
+
+Run the same import again to move to the repository's latest commit.
+To repeat the flags recorded the first time, use `--replay`:
+
+```bash
+flox agent import juliusbrussee/caveman --out pkgs --replay
+```
+
+The summary says `unchanged`, `regenerated`, or the old and new commit, with the skills added and removed.
+
+To have the plugin published in the `agent-stacks` catalog, open a pull request to agent-pkgs with the generated folder.
+Packages there are re-imported automatically when their upstream moves.
+
+## Related
+
+- [`flox agent import`](/ai-agents/reference/flox-agent-import) reference
+- [`flox agent check-plugin`](/ai-agents/reference/flox-agent-check-plugin) reference
