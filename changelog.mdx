@@ -9,6 +9,53 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 
 {/* changelog:insert */}
 
+<Update label="October 20" description="v1.19.0">
+  ## Sign in to resolve packages from the Catalog
+
+  Starting October 20, 2026, you need a free FloxHub account to install
+  packages, upgrade them, or otherwise resolve packages from the Flox
+  Catalog, and the Catalog enforces this for every Flox version. Run
+  `flox auth login`, or set `FLOX_FLOXHUB_TOKEN` in CI. You can still
+  search for packages and activate an environment whose lockfile is up to
+  date without signing in. See [Authentication](/concepts/authentication).
+
+  ## Resolve package groups against a specific stability
+
+  You can resolve package groups against a specific catalog stability. Set
+  `pkg-groups.<NAME>.stability` for one group or `options.stability` for
+  all groups. This introduces manifest schema version `1.19.0`. See
+  [Choosing a stability](/concepts/package-groups#choosing-a-stability).
+
+  ## Review environment details without network requests
+
+  You can review generation and sync information, per-package upgrade
+  availability and stability, and an available-upgrades summary with
+  `flox list --all`. The output includes next-step hints and makes no
+  network requests. See [`flox list`](/man/flox-list).
+
+  ## Also in this release
+
+  - `flox build`, `flox publish`, and `flox develop` list available
+    packages when the named package does not exist, and `flox publish` and
+    `flox develop` prompt you to choose a package when several exist or
+    list them when not running interactively.
+  - `flox activate` and `flox run` prompt you to run `flox auth login` or
+    log in again when downloading a custom-catalog package requires
+    authentication.
+  - `flox run` asks you to log in before showing the package picker when
+    several packages provide the command and you are not logged in.
+  - `flox install`, `flox uninstall`, `flox edit`, and `flox upgrade` now
+    work in Docker and podman when the environment came from an earlier
+    image layer.
+  - Concurrent activations of the same environment no longer fail because
+    of a race on the activation lock file.
+
+  See the
+  [v1.19.0 release notes](https://github.com/flox/flox/releases/tag/v1.19.0)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.19.0 */}
+
 <Update label="October 14" description="v1.18.2">
   ## Upgrade to address a Nix privilege escalation
 
