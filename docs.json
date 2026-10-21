@@ -251,6 +251,36 @@
         ]
       },
       {
+        "tab": "AI agents",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "ai-agents/overview",
+              "ai-agents/quickstart"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "ai-agents/guides/package-a-skill-repository",
+              "ai-agents/guides/audit-a-plugin",
+              "ai-agents/guides/launch-in-a-sandbox"
+            ]
+          },
+          {
+            "group": "Command reference",
+            "pages": [
+              "ai-agents/reference/flox-agent-list",
+              "ai-agents/reference/flox-agent-launch",
+              "ai-agents/reference/flox-agent-import",
+              "ai-agents/reference/flox-agent-audit",
+              "ai-agents/reference/flox-agent-check-plugin"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Changelog",
         "pages": [
           "changelog",

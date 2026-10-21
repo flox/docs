@@ -1,0 +1,104 @@
+---
+title: "flox agent launch"
+description: "Run an AI coding agent with the environment's agent plugins, optionally inside a sandbox."
+---
+
+## Synopsis
+
+```text
+flox agent launch [--sandbox <name> [--sandbox-options '<json>']] <agent> [-- <args>...]
+```
+
+## Description
+
+Runs `<agent>` with every agent plugin installed in the active environment, then gets out of the way.
+The agent replaces the `flox agent` process, so its exit status and terminal are yours.
+
+`<agent>` is one of:
+
+| Agent | Harness package | What it receives |
+| ----- | --------------- | ---------------- |
+| `claude` | `agent-stacks/claude-code` | Whole plugins: skills, MCP servers, hooks, agents, and commands |
+| `codex` | `agent-stacks/codex` | Skills |
+| `opencode` | `agent-stacks/opencode` | Skills |
+| `pi` | `agent-stacks/pi` | Skills |
+| `agent-deck` | `agent-stacks/agent-deck` | Nothing directly; every Claude Code session it starts runs through `flox agent launch claude` |
+
+The agent is found on `PATH`, so the environment's harness wins over one installed elsewhere.
+When the agent comes from outside the Nix store, such as a copy installed with npm or Homebrew, launch warns and runs it anyway.
+
+Each launch stages the plugins in its own folder under `.flox/cache/agent-stacks/launch/` and hands that to the agent.
+Staged files are links into the installed packages, so nothing is copied.
+Your own agent configuration, such as `~/.claude` and your login, is not changed.
+
+Launch prints a `note:` line for each hook a plugin runs and each setting it applies, and a warning for anything it leaves out.
+
+## Options
+
+Options for `launch` go between `launch` and `<agent>`.
+
+| Option | Effect |
+| ------ | ------ |
+| `--sandbox <name>` | Run the agent through the sandbox program `agent-sandbox-<name>`, found on `PATH`. If it is missing, launch stops and names the package to install. |
+| `--sandbox-options '<json>'` | Pass options to the sandbox. The value must be a JSON object; anything else stops the launch before it starts. The sandbox checks the keys. |
+
+## Arguments for the agent
+
+Everything after `<agent>` goes to the agent unchanged.
+A single leading `--` is removed:
+
+```bash
+flox agent launch claude -- --continue
+```
+
+## Global options
+
+Global options go before `launch`: `flox agent --config-dir ./cfg launch claude`.
+
+| Option | Default | Effect |
+| ------ | ------- | ------ |
+| `--dir <path>` | `$FLOX_ENV/share` | Read plugins from `<path>/agent-plugins` |
+| `--config-dir <path>` | `$FLOX_ENV_PROJECT/.flox/cache/agent-stacks` | Where launches are staged |
+
+## Sandboxes
+
+With `--sandbox`, launch builds the agent's command and environment exactly as it does without one, then runs:
+
+```text
+agent-sandbox-<name> [--options '<json>'] -- <agent> [args]
+```
+
+The sandbox validates its options, sets itself up, and runs the agent.
+Its error messages and exit status reach you unchanged.
+
+| Sandbox | Package | Options |
+| ------- | ------- | ------- |
+| `srt` | `agent-stacks/agent-sandbox-srt` | `allowedDomains`, `allowWrite`, `denyRead` |
+| `nono` | `agent-stacks/agent-sandbox-nono` | `allowedDomains`, `allowWrite`, `denyRead` |
+
+See [Launch an agent in a sandbox](/ai-agents/guides/launch-in-a-sandbox) for what each sandbox allows.
+
+## Examples
+
+```bash
+flox agent launch claude
+```
+
+```bash
+flox agent launch codex
+```
+
+```bash
+flox agent launch --sandbox srt --sandbox-options '{"allowedDomains": ["github.com"]}' claude
+```
+
+## Requirements
+
+Claude Code 2.1.280 or later.
+The `agent-stacks/claude-code` package meets this.
+Codex must be the `agent-stacks/codex` build, which accepts skills from Flox; another build launches without them, and `flox agent doctor` reports it as degraded.
+
+## See also
+
+- [`flox agent list`](/ai-agents/reference/flox-agent-list)
+- [Launch an agent in a sandbox](/ai-agents/guides/launch-in-a-sandbox)
