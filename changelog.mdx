@@ -9,6 +9,45 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 
 {/* changelog:insert */}
 
+<Update label="October 22" description="v1.19.1">
+  ## Upgrade to distrust compromised certificate authorities
+
+  You should upgrade to 1.19.1 to distrust four compromised certificate
+  roots. On Linux, Flox's bundled CA certificates now distrust three
+  emSign roots and the Comodo AAA Services root. Reboot your system after
+  upgrading to ensure full remediation. See
+  [Upgrade existing Flox installation](/install-flox/install#upgrade-existing-flox-installation).
+
+  ## Set `SSL_CERT_FILE` yourself if your environment needs it
+
+  Flox no longer sets `SSL_CERT_FILE` in activated environments, no longer
+  copies your `SSL_CERT_FILE` into `NIX_SSL_CERT_FILE`, and no longer
+  overrides a `NIX_SSL_CERT_FILE`, `PATH_LOCALE`, or `LOCALE_ARCHIVE` you
+  have set. When neither certificate variable is set, Flox sets
+  `NIX_SSL_CERT_FILE` for Nix-built software only. If your environment or
+  a tool in it relied on the `SSL_CERT_FILE` Flox used to export, set it
+  yourself in the manifest's `[vars]` section. See
+  [`[vars]`](/man/manifest.toml#vars).
+
+  ## Also in this release
+
+  - Environments built with Flox 1.19.0 or earlier no longer export an
+    outdated `SSL_CERT_FILE` when activated, and no rebuild is needed.
+  - Container images built with `flox containerize` now carry the same CA
+    bundle at `/etc/ssl/certs` as Flox itself, including distrust of the
+    compromised roots.
+  - On Linux, activations, services, local builds, `flox develop`,
+    `flox run`, and extensions no longer inherit the `SSL_CERT_FILE` and
+    `SSL_CERT_DIR` that Flox's TLS library wrote into the Flox process.
+  - macOS is unaffected by the distrust changes because the system
+    keychain governs trust there.
+
+  See the
+  [v1.19.1 release notes](https://github.com/flox/flox/releases/tag/v1.19.1)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.19.1 */}
+
 <Update label="October 14" description="v1.18.2">
   ## Upgrade to address a Nix privilege escalation
 
