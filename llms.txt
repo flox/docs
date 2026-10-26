@@ -165,7 +165,15 @@ Key terms:
 ## FloxHub on-prem: Administer: Users
 
 - [Administer users](https://flox.dev/docs/floxhub-onprem/administration/users/overview.md): Provisioning and managing the people who use your deployment.
-- [User identity](https://flox.dev/docs/floxhub-onprem/administration/users/identity.md): Connecting FloxHub to your identity provider.
+
+## FloxHub on-prem: Administer: Users: User identity
+
+- [User identity](https://flox.dev/docs/floxhub-onprem/administration/users/identity.md): Choose an identity integration for FloxHub on-prem: identity providers through Dex or a deployment authentication override for Kerberos.
+- [Configure identity providers](https://flox.dev/docs/floxhub-onprem/administration/users/identity/configure.md): Shared setup, identity claims, and verification for identity providers connected through Dex.
+- [OpenID Connect](https://flox.dev/docs/floxhub-onprem/administration/users/identity/oidc.md): Connect Okta, AD FS, or another OpenID Connect identity provider through Dex.
+- [Microsoft Entra ID](https://flox.dev/docs/floxhub-onprem/administration/users/identity/entra-id.md): Connect Microsoft Entra ID through the Dex Microsoft connector.
+- [LDAP and Active Directory](https://flox.dev/docs/floxhub-onprem/administration/users/identity/ldap.md): Connect an LDAP directory or Active Directory through Dex.
+- [Kerberos authentication](https://flox.dev/docs/floxhub-onprem/administration/users/identity/kerberos.md): Use deployment authentication overrides to integrate Kerberos and SPNEGO with FloxHub.
 
 ## FloxHub on-prem: Upgrade
 

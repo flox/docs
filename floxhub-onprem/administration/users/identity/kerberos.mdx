@@ -1,0 +1,57 @@
+---
+title: "Kerberos authentication"
+description: "Use deployment authentication overrides to integrate Kerberos and SPNEGO with FloxHub."
+---
+
+Kerberos/SPNEGO is an authentication override for the deployment. FloxHub's
+front door verifies the Kerberos credential, and Accounts resolves the verified
+principal to a FloxHub identity. This path operates independently of Dex
+connectors.
+
+## Deployment configuration
+
+Supply the following overrides in your deployment's Flox environment:
+
+| Setting | Value |
+| --- | --- |
+| `FLOXHUB_SITE_NGINX_AUTH_MODE` | `kerberos` |
+| `FLOXHUB_SITE_AUTH` | `reverse_proxy` |
+| `FLOXHUB_SITE_BACKEND_AUTHN_MODE` | `trusted_identity` |
+| `FLOXHUB_SITE_KERBEROS_REALM` | Your Kerberos realm |
+| `FLOXHUB_SITE_KERBEROS_SERVICE_NAME` | Your HTTP service principal |
+| `FLOXHUB_SITE_KERBEROS_KEYTAB` | Path to the service keytab |
+
+The nginx package included with FloxHub contains the SPNEGO module. You supply
+the realm configuration and service credentials. Restrict access to the keytab
+to the service identity that needs it.
+
+The authentication front door also needs the Accounts internal API credential
+in `$FLOX_ENV_CACHE/secrets/accounts-internal-api-keys`. It uses this credential
+to resolve the verified Kerberos principal through Accounts. Keep internal
+Accounts endpoints accessible only to trusted services.
+
+Render the configuration after changing authentication settings, the keytab
+path, or the Accounts credential:
+
+```bash
+flox activate -- floxhub render
+```
+
+Restart the affected services through your deployment's service manager to
+apply the rendered configuration. Dex is enabled independently; selecting
+Kerberos does not automatically disable it.
+
+## Identity and trust
+
+FloxHub verifies the configured realm and keeps a stable Accounts identifier
+for each full realm-qualified principal. The username portion is preserved for
+POSIX lookups. Kerberos handles accept ASCII letters, digits, underscores, and
+hyphens; unsupported characters are rejected.
+
+The front door replaces incoming identity assertions with the verified
+Accounts identity before forwarding requests. Backend services must only
+accept trusted identity assertions from that authentication boundary.
+
+Organization membership and authorization are configured separately from
+Kerberos authentication. See [Administer users](/floxhub-onprem/administration/users/overview)
+for the user administration topics.

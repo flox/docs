@@ -1,0 +1,35 @@
+---
+title: "Microsoft Entra ID"
+description: "Connect Microsoft Entra ID through the Dex Microsoft connector."
+---
+
+Complete the [shared setup](/floxhub-onprem/administration/users/identity/configure) and use the
+`${FLOXHUB_SITE_URL}/dex/callback` URL when registering your application.
+
+## Register the application and write the connector
+
+Register an application under **App registrations** — web platform, with the
+callback URL as the redirect URI — and create a client secret. The `microsoft`
+connector handles the Entra specifics.
+
+```yaml
+connectors:
+  - type: microsoft
+    id: entra
+    name: Entra ID
+    config:
+      tenant: <tenant id or domain>
+      clientID: <application id>
+      clientSecret: <client secret>
+      redirectURI: https://<host>/dex/callback
+```
+
+## Apply and verify
+
+Follow the [render and verification steps](/floxhub-onprem/administration/users/identity/configure#connect-your-provider).
+Confirm that the identity returned through Dex includes `preferred_username`
+or `name`, as described in the
+[required claims](/floxhub-onprem/administration/users/identity/configure#what-the-deployment-takes-from-your-provider).
+
+See the [Dex Microsoft connector reference](https://dexidp.io/docs/connectors/microsoft/)
+for provider-specific options.

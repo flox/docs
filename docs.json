@@ -164,7 +164,17 @@
                     "group": "Users",
                     "pages": [
                       "floxhub-onprem/administration/users/overview",
-                      "floxhub-onprem/administration/users/identity"
+                      {
+                        "group": "User identity",
+                        "pages": [
+                          "floxhub-onprem/administration/users/identity",
+                          "floxhub-onprem/administration/users/identity/configure",
+                          "floxhub-onprem/administration/users/identity/oidc",
+                          "floxhub-onprem/administration/users/identity/entra-id",
+                          "floxhub-onprem/administration/users/identity/ldap",
+                          "floxhub-onprem/administration/users/identity/kerberos"
+                        ]
+                      }
                     ]
                   },
                   "floxhub-onprem/administration/factory",
