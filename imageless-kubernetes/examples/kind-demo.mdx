@@ -9,6 +9,19 @@ Kubernetes deployment, but you don't have to build a container image.
 To demonstrate this, we'll run a simple web server backed by Redis using two
 Flox environments.
 
+## Prerequisites
+
+Before you start, make sure you have:
+
+- [Flox installed](/install-flox/install)
+- A FloxHub login — run [`flox auth login`](/man/flox-auth)
+
+The example pulls its Flox environments from FloxHub, so the shim needs a
+FloxHub token. `just up` copies your token into a Kubernetes secret for you
+and stops with an error if you are not logged in. See
+[Configuration](/imageless-kubernetes/config) for how that secret is created
+and mounted.
+
 ## Running the example
 
 The entirety of this example can be run locally with the following commands:

@@ -23,7 +23,7 @@ Verify the Flox runtime configuration is present in the active containerd config
 
 2. Check if `containerd config dump` has an `imports` section that might be loading other configuration files.
 
-3. Confirm the relevant sections exist in the output:
+3. Confirm the relevant sections exist in the output. The plugin id depends on your containerd config schema version — `io.containerd.grpc.v1.cri` for `version = 2` (shown below) and `io.containerd.cri.v1.runtime` for `version = 3` or `4`. See [Self-managed installation](/imageless-kubernetes/install/self-managed) for both forms.
 
     ```toml
     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.flox]
