@@ -229,8 +229,8 @@ Key terms:
 
 ## AI agents: Get started
 
-- [AI coding agents](https://flox.dev/docs/ai-agents/overview.md): Put an AI coding agent, its plugins, and a sandbox in a Flox environment, and launch the agent with exactly that set.
 - [AI agent quickstart](https://flox.dev/docs/ai-agents/quickstart.md): Install Claude Code and an agent plugin into a Flox environment, then launch the agent with that plugin.
+- [AI coding agents](https://flox.dev/docs/ai-agents/overview.md): Put an AI coding agent, its plugins, and a sandbox in a Flox environment, and launch the agent with exactly that set.
 
 ## AI agents: Guides
 

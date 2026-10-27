@@ -6,7 +6,7 @@ description: "Scan an agent plugin for security issues with SkillSpector before 
 
 A plugin's skills are instructions your agent follows.
 Before you install one, you can scan it for prompt injection, credential access, and other risky patterns.
-`flox agent audit` runs NVIDIA SkillSpector over each skill and scores the plugin from 0 to 100, where higher is better.
+`flox agent audit` runs NVIDIA [SkillSpector](https://github.com/nvidia/skillspector) over each skill and scores the plugin from 0 to 100, where higher is better.
 
 ## Install the scanner
 
@@ -44,8 +44,7 @@ Add `@<version>` to audit a specific version, for example `agent-stacks/agent-pl
 
 ## Audit what is already installed
 
-Pass a path instead of a package name.
-A path starts with `./`, `../`, `/`, or `~/`.
+Pass a file path instead of a package name.
 To audit one installed plugin:
 
 ```bash
