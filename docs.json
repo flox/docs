@@ -257,8 +257,8 @@
           {
             "group": "Get started",
             "pages": [
-              "ai-agents/overview",
-              "ai-agents/quickstart"
+              "ai-agents/quickstart",
+              "ai-agents/overview"
             ]
           },
           {
