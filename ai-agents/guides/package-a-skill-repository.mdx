@@ -13,15 +13,19 @@ The steps below build in a checkout of that repository, which provides the build
 
 ## Prerequisites
 
-- An environment with `flox/flox-agent` installed, as in the [quickstart](/ai-agents/quickstart).
-- Nix, to build the package.
+- An environment with `flox/flox-agent` installed, as in the [quickstart](/ai-agents/quickstart), plus `nix` from the catalog to build the package:
+
+```bash
+flox install nix
+```
+
 - A clone of agent-pkgs:
 
 ```bash
 git clone https://github.com/agent-stacks/agent-pkgs.git && cd agent-pkgs
 ```
 
-Run the commands below in a shell where your environment is active, so `flox agent` is available.
+Run the commands below in a shell where your environment is active, so `flox agent` and `nix` are available.
 
 ## Import the repository
 
@@ -64,10 +68,12 @@ See the [`flox agent import`](/ai-agents/reference/flox-agent-import) reference 
 
 ## Build and check the package
 
-The build fetches only tracked files, so add the new folder to git first:
+The build fetches only tracked files, so add the new folder to git first.
+The flag turns on the Nix features a flake build needs:
 
 ```bash
-git add pkgs/agent-plugin-caveman && nix build .#agent-plugin-caveman
+git add pkgs/agent-plugin-caveman
+nix --extra-experimental-features 'nix-command flakes' build .#agent-plugin-caveman
 ```
 
 Check the built plugin against the Agent Plugins specification:
