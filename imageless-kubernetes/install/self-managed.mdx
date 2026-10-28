@@ -117,71 +117,76 @@ See [Authentication](/concepts/authentication) for details.
     readlink -e /usr/local/bin/containerd-shim-flox-v2
     ```
 
-4. Add the Flox runtime configuration to the `containerd` `config.toml`, usually `/etc/containerd/config.toml`.
-Check the `version` line in the file and use the matching configuration below.
-On K3s, see [K3s configuration](#k3s-configuration) instead.
+##### Register the shim with `containerd`
 
-    ```toml title="version = 2"
-    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.flox]
+Add the Flox runtime to the `containerd` configuration and restart `containerd`.
+The steps depend on how `containerd` is installed on the node.
+
+<Tabs>
+  <Tab title="containerd">
+  1. Add the Flox runtime configuration to `/etc/containerd/config.toml`.
+  Check the `version` line in the file and use the matching configuration below.
+
+      ```toml title="version = 2"
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.flox]
+          runtime_path = "/usr/local/bin/containerd-shim-flox-v2"
+          runtime_type = "io.containerd.runc.v2"
+          pod_annotations = [ "flox.dev/*" ]
+          container_annotations = [ "flox.dev/*" ]
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.flox.options]
+          SystemdCgroup = true
+      ```
+
+      ```toml title="version = 3"
+      [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox]
         runtime_path = "/usr/local/bin/containerd-shim-flox-v2"
         runtime_type = "io.containerd.runc.v2"
         pod_annotations = [ "flox.dev/*" ]
         container_annotations = [ "flox.dev/*" ]
-    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.flox.options]
-        SystemdCgroup = true
-    ```
+      [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox.options]
+          SystemdCgroup = true
+      ```
 
-    ```toml title="version = 3"
-    [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox]
-      runtime_path = "/usr/local/bin/containerd-shim-flox-v2"
-      runtime_type = "io.containerd.runc.v2"
-      pod_annotations = [ "flox.dev/*" ]
-      container_annotations = [ "flox.dev/*" ]
-    [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox.options]
-        SystemdCgroup = true
-    ```
+  2. Restart `containerd`.
 
-5. Restart `containerd`.
+      ```bash
+      sudo systemctl restart containerd
+      ```
+  </Tab>
+  <Tab title="K3s">
+  K3s regenerates `/var/lib/rancher/k3s/agent/etc/containerd/config.toml` each time it starts, so changes made directly to that file are lost.
+  Instead, add the Flox runtime to a configuration template in the same directory, as described in the [K3s documentation](https://docs.k3s.io/advanced#configuring-containerd).
 
-    ```bash
-    sudo systemctl restart containerd
-    ```
+  1. Create `config-v3.toml.tmpl` with the configuration below.
+  The first line includes the K3s base template.
 
-##### K3s configuration
+      ```toml title="/var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.tmpl"
+      {{ template "base" . }}
 
-K3s regenerates `/var/lib/rancher/k3s/agent/etc/containerd/config.toml` each time it starts, so changes made directly to that file are lost.
-Instead, add the Flox runtime to a configuration template in the same directory, as described in the [K3s documentation](https://docs.k3s.io/advanced#configuring-containerd).
+      [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox]
+        runtime_path = "/usr/local/bin/containerd-shim-flox-v2"
+        runtime_type = "io.containerd.runc.v2"
+        pod_annotations = [ "flox.dev/*" ]
+        container_annotations = [ "flox.dev/*" ]
+      [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox.options]
+          SystemdCgroup = true
+      ```
 
-1. Create the template.
-For `containerd` 2.x, use `config-v3.toml.tmpl` with the `version = 3` configuration.
-For `containerd` 1.7, use `config.toml.tmpl` with the `version = 2` configuration.
-The first line includes the K3s base template.
+  2. Restart K3s.
+  K3s does not use a `containerd` service; restarting K3s restarts its bundled `containerd`.
+  Use `k3s` on server nodes and `k3s-agent` on agent nodes.
 
-    ```toml title="/var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.tmpl"
-    {{ template "base" . }}
+      ```bash
+      sudo systemctl restart k3s
+      ```
 
-    [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox]
-      runtime_path = "/usr/local/bin/containerd-shim-flox-v2"
-      runtime_type = "io.containerd.runc.v2"
-      pod_annotations = [ "flox.dev/*" ]
-      container_annotations = [ "flox.dev/*" ]
-    [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox.options]
-        SystemdCgroup = true
-    ```
+  3. Confirm the generated configuration includes the Flox runtime:
 
-2. Restart K3s.
-K3s does not use a `containerd` service; restarting K3s restarts its bundled `containerd`.
-Use `k3s` on server nodes and `k3s-agent` on agent nodes.
-
-    ```bash
-    sudo systemctl restart k3s
-    ```
-
-3. Confirm the generated configuration includes the Flox runtime:
-
-    ```bash
-    sudo grep -A 2 'runtimes.flox]' /var/lib/rancher/k3s/agent/etc/containerd/config.toml
-    ```
+      ```bash
+      sudo grep -A 2 'runtimes.flox]' /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+      ```
+  </Tab>
+</Tabs>
 
 ## Kubernetes configuration
 
