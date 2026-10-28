@@ -43,10 +43,27 @@ We provide an installer in the form of a Flox environment that deploys Imageless
 
 Details about the installer can be found on its [FloxHub page](https://hub.flox.dev/flox/containerd-shim-flox-installer); the script is executed by the activation hook for the environment.
 
+The installer updates `/etc/containerd/config.toml`, which must already exist.
+Some `containerd` packages, such as Ubuntu's, do not create it.
+If the file is missing, generate the default configuration:
+
+```bash
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
+```
+
 Once Flox is installed, the runtime shim can be installed by running the following command as `root` on each node that will host Imageless Kubernetes pods.
 
 ```bash
 flox activate -r flox/containerd-shim-flox-installer --trust
+```
+
+The command's exit status does not indicate whether the shim was installed.
+Check its output for one of these lines:
+
+```text
+Updated containerd config at /etc/containerd/config.toml
+confirmed containerd config contains desired flox runtime config
 ```
 
 #### Manual installation
@@ -172,6 +189,8 @@ A [RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) 
 
 We recommend labeling nodes that have the runtime shim installed to ensure Flox pods are only scheduled on them.
 
+On K3s, the default kubeconfig at `/etc/rancher/k3s/k3s.yaml` is readable only by `root`, so run the `kubectl` commands below with `sudo`.
+
 1. Label your nodes with the following command:
 
     ```sh
@@ -204,3 +223,13 @@ The `nodeSelector` ensures that Flox pods will only be scheduled on nodes with t
 Once the nodes have Flox and the shim installed, you are ready to create pods using the Flox runtime.
 
 A sample `Pod` manifest is available in the [Introduction](/imageless-kubernetes/intro), but any Kubernetes resource that creates a pod (e.g. `Deployment`) can be used by setting the `runtimeClassName` parameter to `flox`.
+
+To verify the installation, save the sample manifest as `pod.yaml` and apply it:
+
+```bash
+kubectl apply -f pod.yaml
+kubectl wait --for=condition=Ready pod/flox-containerd-demo --timeout=300s
+kubectl logs flox-containerd-demo
+```
+
+The logs include `Listening on http://:8080` once the `flox/echoip` environment is running.
