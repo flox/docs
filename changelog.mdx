@@ -9,6 +9,24 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 
 {/* changelog:insert */}
 
+<Update label="October 27" description="v1.19.2">
+  ## Upgrade to address a Brotli vulnerability
+
+  You should upgrade to 1.19.2 to address CVE-2026-111497 in the Brotli
+  decompression library used by Flox's bundled Nix. The vulnerability
+  could be chained with compromised trusted infrastructure or a MITM
+  attack to serve malicious Brotli-compressed data through a Nix
+  substituter, flake download, or source download and potentially allow
+  arbitrary code execution on your machine. Reboot your system after
+  upgrading to ensure full remediation. See
+  [Upgrade existing Flox installation](/install-flox/install#upgrade-existing-flox-installation).
+
+  See the
+  [v1.19.2 release notes](https://github.com/flox/flox/releases/tag/v1.19.2)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.19.2 */}
+
 <Update label="October 14" description="v1.18.2">
   ## Upgrade to address a Nix privilege escalation
 
