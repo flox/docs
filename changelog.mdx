@@ -9,6 +9,31 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 
 {/* changelog:insert */}
 
+<Update label="October 28" description="v1.19.3">
+  ## Recover from a failed Homebrew upgrade on macOS
+
+  You can upgrade a Homebrew install of Flox on macOS without failing with
+  `An existing package already provides the following file`. The failure
+  hit the second and later `brew upgrade` and can leave `/nix` unmounted
+  after a reboot. If `brew upgrade` already moved you to 1.19.1 or 1.19.2,
+  run
+  `curl -fsSL https://github.com/flox/flox/releases/download/v1.19.3/recover-brew-upgrade.sh | sh`
+  as your normal user instead of `brew upgrade flox` to repair and upgrade
+  to 1.19.3. See [Homebrew](/install-flox/install#homebrew).
+
+  ## Also in this release
+
+  - Upgrading Flox on Debian and Ubuntu now restarts `nix-daemon` with its
+    updated configuration.
+  - `apt remove flox` now removes the `nixbld` users and group on Debian
+    and Ubuntu.
+
+  See the
+  [v1.19.3 release notes](https://github.com/flox/flox/releases/tag/v1.19.3)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.19.3 */}
+
 <Update label="October 14" description="v1.18.2">
   ## Upgrade to address a Nix privilege escalation
 
