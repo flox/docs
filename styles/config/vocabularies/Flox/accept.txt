@@ -22,6 +22,15 @@ sourceRoot
 substituters
 vendorHash
 
+# === AI agents ===
+Anthropic
+bubblewrap
+frontmatter
+Landlock
+opencode
+seccomp
+SkillSpector
+
 # === Other technical vocabulary ===
 allowlist
 auditable

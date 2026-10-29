@@ -1,0 +1,81 @@
+---
+title: "AI coding agents"
+description: "Put an AI coding agent, its plugins, and a sandbox in a Flox environment, and launch the agent with exactly that set."
+---
+
+An AI coding agent is only as predictable as the things it loads.
+Claude Code picks up skills, MCP servers, and hooks from your home directory, from marketplaces, and from whatever someone installed last week.
+Two developers running "the same" agent are rarely running the same thing.
+
+Flox lets you declare the agent setup the way you declare any other toolchain: as packages in an environment.
+You install three kinds of package, and `flox agent` launches the agent with exactly what the environment holds.
+
+## Harness, plugins, sandboxes
+
+**The harness** is the agent program itself, such as Claude Code.
+It comes from the `agent-stacks` catalog on FloxHub as an ordinary package, so its version is pinned in the lockfile like everything else.
+
+| Harness | Package | Launch name |
+| ------- | ------- | ----------- |
+| Claude Code | `agent-stacks/claude-code` | `claude` |
+| OpenAI Codex | `agent-stacks/codex` | `codex` |
+| opencode | `agent-stacks/opencode` | `opencode` |
+| pi | `agent-stacks/pi` | `pi` |
+| Agent Deck | `agent-stacks/agent-deck` | `agent-deck` |
+
+**Agent plugins** carry what the agent can use: skills, MCP servers, and, for Claude Code, hooks, agents, and commands.
+Each plugin is a package named `agent-stacks/agent-plugin-<name>`, built from a pinned commit of its upstream repository.
+An installed plugin lands in the environment under `share/agent-plugins/<name>/`.
+Claude Code receives whole plugins.
+Codex, opencode, and pi receive the plugins' skills only.
+
+**A sandbox** limits what the agent can reach once it runs: which files it can write, which files it can read, and which hosts it can contact.
+Each sandbox is a package named `agent-stacks/agent-sandbox-<name>`, and you choose one when you launch.
+
+<Note>
+  Agent plugins are packages an AI agent loads.
+  They are unrelated to the `[plugins]` section of the manifest, which is described in [Plugins](/concepts/plugins).
+</Note>
+
+## What `flox agent launch` does
+
+When you run `flox agent launch claude`, Flox:
+
+1. Finds the harness on the environment's `PATH`.
+2. Reads every agent plugin installed in the environment.
+3. Stages those plugins in the environment's cache, under `.flox/cache/agent-stacks/`.
+4. Starts the harness with the staged plugins, through a sandbox if you asked for one.
+
+Your own agent configuration is left alone.
+The plugins apply to that one agent process, so `~/.claude` and your login are not changed, and a `claude` started outside the environment does not see them.
+
+## Why a Flox environment
+
+- **Reproducible.** The harness and every plugin are pinned in `manifest.lock`. A teammate who activates the same environment launches the same agent with the same skills.
+- **Shareable.** Push the environment to FloxHub and the whole setup travels with it. See [Sharing environments](/tutorials/sharing-environments).
+- **Reviewable.** Changing the agent's skills is a change to the manifest, so it shows up in a diff and in the environment's [generations](/concepts/generations).
+- **Auditable.** You can scan a plugin for security issues before you install it. See [Audit an agent plugin](/ai-agents/guides/audit-a-plugin).
+
+## Requirements
+
+`flox agent` is a Flox extension provided by the `flox/flox-agent` package.
+Extensions are a beta feature, so enable beta features once:
+
+```bash
+flox config --set features.beta true
+```
+
+Alternatively, set `FLOX_FEATURES_BETA=true` in your shell.
+
+## Usage data
+
+`flox agent` follows the same consent and opt-out as the Flox CLI.
+It can send crash reports and usage events: the command that ran, the operating system, the release, counts of plugins and skills, and whether the command succeeded.
+It never sends names, paths, file contents, or arguments.
+`flox config --set disable_metrics true`, `FLOX_DISABLE_METRICS=true`, or `DO_NOT_TRACK=1` turns both off.
+
+## Next steps
+
+- [Quickstart](/ai-agents/quickstart): launch Claude Code with a plugin in a few minutes.
+- [Launch an agent in a sandbox](/ai-agents/guides/launch-in-a-sandbox)
+- [Package a skill repository](/ai-agents/guides/package-a-skill-repository)
