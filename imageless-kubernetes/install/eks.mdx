@@ -141,9 +141,9 @@ In the above example, the `cloudinit_pre_nodeadm` section is used by `nodeadm` t
 
 First, it installs Flox on the node using the latest `rpm` package, which will then be used to create pods backed by Flox environments.
 
-Then, the `flox activate` command executes an [installer](https://hub.flox.dev/flox/containerd-shim-flox-installer) that detects the node's running `containerd` version, downloads the correct version of the Flox runtime shim to match, and installs it to `/usr/local/bin` on the node.
+Then, the `flox activate` command executes an [installer](https://hub.flox.dev/flox/containerd-shim-flox-installer) that detects the node's running `containerd` version and config schema, downloads the matching Flox runtime shim to `/usr/local/bin`, and registers the `flox` runtime in `/etc/containerd/config.toml` under the CRI plugin key the schema requires — `io.containerd.grpc.v1.cri` for config `version = 2`, or `io.containerd.cri.v1.runtime` for `version = 3`/`4` (containerd 2.x). On current Amazon Linux 2023 EKS AMIs (containerd 2.3, schema v4) the runtime is registered under `io.containerd.cri.v1.runtime`.
 
-Finally, it uses a `NodeConfig` manifest to leverage `nodeadm`'s native functionality to update the node's `containerd` configuration to be aware of the Flox runtime.
+The `NodeConfig` manifest above leverages `nodeadm`'s native functionality to seed the node's `containerd` configuration; the installer then normalizes the `flox` runtime to the schema-appropriate key. The key shown in the example is the legacy `version = 2` form.
 
 The `labels` section is used to give each Flox-enabled node an identifier to ensure that Flox pods only target these nodes.
 The `label` is used in concert with a `RuntimeClass` in the next section to make Kubernetes aware of the Flox runtime.
