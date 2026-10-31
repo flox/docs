@@ -43,10 +43,27 @@ We provide an installer in the form of a Flox environment that deploys Imageless
 
 Details about the installer can be found on its [FloxHub page](https://hub.flox.dev/flox/containerd-shim-flox-installer); the script is executed by the activation hook for the environment.
 
+The installer updates `/etc/containerd/config.toml`, which must already exist.
+Some `containerd` packages, such as Ubuntu's, do not create it.
+If the file is missing, generate the default configuration:
+
+```bash
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
+```
+
 Once Flox is installed, the runtime shim can be installed by running the following command as `root` on each node that will host Imageless Kubernetes pods.
 
 ```bash
 flox activate -r flox/containerd-shim-flox-installer --trust
+```
+
+The command's exit status does not indicate whether the shim was installed.
+Check its output for one of these lines:
+
+```text
+Updated containerd config at /etc/containerd/config.toml
+confirmed containerd config contains desired flox runtime config
 ```
 
 #### Manual installation
@@ -59,68 +76,125 @@ containerd not found, skipping flox shim installation
 
 when running the installer, but do have `containerd` installed, you can perform the installation process manually.
 
-This may be necessary for Kubernetes distributions like K3s that vendor `containerd`, and put its binaries and configuration in a non-standard location.
+The installer does not support Kubernetes distributions that bundle their own `containerd`, such as K3s. On those, use the manual method.
 
-1. Create a Flox environment and install the runtime shim.
+1. Check the `containerd` version on the node.
+Use the `-2x` shim package for `containerd` 2.x and the `-17` package for 1.7.
 
-    ```sh
+    ```bash
+    containerd --version
+    ```
+
+    On K3s, `containerd` is not on the `PATH`. Use:
+
+    ```bash
+    sudo k3s ctr version
+    ```
+
+2. Create a Flox environment and install the runtime shim.
+Installing a package from the catalog requires you to be signed in to FloxHub.
+Run `flox auth login`, or set `FLOX_FLOXHUB_TOKEN` on nodes without a browser.
+See [Authentication](/concepts/authentication) for details.
+
+    ```bash
     mkdir containerd-shim-flox
     cd containerd-shim-flox
     flox init -b
-    # use -2x for containerd 2.x, and -17 for 1.7
-    flox install flox/containerd-shim-flox-2x 
+    flox install flox/containerd-shim-flox-2x
     ```
 
-2. Create a symlink from the Flox environment to `/usr/local/bin`.
+    Keep this directory in place; the symlink in the next step points into it.
 
-    ```sh
-    ln -s $PWD/.flox/run/*-linux.containerd-shim-flox.run/bin/containerd-shim-flox-v2 /usr/local/bin/containerd-shim-flox-v2
+3. Create a symlink from the Flox environment to `/usr/local/bin`.
 
+    ```bash
+    sudo ln -s $PWD/.flox/run/*-linux.containerd-shim-flox-run/bin/containerd-shim-flox-v2 /usr/local/bin/containerd-shim-flox-v2
     ```
 
-3. Add the Flox runtime configuration to the `containerd` `config.toml`.
-Check the `version` line at the beginning of the file and use the matching configuration below.
+    Confirm the symlink resolves to the shim binary:
 
-    <Note>
-      **Note**
+    ```bash
+    readlink -e /usr/local/bin/containerd-shim-flox-v2
+    ```
 
-      This is usually in `/etc/containerd`, but on K3s, it is in `/var/lib/rancher/k3s/agent/etc/containerd`.
+##### Register the shim with `containerd`
 
-      See the [K3s documentation](https://docs.k3s.io/advanced#configuring-containerd) for more details on that specific implementation.
-    </Note>
-    ```toml title="version = 2"
-    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.flox]
+Add the Flox runtime to the `containerd` configuration and restart `containerd`.
+The steps depend on how `containerd` is installed on the node.
+
+<Tabs>
+  <Tab title="containerd">
+  1. Add the Flox runtime configuration to `/etc/containerd/config.toml`.
+  Check the `version` line in the file and use the matching configuration below.
+
+      ```toml title="version = 2"
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.flox]
+          runtime_path = "/usr/local/bin/containerd-shim-flox-v2"
+          runtime_type = "io.containerd.runc.v2"
+          pod_annotations = [ "flox.dev/*" ]
+          container_annotations = [ "flox.dev/*" ]
+      [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.flox.options]
+          SystemdCgroup = true
+      ```
+
+      ```toml title="version = 3"
+      [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox]
         runtime_path = "/usr/local/bin/containerd-shim-flox-v2"
         runtime_type = "io.containerd.runc.v2"
         pod_annotations = [ "flox.dev/*" ]
         container_annotations = [ "flox.dev/*" ]
-    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.flox.options]
-        SystemdCgroup = true
-    ```
+      [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox.options]
+          SystemdCgroup = true
+      ```
 
-    ```toml title="version = 3"
-    [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox]
-      runtime_path = "/usr/local/bin/containerd-shim-flox-v2"
-      runtime_type = "io.containerd.runc.v2"
-      pod_annotations = [ "flox.dev/*" ]
-      container_annotations = [ "flox.dev/*" ]
-    [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox.options]
-        SystemdCgroup = true
-    ```
+  2. Restart `containerd`.
 
-4. Restart `containerd`
+      ```bash
+      sudo systemctl restart containerd
+      ```
+  </Tab>
+  <Tab title="K3s">
+  K3s regenerates `/var/lib/rancher/k3s/agent/etc/containerd/config.toml` each time it starts, so changes made directly to that file are lost.
+  Instead, add the Flox runtime to a configuration template in the same directory, as described in the [K3s documentation](https://docs.k3s.io/advanced#configuring-containerd).
 
-    ```sh
-    systemctl restart containerd
-    # if needed
-    systemctl restart k3s
-    ```
+  1. Create `config-v3.toml.tmpl` with the configuration below.
+  The first line includes the K3s base template.
+
+      ```toml title="/var/lib/rancher/k3s/agent/etc/containerd/config-v3.toml.tmpl"
+      {{ template "base" . }}
+
+      [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox]
+        runtime_path = "/usr/local/bin/containerd-shim-flox-v2"
+        runtime_type = "io.containerd.runc.v2"
+        pod_annotations = [ "flox.dev/*" ]
+        container_annotations = [ "flox.dev/*" ]
+      [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.flox.options]
+          SystemdCgroup = true
+      ```
+
+  2. Restart K3s.
+  K3s does not use a `containerd` service; restarting K3s restarts its bundled `containerd`.
+  Use `k3s` on server nodes and `k3s-agent` on agent nodes.
+
+      ```bash
+      sudo systemctl restart k3s
+      ```
+
+  3. Confirm the generated configuration includes the Flox runtime:
+
+      ```bash
+      sudo grep -A 2 'runtimes.flox]' /var/lib/rancher/k3s/agent/etc/containerd/config.toml
+      ```
+  </Tab>
+</Tabs>
 
 ## Kubernetes configuration
 
 A [RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) is used to expose the runtime to Kubernetes such that it can be utilized to create pods.
 
 We recommend labeling nodes that have the runtime shim installed to ensure Flox pods are only scheduled on them.
+
+On K3s, the default kubeconfig at `/etc/rancher/k3s/k3s.yaml` is readable only by `root`, so run the `kubectl` commands below with `sudo`.
 
 1. Label your nodes with the following command:
 
@@ -154,3 +228,13 @@ The `nodeSelector` ensures that Flox pods will only be scheduled on nodes with t
 Once the nodes have Flox and the shim installed, you are ready to create pods using the Flox runtime.
 
 A sample `Pod` manifest is available in the [Introduction](/imageless-kubernetes/intro), but any Kubernetes resource that creates a pod (e.g. `Deployment`) can be used by setting the `runtimeClassName` parameter to `flox`.
+
+To verify the installation, save the sample manifest as `pod.yaml` and apply it:
+
+```bash
+kubectl apply -f pod.yaml
+kubectl wait --for=condition=Ready pod/flox-containerd-demo --timeout=300s
+kubectl logs flox-containerd-demo
+```
+
+The logs include `Listening on http://:8080` once the `flox/echoip` environment is running.
