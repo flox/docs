@@ -8,7 +8,7 @@ description: "What the Flox CLI and FloxHub collect, what is linked to your acco
 - The Flox CLI sends Flox usage telemetry and error reports. Both carry a random device ID, which Flox links to your FloxHub account when you sign in.
 - FloxHub logs the requests the CLI sends it, such as package searches and installs, with your IP address.
 - Flox doesn't upload your source files, except in packages you publish. When you push an environment, FloxHub stores its manifest and lockfile.
-- `FLOX_DISABLE_METRICS=true` turns off telemetry and error reports. It doesn't stop the requests that features such as search and install need.
+- `FLOX_DISABLE_METRICS=true` or `DO_NOT_TRACK=1` turns off telemetry and error reports. It doesn't stop the requests that features such as search and install need.
 
 ## What Flox collects
 
@@ -22,7 +22,8 @@ Flox saves events on your machine and sends them in the background from time to 
 
 Events don't contain your hostname, error messages, the commands you run inside an environment, or your manifest's variables and scripts.
 
-Each event carries a random device ID that Flox creates the first time you run it.
+Each event carries a random device ID.
+Flox creates it, and prints a notice about telemetry, the first time you run Flox.
 When you're signed in, Flox also records your FloxHub account ID with your events.
 Flox links your device ID to your account, so events the device sent before you signed in are linked too.
 
@@ -32,7 +33,8 @@ The install script also reports each install, with your operating system, CPU ar
 
 If you installed Flox with Flox's installers or Homebrew, or use the `flox/flox` container images, Flox sends error reports and performance traces to Sentry.
 They contain error messages, recent log messages, and the timing of each step with the values it worked on, such as search terms, package names, environment names and file paths.
-They carry your device ID and your computer's hostname.
+They carry your device ID.
+Earlier Flox releases also send your computer's hostname.
 
 ### Requests to the catalog and FloxHub
 
@@ -76,16 +78,19 @@ Set it before you run Flox for the first time, so that Flox never creates a devi
 Turning telemetry off later doesn't delete a device ID or unsent events that Flox already saved on your machine.
 If you turn telemetry back on, Flox sends them.
 
-The variable accepts only `true` or `false`.
+`FLOX_DISABLE_METRICS` accepts only `true` or `false`.
 Any other value, such as `1`, makes Flox commands exit with an error.
 To save the setting in your user configuration instead, run `flox config --set disable_metrics true`.
 
+Flox also turns telemetry off when `DO_NOT_TRACK` has any value other than an empty value, `0` or `false`.
+`DO_NOT_TRACK` overrides `FLOX_DISABLE_METRICS=false` and `disable_metrics = false`.
+
 Other places to set it:
 
-- **Every user on a machine:** add `disable_metrics = true` to `/etc/flox.toml`, and export `FLOX_DISABLE_METRICS=true` from a system-wide shell profile.
+- **Every user on a machine:** add `disable_metrics = true` to `/etc/flox.toml`, and export `FLOX_DISABLE_METRICS=true` or `DO_NOT_TRACK=1` from a system-wide shell profile.
 - **CI:** set `FLOX_DISABLE_METRICS=true` in the job's environment.
 - **Imageless Kubernetes:** see [Imageless Kubernetes configuration](/imageless-kubernetes/config#telemetry).
-- **The install script:** it reads only the environment variable.
+- **The install script:** it reads only `FLOX_DISABLE_METRICS`, not `DO_NOT_TRACK` or configuration files.
 
   ```bash
   curl -fsSL https://get.flox.dev | FLOX_DISABLE_METRICS=true sh
@@ -106,7 +111,6 @@ A user can override these settings, so Flox can't enforce them.
 To enforce them, block these endpoints at your network edge:
 
 - `api.flox.dev/events`, which shares a hostname with the catalog API, so blocking it needs a proxy that filters by path
-- `z7qixlmjr3.execute-api.eu-north-1.amazonaws.com`
 - `*.ingest.us.sentry.io`
 
 ### What turning it off doesn't stop
