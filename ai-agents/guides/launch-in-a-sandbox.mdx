@@ -1,0 +1,103 @@
+---
+title: "Launch an agent in a sandbox"
+sidebarTitle: "Launch in a sandbox"
+description: "Run an AI coding agent inside a sandbox package that limits the files and hosts it can reach."
+---
+
+Installing a harness and its plugins in an environment decides what the agent brings with it.
+A sandbox decides what the agent can reach once it runs.
+This guide runs Claude Code inside a sandbox from the same environment.
+
+You need an environment set up as in the [quickstart](/ai-agents/quickstart).
+
+## Choose a sandbox
+
+Each sandbox is a package.
+Two are available:
+
+| Sandbox | Package | macOS | Linux |
+| ------- | ------- | ----- | ----- |
+| `srt` | `agent-stacks/agent-sandbox-srt` | Seatbelt | bubblewrap and seccomp |
+| `nono` | `agent-stacks/agent-sandbox-nono` | Seatbelt | Landlock |
+
+`srt` runs the agent inside Anthropic's sandbox-runtime.
+Network access is limited to the hosts it allows.
+`nono` leaves the network open until you list allowed hosts, and needs no administrator setup on Linux.
+
+Install the one you want:
+
+```bash
+flox install agent-stacks/agent-sandbox-srt
+```
+
+## Launch the agent in the sandbox
+
+Pass `--sandbox` between `launch` and the harness name:
+
+```bash
+flox agent launch --sandbox srt claude
+```
+
+The sandbox prints a line saying it is running the agent, then Claude Code starts as usual.
+If the sandbox package is not installed, the launch stops before starting anything and names the package to install.
+
+Start the agent from your project folder.
+The project folder is writable inside the sandbox, so both sandboxes refuse to start in `/` or in your home folder.
+
+## What the sandbox allows
+
+Both sandboxes start from these defaults:
+
+- The project folder is writable, along with `/tmp` and Claude's own state (`~/.claude` and `~/.claude.json`).
+- `~/.ssh` cannot be read.
+- Claude's API hosts are reachable, as is every host named by an MCP server of the installed plugins.
+
+With `srt`, no other host is reachable.
+With `nono`, the network stays open until you pass `allowedDomains`.
+
+## Pass options to the sandbox
+
+Pass options as one JSON object with `--sandbox-options`.
+Both sandboxes accept the same three keys, and each value is a list of strings that is added to the defaults:
+
+| Key | Adds |
+| --- | ---- |
+| `allowedDomains` | Hosts the agent can reach |
+| `allowWrite` | Paths the agent can write |
+| `denyRead` | Paths the agent cannot read |
+
+For example, to let the agent reach GitHub:
+
+```bash
+flox agent launch --sandbox srt --sandbox-options '{"allowedDomains": ["github.com"]}' claude
+```
+
+`flox agent launch` checks only that the value is a JSON object.
+The sandbox checks the keys, and reports an unknown key or a value that is not a list of strings without starting the agent.
+
+To see the settings `srt` would apply without starting the agent, set `AGENT_SANDBOX_SRT_DRY_RUN=1`.
+For `nono`, the variable is `AGENT_SANDBOX_NONO_DRY_RUN=1`.
+
+```bash
+AGENT_SANDBOX_SRT_DRY_RUN=1 flox agent launch --sandbox srt claude
+```
+
+## Flags for the agent
+
+Flags for `flox agent launch` go before the harness name.
+Everything after the harness name belongs to the harness:
+
+```bash
+flox agent launch --sandbox srt claude -- --continue
+```
+
+## Ubuntu 24.04 and later
+
+Ubuntu 24.04 restricts unprivileged user namespaces, which `srt` needs on Linux.
+When that restriction is on, `agent-sandbox-srt` stops and prints the one-time administrator step that allows it.
+`nono` does not need this step.
+
+## Related
+
+- [`flox agent launch`](/ai-agents/reference/flox-agent-launch) reference
+- [AI coding agents](/ai-agents/overview)

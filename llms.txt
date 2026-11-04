@@ -228,6 +228,25 @@ Key terms:
 - [flox gc](https://flox.dev/docs/man/flox-gc.md): Garbage collection.
 - [flox include upgrade](https://flox.dev/docs/man/flox-include-upgrade.md): Upgrade an environment with latest changes to its included environments.
 
+## AI agents: Get started
+
+- [AI agent quickstart](https://flox.dev/docs/ai-agents/quickstart.md): Install Claude Code and an agent plugin into a Flox environment, then launch the agent with that plugin.
+- [AI coding agents](https://flox.dev/docs/ai-agents/overview.md): Put an AI coding agent, its plugins, and a sandbox in a Flox environment, and launch the agent with exactly that set.
+
+## AI agents: Guides
+
+- [Package a skill repository](https://flox.dev/docs/ai-agents/guides/package-a-skill-repository.md): Turn a GitHub repository of agent skills into a pinned agent plugin package and install it into a Flox environment.
+- [Audit an agent plugin](https://flox.dev/docs/ai-agents/guides/audit-a-plugin.md): Scan an agent plugin for security issues with SkillSpector before or after you install it.
+- [Launch an agent in a sandbox](https://flox.dev/docs/ai-agents/guides/launch-in-a-sandbox.md): Run an AI coding agent inside a sandbox package that limits the files and hosts it can reach.
+
+## AI agents: Command reference
+
+- [flox agent list](https://flox.dev/docs/ai-agents/reference/flox-agent-list.md): Show the harnesses and agent plugins an environment gives its AI agent.
+- [flox agent launch](https://flox.dev/docs/ai-agents/reference/flox-agent-launch.md): Run an AI coding agent with the environment's agent plugins, optionally inside a sandbox.
+- [flox agent import](https://flox.dev/docs/ai-agents/reference/flox-agent-import.md): Generate a pinned agent plugin package from a GitHub repository of skills.
+- [flox agent audit](https://flox.dev/docs/ai-agents/reference/flox-agent-audit.md): Security-audit an agent plugin, by path or by catalog package, with NVIDIA SkillSpector.
+- [flox agent check-plugin](https://flox.dev/docs/ai-agents/reference/flox-agent-check-plugin.md): Validate an agent plugin folder against the Agent Plugins and Agent Skills specifications.
+
 ## Changelog
 
 - [2026](https://flox.dev/docs/changelog.md): What's new across the Flox CLI, FloxHub, and extensions
