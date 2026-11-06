@@ -9,6 +9,57 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 
 {/* changelog:insert */}
 
+<Update label="November 5" description="v1.19.4">
+  ## Repair Homebrew upgrades to v1.19.4 on macOS
+
+  If you upgraded to 1.19.1 or 1.19.2 on macOS with `brew upgrade`, a
+  plain `brew upgrade flox` to 1.19.4 fails because Homebrew runs the old
+  uninstall script first. Run
+  `curl -fsSL https://github.com/flox/flox/releases/download/v1.19.4/recover-brew-upgrade.sh | sh`
+  instead to repair the installation and upgrade to the latest release
+  available through Homebrew. Do not run the script as root, even though
+  it uses `sudo`. See [Homebrew](/install-flox/install#homebrew).
+
+  ## Regenerate v1 catalog locks for Nix expression builds
+
+  If you build with Nix expressions and have a v1 `.flox/catalog.lock`,
+  you regenerate it with `flox build update-catalogs` because version 2 is
+  now required and no automatic migration occurs. Commit the regenerated
+  lockfile with your project. See
+  [`flox build update-catalogs`](/man/flox-build-update-catalogs).
+
+  ## Publish only from full clones that track an upstream branch
+
+  You publish only from a checked-out branch that tracks an upstream, has
+  complete history, and contains the advertised upstream tip. Set
+  `fetch-depth: 0` when you use `actions/checkout` in GitHub Actions
+  because shallow checkouts fail. If the remote tip is missing from your
+  clone, `flox publish` stops and asks you to run
+  `git fetch <remote> <branch>` and retry. See
+  [`flox publish`](/man/flox-publish#preconditions).
+
+  ## Also in this release
+
+  - `flox publish` asks you to confirm a source lineage change before
+    building instead of after building and uploading.
+  - Zsh and tcsh no longer auto-activate an environment for `cd` inside a
+    subshell, such as `(cd project && make)`; run one command in another
+    environment with `flox activate -d project -- make`.
+  - Zsh and tcsh keep their attachment to an auto-activated environment
+    when a subshell changes directory, which fixes `PID … is not attached`
+    errors and services stopping while you still use the shell.
+  - `flox containerize` honors `[options] cuda-detection`, so GPU
+    workloads no longer silently fall back to CPU in containers.
+  - Container images now contain real `/etc/passwd` and `/etc/group` files
+    instead of symlinks, which fixes startup failures on containerd
+    2.2.0–2.2.7 and 2.3.0–2.3.4.
+
+  See the
+  [v1.19.4 release notes](https://github.com/flox/flox/releases/tag/v1.19.4)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.19.4 */}
+
 <Update label="October 14" description="v1.18.2">
   ## Upgrade to address a Nix privilege escalation
 
