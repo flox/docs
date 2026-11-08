@@ -71,8 +71,6 @@ Each of those runs sends the telemetry and error reports that [What Flox collect
 Imageless Kubernetes always sets the invocation source `containerd`, so its telemetry and its requests to FloxHub carry that label.
 If you mount a FloxHub token, Flox records that token's account ID with its [telemetry](/concepts/data-collection#cli-telemetry).
 The Flox package that Imageless Kubernetes nodes install sends error reports and performance traces to Sentry.
-Reports from the node's commands contain the node's hostname.
-Reports from the container contain the pod's hostname, which is the pod's name unless you set `spec.hostname`.
 
 ### Disabling telemetry
 
