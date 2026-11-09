@@ -5,10 +5,17 @@ description: "Install Claude Code and an agent plugin into a Flox environment, t
 ---
 
 In this guide you create an environment holding Claude Code and the `frontend-design` plugin, check what the agent will get, and launch it.
-You need [Flox installed](/install-flox/install) and a Claude account.
+You need [Flox installed](/install-flox/install), a free FloxHub account, and a Claude account.
 For the ideas behind it (harnesses, plugins and sandboxes), see [AI coding agents](/ai-agents/overview).
 
-## Enable the extension
+## Log in and enable the extension
+
+Installing packages from the Flox Catalog needs you to be logged in to FloxHub.
+Log in once per machine:
+
+```bash
+flox auth login
+```
 
 `flox agent` is a beta Flox extension, and Flox only runs beta commands once you opt in.
 Turn on beta features once:
