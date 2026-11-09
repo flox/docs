@@ -6,10 +6,10 @@ description: "Generate a pinned agent plugin package from a GitHub repository of
 ## Synopsis
 
 ```text
-flox agent import <path|url> [--out <dir>] [--plugin <path[=name]>]...
-                  [--path-ignore <glob>]... [--dependency <attr>]...
-                  [--no-auto-discovery]
-flox agent import <path|url> [--out <dir>] --replay
+flox agent import <path|url> [--pkgs-dir <dir>] [--lib-dir <dir>] [--yes]
+                  [--plugin <path[=name]>]... [--path-ignore <glob>]...
+                  [--dependency <attr>]... [--no-auto-discovery]
+flox agent import <path|url> [--pkgs-dir <dir>] [--yes] --replay
 ```
 
 ## Description
@@ -26,14 +26,16 @@ Import:
 2. Finds every plugin and its skills.
 3. Computes the hash of the source the build will fetch.
 4. Validates each plugin with the [`check-plugin`](/ai-agents/reference/flox-agent-check-plugin) rules. A plugin with errors is not written; the others are.
-5. Writes `agent-plugin-<name>/source.json` and `agent-plugin-<name>/default.nix` under the output folder, and prints a summary.
+5. Writes `agent-plugin-<name>/default.json` and `agent-plugin-<name>/default.nix` under the packages folder, and prints a summary.
+6. Writes what the packages need to build beside them: the builder in the lib folder, and the `flox-agent` that ran the import as its own package.
 
 The summary is `new plugin` on a first import.
 On a re-import it is `unchanged at <rev>`, `regenerated at <rev>`, or `<old> -> <new>` with the skills added and removed.
 There is no separate update command; re-importing is how a package moves to a newer commit.
 
-`source.json` records the source, the skills, the flags given, and every warning.
+`default.json` records the source, the skills, the flags given, and every warning.
 `default.nix` is the same in every package, apart from a block between its `BEGIN custom` and `END custom` markers that a re-import keeps.
+A package written before `default.json` holds `source.json` instead; import still reads it, and moves it to `default.json` on its next write.
 
 ## Finding plugins
 
@@ -52,18 +54,23 @@ Within each plugin, import searches for `SKILL.md` files and records anything it
 
 | Option | Repeatable | Effect |
 | ------ | ---------- | ------ |
-| `--out <dir>` | No | Where to write packages. Default `.flox/pkgs/` |
+| `--pkgs-dir <dir>` | No | Where to write packages. Default `.flox/pkgs/` |
+| `--lib-dir <dir>` | No | Where to write the builder, inside the same root. Default `.flox/agent-lib/` in a Flox environment, else `lib/` beside the packages folder |
+| `--yes` | No | Create the Flox environment or `flake.nix` the packages folder needs, without asking |
 | `--plugin <path[=name]>` | Yes | Treat `<path>` as a plugin, named `<name>` or after its folder |
 | `--path-ignore <glob>` | Yes | Never read or package anything matching `<glob>` |
 | `--dependency <attr>` | Yes | A Nixpkgs package the build may link a script's interpreter from, such as `R` for `Rscript` |
 | `--no-auto-discovery` | No | Import only the `--plugin` folders |
 | `--replay` | No | Repeat the flags recorded in the existing packages for this repository |
 
-Every option except `--out` and `--replay` is recorded in `source.json`.
-`--replay` can be combined only with `--out`.
+Every option except `--yes` and `--replay` is recorded in `default.json`.
+`--pkgs-dir` and `--lib-dir` are recorded only when given, relative to the root.
+`--replay` can be combined only with `--pkgs-dir` and `--yes`.
 
-A default output under `.flox` needs that `.flox` to be a Flox environment.
-Run `flox init` first, or pass `--out` with a folder outside `.flox`.
+A packages folder under `.flox` needs that `.flox` to be a Flox environment, and one anywhere else needs a `flake.nix` beside it.
+When it is missing, import offers to create it; `--yes` creates it without asking, and a run without a terminal fails instead.
+
+`--out` was removed. Passing it is a usage error that names `--pkgs-dir` instead.
 
 A package folder belongs to the repository that wrote it.
 Import refuses to overwrite a package recorded from a different repository.
@@ -74,26 +81,32 @@ Import refuses to overwrite a package recorded from a different repository.
 | ------ | ------- |
 | `0` | Every plugin was imported |
 | `1` | A plugin failed, or the clone or a write failed; the other plugins are still written |
-| `2` | Usage error, including `--replay` with a flag other than `--out` |
+| `2` | Usage error, including `--out` and `--replay` with a flag other than `--pkgs-dir` or `--yes` |
 
 ## Examples
 
-Import a repository into an agent-pkgs checkout:
+Import a repository into the current environment:
 
 ```bash
-flox agent import juliusbrussee/caveman --out pkgs
+flox agent import juliusbrussee/caveman
 ```
 
 Import a folder of skills that discovery misses, under a chosen name:
 
 ```bash
-flox agent import owner/repo --out pkgs --plugin skills=my-skills
+flox agent import owner/repo --plugin skills=my-skills
 ```
 
 Update a package, repeating the flags it was first imported with:
 
 ```bash
-flox agent import juliusbrussee/caveman --out pkgs --replay
+flox agent import juliusbrussee/caveman --replay
+```
+
+Import into an agent-pkgs checkout:
+
+```bash
+flox agent import juliusbrussee/caveman --pkgs-dir pkgs
 ```
 
 ## See also
