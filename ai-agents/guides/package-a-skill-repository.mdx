@@ -1,53 +1,46 @@
 ---
 title: "Package a skill repository"
 sidebarTitle: "Package a skill repository"
-description: "Turn a GitHub repository of agent skills into a pinned agent plugin package and install it into a Flox environment."
+description: "Turn a GitHub repository of agent skills into a pinned agent plugin package, build it with Flox, and install it into an environment."
 ---
 
 Many skill collections live in GitHub repositories rather than in the catalog.
-`flox agent import` reads such a repository, finds its plugins and skills, and writes a package definition pinned to one commit.
-This guide imports a repository, builds the package, checks it, and installs it into an environment.
-
-The agent plugin packages in the `agent-stacks` catalog are generated this way, in the [agent-pkgs](https://github.com/agent-stacks/agent-pkgs) repository.
-The steps below build in a checkout of that repository, which provides the builder the generated package needs.
+`flox agent import` reads such a repository, finds its plugins and skills, and writes a package pinned to one commit into your environment.
+This guide imports a repository, builds the package with `flox build`, checks it, and installs it.
 
 ## Prerequisites
 
-- An environment with `flox/flox-agent` installed, as in the [quickstart](/ai-agents/quickstart), plus `nix` from the catalog to build the package:
+- An environment with `flox/flox-agent` installed, as in the [quickstart](/ai-agents/quickstart).
+- The environment's folder is a git repository, because `flox build` reads only files git tracks:
 
 ```bash
-flox install nix
+git init
 ```
 
-- A clone of agent-pkgs:
-
-```bash
-git clone https://github.com/agent-stacks/agent-pkgs.git && cd agent-pkgs
-```
-
-Run the commands below in a shell where your environment is active, so `flox agent` and `nix` are available.
+Run the commands below in a shell where your environment is active, so `flox agent` is available.
 
 ## Import the repository
 
-Pass the repository as `owner/repo`, a GitHub URL, or a local clone whose `origin` is on GitHub.
-Write the package into the `pkgs` folder:
+Pass the repository as `owner/repo`, a GitHub URL, or a local clone whose `origin` is on GitHub:
 
 ```bash
-flox agent import juliusbrussee/caveman --out pkgs
+flox agent import juliusbrussee/caveman
 ```
 
 Import pins the current commit, finds every plugin in the repository, and validates each one.
 It prints a warning for anything it packages with a deviation and for anything it leaves out, then a summary per plugin:
 
 ```console
-caveman: new plugin at bad48a0e1df5 (22 skills)
-  written to pkgs/agent-plugin-caveman
+caveman: new plugin at 3dc497a7f858 (22 skills)
+  written to .flox/pkgs/agent-plugin-caveman
 ```
 
-Each plugin becomes a folder holding two files:
+Each plugin becomes a folder under `.flox/pkgs` holding two files:
 
-- `source.json` records the pinned source, the skills, and the import that produced them, including its warnings.
-- `default.nix` reads `source.json` and is the same in every package.
+- `default.json` records the pinned source, the skills, and the import that produced them, including its warnings.
+- `default.nix` reads `default.json` and is the same in every package.
+
+Import also writes what the packages need to build: the builder in `.flox/agent-lib/` and the `flox-agent` that ran the import in `.flox/pkgs/flox-agent/`.
 
 Import only reads from GitHub.
 Repositories hosted elsewhere are rejected.
@@ -55,7 +48,7 @@ Repositories hosted elsewhere are rejected.
 ### Choose what gets imported
 
 Most repositories need no flags.
-When discovery finds the wrong thing, these flags adjust it, and import records them in `source.json` so a later re-import repeats them:
+When discovery finds the wrong thing, these flags adjust it, and import records them in `default.json` so a later re-import repeats them:
 
 | Flag | Use it to |
 | ---- | --------- |
@@ -68,37 +61,45 @@ See the [`flox agent import`](/ai-agents/reference/flox-agent-import) reference 
 
 ## Build and check the package
 
-The build fetches only tracked files, so add the new folder to git first.
-The flag turns on the Nix features a flake build needs:
+Track the new files, then build the plugin:
 
 ```bash
-git add pkgs/agent-plugin-caveman
-nix --extra-experimental-features 'nix-command flakes' build .#agent-plugin-caveman
+git add .flox
+flox build agent-plugin-caveman
+```
+
+The build checks the plugin as it assembles it and ends with:
+
+```console
+⚡︎ Built output: ./result-agent-plugin-caveman
 ```
 
 Check the built plugin against the Agent Plugins specification:
 
 ```bash
-flox agent check-plugin result/share/agent-plugins/caveman
+flox agent check-plugin result-agent-plugin-caveman/share/agent-plugins/caveman
 ```
 
 Scan it for security issues:
 
 ```bash
-flox agent audit ./result
+flox agent audit ./result-agent-plugin-caveman
 ```
 
 See [Audit an agent plugin](/ai-agents/guides/audit-a-plugin) for how to read the score.
 
 ## Install it into your environment
 
-From your project's environment, install the package from the agent-pkgs checkout:
+Publish the package to your catalog, then install it from there:
 
 ```bash
-flox install "git+file://$HOME/agent-pkgs#agent-plugin-caveman"
+flox publish agent-plugin-caveman
+flox install <your-handle>/agent-plugin-caveman
 ```
 
-Replace `$HOME/agent-pkgs` with the path to your clone.
+`flox publish` needs the repository pushed to a remote, with the commit you publish on its branch.
+See [`flox publish`](/man/flox-publish) for what it checks.
+
 `flox agent list` now shows the plugin, and the next `flox agent launch` loads it.
 
 ## Update the package
@@ -107,12 +108,14 @@ Run the same import again to move to the repository's latest commit.
 To repeat the flags recorded the first time, use `--replay`:
 
 ```bash
-flox agent import juliusbrussee/caveman --out pkgs --replay
+flox agent import juliusbrussee/caveman --replay
 ```
 
 The summary says `unchanged`, `regenerated`, or the old and new commit, with the skills added and removed.
+Build and publish again to ship the new version.
 
-To have the plugin published in the `agent-stacks` catalog, open a pull request to agent-pkgs with the generated folder.
+The agent plugin packages in the `agent-stacks` catalog are made the same way, in the [agent-pkgs](https://github.com/agent-stacks/agent-pkgs) repository.
+To have a plugin published there, open a pull request to agent-pkgs with the generated folder.
 Packages there are re-imported automatically when their upstream moves.
 
 ## Related
