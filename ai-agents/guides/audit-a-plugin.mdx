@@ -6,7 +6,7 @@ description: "Scan an agent plugin for security issues with SkillSpector before 
 
 A plugin's skills are instructions your agent follows.
 Before you install one, you can scan it for prompt injection, credential access, and other risky patterns.
-`flox agent audit` runs NVIDIA [SkillSpector](https://github.com/nvidia/skillspector) over each skill and scores the plugin from 0 to 100, where higher is better.
+`flox agent audit` runs NVIDIA [SkillSpector](https://github.com/nvidia/skillspector) over each skill and the rest of what the plugin carries, and scores it from 0 to 100, where higher is better.
 
 ## Install the scanner
 
@@ -61,7 +61,7 @@ A bare word is always read as a package, so `flox agent audit frontend-design` l
 
 ## Read the result
 
-Each skill gets its own score, and the plugin scores its worst skill.
+Each skill and component gets its own score, and the plugin scores its worst.
 The bands are SkillSpector's:
 
 | Score | Status |
@@ -75,8 +75,8 @@ HIGH and CRITICAL findings move the score most.
 For a `caution` score, read each finding and decide whether the skill's text justifies it.
 
 The audit also says what it did **not** check.
-It scans skills only.
-MCP server configuration, hooks, `bin/`, and files outside the plugin layout are listed under "Not checked", and the score says nothing about them.
+It scans the plugin's skills, its hooks, agents and commands, a `bin/` with programs of its own, and other folders such as `scripts/` and `src/`.
+MCP server configuration and files outside the plugin layout, such as `README.md`, are listed under "Not checked", and the score says nothing about them.
 Nothing is executed, and no language model reads the plugin.
 
 ## Gate on a score in CI
@@ -88,7 +88,7 @@ flox agent audit "$FLOX_ENV" --threshold 80
 ```
 
 A threshold of 80 fails on anything that is not `safe`.
-On a slow runner, give each skill's scan more time with `--scan-timeout`, for example `--scan-timeout 15m`.
+On a slow runner, give each scan more time with `--scan-timeout`, for example `--scan-timeout 15m`.
 
 ## Related
 

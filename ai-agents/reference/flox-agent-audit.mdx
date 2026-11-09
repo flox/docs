@@ -11,7 +11,7 @@ flox agent audit <target> [--json] [--threshold N] [--raw] [--scan-timeout D]
 
 ## Description
 
-Finds the plugin `<target>` names, validates it, lists what it will and will not look at, scans each skill with [SkillSpector](https://github.com/nvidia/skillspector), and scores the plugin from 0 to 100 by its worst skill.
+Finds the plugin `<target>` names, validates it, lists what it will and will not look at, scans each component with [SkillSpector](https://github.com/nvidia/skillspector), and scores the plugin from 0 to 100 by its worst component.
 Higher is better.
 
 `audit` measures security only.
@@ -43,27 +43,29 @@ Options can go on either side of `<target>`.
 | ------ | ------ |
 | `--json` | Print the result as JSON instead of the summary |
 | `--threshold N` | Exit with status 1 when the score is below `N` |
-| `--raw` | Include SkillSpector's own report for each skill |
-| `--scan-timeout D` | Stop a skill's scan after `D`, such as `90s` or `15m` (default `5m`) |
+| `--raw` | Include SkillSpector's own report for each component |
+| `--scan-timeout D` | Stop a component's scan after `D`, such as `90s` or `15m` (default `5m`) |
 
 ## What is checked
 
 | Entry | Treatment |
 | ----- | --------- |
-| Each `skills/<name>` with a `SKILL.md` | Scanned |
+| Each `skills/<name>` with a `SKILL.md` | Scanned, one scan per skill |
 | `plugin.json` | Validated only |
 | `mcp.json` | Not checked |
-| `bin/` | Not checked |
-| Client folders such as `com.anthropic.claude-code/`, which hold hooks, agents, and commands | Not checked |
-| Anything else | Not checked |
+| `bin/` with programs of its own | Scanned |
+| `bin/` holding only links to interpreters | Not checked |
+| Each entry of a client folder such as `com.anthropic.claude-code/`, which holds hooks, agents, and commands | Scanned, one scan per entry |
+| Any other folder, such as `scripts/` or `src/` | Scanned |
+| Anything else, such as `README.md` or `.github/` | Not checked |
 
 The summary lists every entry under one of these headings.
 The score says nothing about the entries that were not checked.
 
 ## Score
 
-Each skill scores `100 - risk`, using SkillSpector's risk model.
-The plugin scores its worst skill, and several plugins score their worst plugin.
+Each scanned component scores `100 - risk`, using SkillSpector's risk model.
+The plugin scores its worst component, and several plugins score their worst plugin.
 
 | Score | Status |
 | ----- | ------ |

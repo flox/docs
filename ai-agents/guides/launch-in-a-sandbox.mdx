@@ -55,6 +55,15 @@ Both sandboxes start from these defaults:
 With `srt`, no other host is reachable.
 With `nono`, the network stays open until you pass `allowedDomains`.
 
+The two also differ in what the agent can read.
+`nono`'s default profile hides `~/.ssh` and other credential folders.
+`srt` hides only `~/.ssh`: the agent can read the rest of your home folder, including credentials such as `~/.aws`.
+With `srt`, hide them with `denyRead`:
+
+```bash
+flox agent launch --sandbox srt --sandbox-options '{"denyRead": ["~/.aws", "~/.config/gcloud", "~/.kube"]}' claude
+```
+
 ## Pass options to the sandbox
 
 Pass options as one JSON object with `--sandbox-options`.
