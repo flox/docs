@@ -235,7 +235,7 @@ Key terms:
 
 ## AI agents: Guides
 
-- [Package a skill repository](https://flox.dev/docs/ai-agents/guides/package-a-skill-repository.md): Turn a GitHub repository of agent skills into a pinned agent plugin package and install it into a Flox environment.
+- [Package a skill repository](https://flox.dev/docs/ai-agents/guides/package-a-skill-repository.md): Turn a GitHub repository of agent skills into a pinned agent plugin package, build it with Flox, and install it into an environment.
 - [Audit an agent plugin](https://flox.dev/docs/ai-agents/guides/audit-a-plugin.md): Scan an agent plugin for security issues with SkillSpector before or after you install it.
 - [Launch an agent in a sandbox](https://flox.dev/docs/ai-agents/guides/launch-in-a-sandbox.md): Run an AI coding agent inside a sandbox package that limits the files and hosts it can reach.
 
