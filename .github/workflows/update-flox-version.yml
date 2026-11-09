@@ -28,11 +28,18 @@ jobs:
         run: |
           OLD="${{ steps.current.outputs.version }}"
           NEW="${{ steps.latest.outputs.version }}"
-          # Target only the three forms the Flox version takes in MDX:
+          # Scope the rewrite to install-flox/, the only pages that track the
+          # latest release (download URLs, checksum notes, flox --version
+          # output). Pinned historical mentions live elsewhere — the
+          # authentication cutoff, "available since Flox X.Y.Z", minimum-version
+          # notes in concepts/ and tutorials/ — and must survive every bump even
+          # when their version momentarily equals OLD. That collision is exactly
+          # how the 1.19.0 cutoff was dragged forward to 1.19.4 before #146.
+          # Target only the three forms the Flox version takes in those pages:
           #   flox-X.Y.Z.   download URLs (pkg, deb, rpm, SHA*SUMS)
           #   Flox X.Y.Z    display text
           #     X.Y.Z       indented output line in flox --version code blocks
-          find . -name "*.mdx" -print0 | xargs -0 sed -i \
+          find install-flox -name "*.mdx" -print0 | xargs -0 sed -i \
             -e "s|flox-${OLD}\.|flox-${NEW}.|g" \
             -e "s|Flox ${OLD}|Flox ${NEW}|g" \
             -e "s|^  ${OLD}$|  ${NEW}|g"
@@ -44,7 +51,7 @@ jobs:
         with:
           token: "${{ secrets.MANAGED_FLOXBOT_GITHUB_ACCESS_TOKEN_REPO_SCOPE }}"
           add-paths: |
-            **/*.mdx
+            install-flox/**/*.mdx
             FLOX_VERSION
           commit-message: "chore: update Flox version to ${{ steps.latest.outputs.version }}"
           committer: "FloxBot <bot@flox.dev>"
