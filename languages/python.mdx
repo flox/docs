@@ -291,64 +291,203 @@ At this point, the version of `eralchemy` is available within your environment.
 Not only can you _develop_ your software with Flox, but you can _build_ it as well.
 See the [builds](/concepts/builds) concept page for more details.
 
-### Manifest builds
+A Python build with Flox splits the work in two.
+The manifest pins the interpreter and the system libraries.
+Your repository's own lockfile (`uv.lock`, `requirements.txt`, `pyproject.toml`, or `poetry.lock`) stays the source of truth for Python packages.
+The build creates a virtual environment at `$out` on the manifest's interpreter and fills it from that lockfile.
+Dev and build resolve the same interpreter store path and the same package versions, so what runs in [run mode](#deploy-in-run-mode) is what you tested.
 
-#### Pip
+### The manifest
 
-For Python projects using `pip`, a build looks like installing the project to the `$out` directory.
-
-```toml
-[build.myproject]
-command = '''
-  pip install --target=$out .
-'''
-```
-
-Note the trailing `.` to indicate that you're installing the package in the
-current directory.
-If you're working in a repository with multiple packages in subdirectories,
-you would replace `.` with the path to the package sources.
-
-#### Poetry
-
-For Poetry and tools that create a virtual environment for you, a build entails installing the virtual environment to `$out`.
-Poetry in particular does not allow you to choose the location (or name) of the virtual environment directory itself, but it does allow you to configure the _parent_ directory of the virtual environment.
-The build command shown below uses environment variables to tell Poetry to use the `$out` directory as the parent of the virtual environment.
-After running `poetry install` you should have a directory structure that looks like this:
-
-```console
-$out/
-  myproject-<hash>-py3.12/
-    ...
-```
-
-Since Poetry doesn't let you decide where _exactly_ this virtual environment belongs, you need to symlink any executables from the virtual environment into the `$out/bin` directory yourself to ensure that the build output adheres to the Filesystem Hierarchy Standard (FHS).
-You also need to install a Python interpreter and add it to `runtime-packages` so that the virtual environment can reference it.
-
-The full manifest for a build using Poetry is shown below:
+The manifest below is the whole recipe.
+It is shown for a project with a `uv.lock`; the two fill lines marked in the comments change per repository shape, and the [table](#fill-lines-per-repository-shape) below has the other three.
+Replace `myapp` with your package name.
 
 ```toml
-version = 1
+schema-version = "1.19.0"
 
 [install]
-python3.pkg-path = "python3"
-python3.version = ">=3.12"
-poetry.pkg-path = "poetry"
+python3.pkg-path = "python312"
+uv.pkg-path = "uv"
+# Linux only: PyPI wheels expect libstdc++ and libz from the system. The build
+# patches their RUNPATH to the runtime environment's lib dir. Scoped so macOS
+# does not pull a compiler closure.
+auto-patchelf.pkg-path = "auto-patchelf"
+auto-patchelf.systems = ["aarch64-linux", "x86_64-linux"]
+patchelf.pkg-path = "patchelf"
+patchelf.systems = ["aarch64-linux", "x86_64-linux"]
+gcc-unwrapped.pkg-path = "gcc-unwrapped"
+gcc-unwrapped.outputs = ["lib"]
+gcc-unwrapped.systems = ["aarch64-linux", "x86_64-linux"]
+zlib.pkg-path = "zlib"
+zlib.systems = ["aarch64-linux", "x86_64-linux"]
 
-[build.myproject]
-command = '''
-  # Install to a new virtualenv.
-  export POETRY_VIRTUALENVS_PATH=$out
-  export POETRY_VIRTUALENVS_IN_PROJECT=false
-  export POETRY_VIRTUALENVS_OPTIONS_NO_PIP=true
-  poetry install
-
-  # Symlink any executables from the virtualenv.
-  mkdir -p "${out}/bin"
-  cd $out/bin
-  ln -s ../*/bin/myproject .
+[hook]
+on-activate = '''
+  # uv must use the manifest's interpreter, never a uv-managed download.
+  export UV_PYTHON_DOWNLOADS=never UV_PYTHON_PREFERENCE=only-system
+  export UV_PROJECT_ENVIRONMENT="$FLOX_ENV_CACHE/venv"
+  [ -x "$UV_PROJECT_ENVIRONMENT/bin/python" ] || uv venv --python "$FLOX_ENV/bin/python3" "$UV_PROJECT_ENVIRONMENT"
+  export VIRTUAL_ENV="$UV_PROJECT_ENVIRONMENT"
+  uv sync --frozen   # dev fill line
+  # [profile] is sourced only by interactive shells; `flox activate -- cmd` needs this too.
+  export PATH="$VIRTUAL_ENV/bin:$PATH"
 '''
-runtime-packages = [
-  "python3",
-]
+
+[profile]
+bash = 'source "$FLOX_ENV_CACHE/venv/bin/activate"'
+zsh  = 'source "$FLOX_ENV_CACHE/venv/bin/activate"'
+
+[build.myapp]
+version = "0.1.0"
+command = '''
+  export UV_PYTHON_DOWNLOADS=never UV_PYTHON_PREFERENCE=only-system UV_LINK_MODE=copy
+  uv venv --python "$FLOX_ENV/bin/python3" "$out"
+  export VIRTUAL_ENV="$out" UV_PROJECT_ENVIRONMENT="$out"
+  uv sync --frozen --no-dev --no-editable   # build fill line
+  # If the project has no console script, write a launcher into $out/bin here.
+  if [ "$(uname)" = Linux ]; then
+    auto-patchelf --paths "$out/lib" --libs "$FLOX_ENV/lib"
+  fi
+'''
+runtime-packages = ["python3", "gcc-unwrapped", "zlib"]
+
+[options]
+systems = ["aarch64-darwin", "x86_64-darwin", "aarch64-linux", "x86_64-linux"]
 ```
+
+A few lines in this manifest are not obvious.
+
+- **Interpreter pinning.** `UV_PYTHON_DOWNLOADS=never` alone is not enough: uv will still prefer a CPython it downloaded earlier over the one on `PATH`, and the build then succeeds with `$out/bin/python` pointing into your home directory. `UV_PYTHON_PREFERENCE=only-system` together with `uv venv --python "$FLOX_ENV/bin/python3"` makes both dev and build use the manifest's interpreter. Do not export `UV_PYTHON`; it retargets `uv pip install` at the store interpreter, which is read-only.
+- **`VIRTUAL_ENV`.** `uv pip install` ignores `UV_PROJECT_ENVIRONMENT`. Exporting `VIRTUAL_ENV` is what points it at `$FLOX_ENV_CACHE/venv` in dev and at `$out` in the build.
+- **Copy link mode.** uv hardlinks wheels out of its cache by default. On Linux the build edits shared libraries in place, so a hardlink would poison the cache with this build's paths and a later build would inherit them. `UV_LINK_MODE=copy` keeps the cache clean.
+- **The Linux-only block.** Wheels from PyPI expect `libstdc++.so.6` and `libz.so.1` from the system. On Linux the build runs `auto-patchelf` so that those references point at the build's runtime environment instead. `auto-patchelf` from the catalog does not bring `patchelf` with it, so both are installed. `gcc-unwrapped.outputs = ["lib"]` takes only the library output of the compiler package, and the `systems` lines keep all four packages off macOS, where they are not needed. The `runtime-packages` list may name install IDs that are absent on the current system.
+- **Exports in `[hook]`.** `[profile]` scripts are sourced by interactive shells only. `flox activate -- cmd`, and therefore every CI step, needs the virtual environment's `bin` on `PATH`, so the hook exports `VIRTUAL_ENV` and `PATH` itself. The build block repeats its exports because hook exports are not visible inside a build.
+
+The `outputs` key needs `schema-version = "1.19.0"`, which is why the manifest sets it.
+
+### Fill lines per repository shape
+
+Only two lines change with how your repository pins its dependencies.
+Replace the dev fill line in `[hook]` and the build fill line in `[build.myapp]` with the row that matches your repository.
+
+| Repository shape | Dev fill line | Build fill line |
+|---|---|---|
+| `uv.lock` | `uv sync --frozen` | `uv sync --frozen --no-dev --no-editable` |
+| `requirements.txt` | `uv pip install -r requirements.txt` | `uv pip install -r requirements.txt` |
+| `pyproject.toml` only | `uv pip install -e .` | `uv pip install .` |
+| `poetry.lock` | `poetry env use "$FLOX_ENV/bin/python3"; poetry install` | `export POETRY_VIRTUALENVS_PATH="$out" POETRY_VIRTUALENVS_IN_PROJECT=false; poetry install --only main --no-root --no-interaction; uv pip install --no-deps .` |
+
+For Poetry, also add `poetry.pkg-path = "poetry"` to `[install]`.
+Poetry owns the dev virtual environment and names it itself, so the hook sets `POETRY_VIRTUALENVS_PATH="$FLOX_ENV_CACHE/poetry"` in place of the `uv venv` lines, runs the dev fill line, and exports `VIRTUAL_ENV="$(poetry env info --path)"`.
+The `[profile]` scripts become `eval "$(poetry env activate)"`.
+The build still creates the venv at `$out` with uv; Poetry installs the locked dependencies into it, and `uv pip install --no-deps .` adds the project itself.
+The `poetry env use` line is needed because the catalog's `poetry` puts its own Python first on `PATH`.
+The [Poetry example](#examples) has the complete manifest.
+
+### Launchers for apps without a console script
+
+A CLI with a `[project.scripts]` entry needs nothing more: uv writes the console script into `$out/bin`.
+A web app usually has no console script, so the build writes a launcher into `$out/bin` instead.
+Write it with `cat >`, as a real file.
+Flox wraps the regular files in `$out/bin` so that they find the runtime environment, but it does not wrap symlinks, so a launcher created with `ln -s` ships without its runtime libraries and fails on Linux with `libz.so.1` or `libstdc++.so.6` not found.
+
+A FastAPI app served by uvicorn:
+
+```bash
+cat > "$out/bin/myapp" <<LAUNCHER
+#!/bin/sh
+exec "$out/bin/uvicorn" app.main:app --host "\${HOST:-127.0.0.1}" --port "\${PORT:-8000}"
+LAUNCHER
+chmod +x "$out/bin/myapp"
+```
+
+A Django project served by gunicorn also needs its source tree, because `manage.py` projects are not installed as a package.
+Copy the tree into `$out/share` and start gunicorn from there; gunicorn puts its working directory on `sys.path`, so that is all Django needs:
+
+```bash
+mkdir -p "$out/share/myapp"
+cp -R manage.py mysite "$out/share/myapp/"
+cat > "$out/bin/myapp" <<LAUNCHER
+#!/bin/sh
+cd "$out/share/myapp"
+exec "$out/bin/gunicorn" mysite.wsgi:application --bind "\${HOST:-127.0.0.1}:\${PORT:-8000}"
+LAUNCHER
+chmod +x "$out/bin/myapp"
+```
+
+Both snippets go into the build command where the comment says, after the build fill line and before the `auto-patchelf` step.
+Paste them at the start of the line, even though the rest of the build command is indented: the shell needs the `LAUNCHER` terminator at column 0.
+`$out` expands when the build writes the file, so the launcher carries its own absolute path; `\$` keeps `HOST` and `PORT` for the time the launcher runs.
+
+### Rules the recipe cannot enforce
+
+- **Do not install Python libraries in this environment's `[install]` or list them in `runtime-packages`.** The build wrapper sets `PYTHONPATH` to the site-packages of the runtime packages, ahead of the virtual environment. A `python312Packages.numpy` from the catalog silently wins over the version your lockfile pins, in dev and in the build. Keep catalog packages for the interpreter and for system libraries; everything from PyPI goes through the lockfile.
+- **An app without a console script needs a build backend.** `uv sync --no-editable` and `uv pip install .` install the project itself into `$out` only if `pyproject.toml` declares one, for example `hatchling`. Without it uv skips the project and the launcher has nothing to import.
+- **A loosely pinned `requirements.txt` resolves at build time.** A line like `django>=5` gives you whatever PyPI has on the day of the build, with no warning in the log. Pin every line with `==`, or generate a lockfile with `uv pip compile`.
+- **A cold uv cache means network at build time.** The build downloads wheels from PyPI unless uv's cache already has them, and the log does not say which happened. A `sandbox = "pure"` build has no network on Linux, so this recipe does not work there without a [vendoring stage](/concepts/manifest-builds#vendoring-dependencies).
+- **Resolution is sticky.** Adding a catalog package can move the `toplevel` group onto an older set of versions, and removing the package does not move `manifest.lock` back. Delete `manifest.lock` and run `flox activate` again to re-resolve.
+
+### Deploy in run mode
+
+An environment activates in one of two modes.
+The default, `dev` mode, puts a package, its development dependencies, and language variables such as `PYTHONPATH` into the activation, and on Linux adds a library loader shim.
+`run` mode links only the requested packages onto `PATH`, with none of that.
+Your build is wrapped to supply its own interpreter and libraries, so it works in either mode, but run mode is the one to test: it is what [Imageless Kubernetes](/imageless-kubernetes/config#activation-mode) pods use by default, and nothing in dev mode is there to paper over a missing dependency.
+See [`options.activate.mode`](/man/manifest.toml#options) for the full definition.
+
+The deploy pattern is a second environment that installs the build by store path and activates in run mode.
+
+Build the package:
+
+```bash
+flox build myapp
+```
+
+Create the deploy environment and install the build into it.
+`flox install` accepts the store path that `result-myapp` points at:
+
+```bash
+flox init -d deploy && flox install -d deploy "$(readlink -f result-myapp)"
+```
+
+Set the environment's mode to `run` in `deploy/.flox/env/manifest.toml`:
+
+```toml
+[options]
+activate.mode = "run"
+```
+
+Then run the app:
+
+```bash
+flox activate -d deploy --mode run -- myapp
+```
+
+Before shipping, run the same command with dev mode's variables stripped from the calling shell.
+If this passes, the package carries everything it needs:
+
+```bash
+env -u PYTHONPATH -u LD_LIBRARY_PATH flox activate -d deploy --mode run -- myapp
+```
+
+To ship a container, containerize the deploy environment in run mode and load the result:
+
+```bash
+flox containerize -d deploy --mode run --file myapp.tar && docker load -i myapp.tar
+```
+
+The image contains the build's closure and nothing from the dev environment.
+Run it with the launcher as the command, for example `docker run -p 8000:8000 -e HOST=0.0.0.0 <image> myapp`.
+
+After a rebuild, the store path changes.
+Run `flox uninstall -d deploy myapp` and install the new path.
+
+### Examples
+
+The [flox-build-examples](https://github.com/flox/flox-build-examples) repository has one complete project per repository shape, each with the manifest above, a launcher where the app needs one, a deploy environment, and a smoke test that runs in CI on macOS and Linux:
+
+- [`quotes-app-python-uv`](https://github.com/flox/flox-build-examples/tree/main/quotes-app-python-uv): `uv.lock`, FastAPI served by uvicorn.
+- [`quotes-app-python-requirements`](https://github.com/flox/flox-build-examples/tree/main/quotes-app-python-requirements): `requirements.txt`, Django served by gunicorn.
+- [`quotes-app-python-pyproject`](https://github.com/flox/flox-build-examples/tree/main/quotes-app-python-pyproject): `pyproject.toml` only, with a console script.
+- [`quotes-app-python-poetry`](https://github.com/flox/flox-build-examples/tree/main/quotes-app-python-poetry): `poetry.lock`, with a console script.
