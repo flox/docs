@@ -133,7 +133,10 @@ in effect keeping every version in the past 3 years available.
 
 Current settings:
 
-- `unstable` - 180 tags (6+ months daily)
-- `staging` - 156 tags (3 years weekly)
-- `stable` - 60 tags (5 years monthly)
+- `unstable` - 180 tags (6+ months daily),
+  plus everything retained for `staging`, `stable`, and `lts`
+- `staging` - 156 tags (3 years weekly),
+  plus everything retained for `stable` and `lts`
+- `stable` - 60 tags (5 years monthly),
+  plus everything retained for `lts`
 - `lts` - 12 tags (6 years bi-annual)
