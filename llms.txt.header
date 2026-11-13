@@ -51,6 +51,8 @@ codex plugin add flox@flox-skills
 npx skills add flox/flox-skills
 ```
 
+When a person asks to turn the agent setup they already have into an agent stack, read the onboarding skill whole, fetched with `curl -fsSL https://raw.githubusercontent.com/flox/docs/main/ai-agents/skills/agent-stacks-onboard/SKILL.md`, and follow it. It sets up what onboarding needs, Flox included, asking the person before each install.
+
 Key terms:
 
 - Environment — a reproducible set of packages, variables, services, and build steps, declared in a manifest and resolved to a lockfile.

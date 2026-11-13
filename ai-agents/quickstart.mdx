@@ -5,8 +5,26 @@ description: "Install Claude Code and an agent plugin into a Flox environment, t
 ---
 
 In this guide you create an environment holding Claude Code and the `frontend-design` plugin, check what the agent will get, and launch it.
-You need [Flox installed](/install-flox/install), a free FloxHub account, and a Claude account.
 For the ideas behind it (harnesses, plugins and sandboxes), see [AI coding agents](/ai-agents/overview).
+
+## Let your agent set it up
+
+If you already use an AI agent such as Claude Code or Codex, it can turn the skills and plugins you have now into an agent stack for you.
+Paste this prompt into it:
+
+```text
+Onboard my current agent setup into Agent Stacks, using Flox.
+Download the onboarding skill with
+curl -fsSL https://raw.githubusercontent.com/flox/docs/main/ai-agents/skills/agent-stacks-onboard/SKILL.md
+and follow it from start to finish. Read the whole file as it is, not a summary of it.
+```
+
+The agent helps you install Flox if it is missing, then turns your current setup into an agent stack: an environment that starts your agent, with your skills and plugins, here and on your other computers.
+It asks before each install, before it uploads or pushes anything to FloxHub, and before it changes what `claude` (or `codex`) starts.
+See [Onboard your agent setup](/ai-agents/guides/onboard-your-setup) for each step and what it changes.
+
+To set up an environment by hand instead, follow the steps below.
+You need [Flox installed](/install-flox/install), a free FloxHub account, and a Claude account.
 
 ## Log in and enable the extension
 
