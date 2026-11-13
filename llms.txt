@@ -51,6 +51,8 @@ codex plugin add flox@flox-skills
 npx skills add flox/flox-skills
 ```
 
+When a person asks to turn the agent setup they already have into an agent stack, read the onboarding skill whole, fetched with `curl -fsSL https://raw.githubusercontent.com/flox/docs/main/ai-agents/skills/agent-stacks-onboard/SKILL.md`, and follow it. It sets up what onboarding needs, Flox included, asking the person before each install.
+
 Key terms:
 
 - Environment — a reproducible set of packages, variables, services, and build steps, declared in a manifest and resolved to a lockfile.
@@ -235,6 +237,7 @@ Key terms:
 
 ## AI agents: Guides
 
+- [Onboard your agent setup](https://flox.dev/docs/ai-agents/guides/onboard-your-setup.md): Paste one prompt into the AI agent you already use, and it turns your skills, plugins, and sandbox into an agent stack that starts the same agent on your other computers too.
 - [Package a skill repository](https://flox.dev/docs/ai-agents/guides/package-a-skill-repository.md): Turn a GitHub repository of agent skills into a pinned agent plugin package, build it with Flox, and install it into an environment.
 - [Audit an agent plugin](https://flox.dev/docs/ai-agents/guides/audit-a-plugin.md): Scan an agent plugin for security issues with SkillSpector before or after you install it.
 - [Launch an agent in a sandbox](https://flox.dev/docs/ai-agents/guides/launch-in-a-sandbox.md): Run an AI coding agent inside a sandbox package that limits the files and hosts it can reach.

@@ -264,6 +264,7 @@
           {
             "group": "Guides",
             "pages": [
+              "ai-agents/guides/onboard-your-setup",
               "ai-agents/guides/package-a-skill-repository",
               "ai-agents/guides/audit-a-plugin",
               "ai-agents/guides/launch-in-a-sandbox"
