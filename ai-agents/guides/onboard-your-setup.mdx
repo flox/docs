@@ -68,9 +68,40 @@ It checks each step first, skips the ones already done, and asks before it insta
 6. **`flox-agent`.**
    The agent installs `flox/flox-agent`, the newest build the catalog is known to serve, into an environment of its own at `~/.cache/agent-stacks/bootstrap`, named `agent-stacks-bootstrap`.
    That environment is for this system only, and stays on this machine.
-   The agent checks that this `flox-agent` has the `onboard` command, and stops if it does not.
+   The agent checks that this `flox-agent` has the `onboard` command.
+   If it does not, the agent makes [a simpler stack](#before-flox-agent-has-onboarding) instead.
 
 From here on, the agent runs onboarding's commands from that environment, one at a time, as `flox activate -d ~/.cache/agent-stacks/bootstrap -m run -- flox-agent onboard <command>`.
+
+## Before flox-agent has onboarding
+
+The `onboard` command is new, and the `flox/flox-agent` the catalog serves may not have it yet.
+Then the agent makes a simpler stack itself: a Flox environment holding `flox/flox-agent`, your agent, and the catalog's packages of the Claude Code plugins you use.
+
+- **Your plugins.**
+  The agent asks Claude Code which plugins you have enabled, with `claude plugin list` and `claude plugin marketplace list`.
+  A plugin goes in the stack when the catalog has a package of the same name made from the same GitHub repository, as [agent-pkgs](https://github.com/agent-stacks/agent-pkgs) records it.
+  The stack takes the catalog's newest version, which may differ from yours.
+- **What stays here.**
+  Your own skills, plugins the catalog does not have, your MCP servers, and your settings stay where they are.
+  The stack's agent still loads them on this computer, but not on another.
+  On this computer, Claude Code also loads its own copy of a plugin the stack brings too, until you turn yours off with `/plugin`.
+- **What it asks.**
+  It shows the stack it proposes, then asks whether to create it on all your computers, which pushes it to FloxHub, or on this computer only.
+  The stack's FloxHub page is public: its name, package names and versions.
+- **Where it is kept.**
+  The environment is `~/.local/share/agent-stacks/environments/my-agent`, or the name you give.
+- **How you start it.**
+  The stack does not change what `claude` starts.
+  Start it with the command the agent shows:
+
+  ```bash
+  flox activate -d ~/.local/share/agent-stacks/environments/my-agent -- flox-agent launch claude
+  ```
+
+  Once the stack is on FloxHub, any computer logged in to FloxHub as you starts it with `flox activate -r <your-handle>/my-agent -- flox-agent launch claude`, and Flox.app lists it.
+
+Once `flox/flox-agent` has onboarding, paste the same prompt again for the full stack described below.
 
 ## Answer the onboarding's questions
 
@@ -190,6 +221,7 @@ Where a file looks like it holds a credential, onboarding names the file and lin
 | `~/.cache/agent-stacks/bootstrap` | The environment that holds `flox-agent` for the onboarding |
 | `~/.cache/agent-stacks/onboard` | The plan file, and copies of the repositories it matches against |
 | `~/.local/share/agent-stacks/stacks/my-stack` | The stack repository |
+| `~/.local/share/agent-stacks/environments/my-agent` | The simpler stack, made [before flox-agent has onboarding](#before-flox-agent-has-onboarding) |
 | `~/.local/share/agent-stacks/remotes` | A git repository, one per stack, that publishing your packages reads from |
 | `~/.local/state/agent-stacks/onboard` | The logs, the newest 30, and how each sync is going |
 | The Nix store | The packages it builds |
@@ -218,6 +250,10 @@ They never leave the machine.
   The Flox CLI cannot delete it.
 - **Make `claude` start it, on all my computers.**
   With this answer, onboarding pushes each change it makes to your default environment to FloxHub.
+- **A simpler stack.**
+  Made [before flox-agent has onboarding](#before-flox-agent-has-onboarding), it reads the catalog's record of each of your plugins from GitHub.
+  With **Create it, on all my computers**, it pushes the environment to FloxHub as `<your-handle>/my-agent`.
+  That page is public: its name, package names and versions.
 - **Usage data.**
   `flox-agent` sends crash reports and usage events as described in [Usage data](/ai-agents/overview#usage-data), and follows the same opt-out as the Flox CLI.
 

@@ -8,11 +8,12 @@ description: Turn the agent setup this machine already has (Claude Code's or Cod
 The person asked you to turn their agent setup into an agent stack: a Flox environment, kept in a git repository of its own, that starts the same agent with the same skills and plugins here and on their other computers.
 First you set up what onboarding needs, asking before you install anything.
 Then the onboarding engine, `flox-agent onboard`, does the work: you run it, show what it says, and ask its questions.
+When the flox-agent the Flox Catalog serves has no `onboard` yet, you make a simpler stack yourself instead, as [Without the engine](#without-the-engine) says.
 Ask only what you have to.
 
 Start by telling the person, in two or three lines, what happens: you check this machine and set up what is missing, asking first; then you read their setup, propose a stack, and build it once they agree; nothing of theirs is uploaded or published unless they choose that, though planning looks up their skills' sources on GitHub and in the Flox Catalog.
 
-If they asked for something under Later, for a stack they already have, do 1 (set up), then go there.
+If they asked for something under Later, for a stack they already have, do 1 (set up), then go there, or, without the engine, to [Later, without the engine](#later-without-the-engine).
 
 ## Rules
 
@@ -35,7 +36,7 @@ If they asked for something under Later, for a stack they already have, do 1 (se
   A command that needs one is the person's to run, in a terminal window of their own: not with Claude Code's `! <command>`, which has no terminal to prompt in either.
   Give them the command, wait until they say it finished, then check again.
 - **Consent.** Install nothing, and change no setting, unless the person said yes to it.
-  Nothing leaves the machine, and no file outside the stack is changed, unless the person picked an option that says so: `sync --publish --push` only after "Create it, on all my computers", or once they ask to share the stack and say yes to it (see Later); `shortcut` only after "Make … start it", and `shortcut --push` only after "Make … start it, on all my computers"; `promote` only for the packages they picked to share with an organization (see Later).
+  Nothing leaves the machine, and no file outside the stack is changed, unless the person picked an option that says so: `sync --publish --push` only after "Create it, on all my computers", or once they ask to share the stack and say yes to it (see Later); `shortcut` only after "Make … start it", and `shortcut --push` only after "Make … start it, on all my computers"; `promote` only for the packages they picked to share with an organization (see Later); without the engine, `flox push` only after "Create it, on all my computers".
 - Never read, print or copy a secret: never run `flox auth token`, and never print `flox config -l` whole.
 - Never add `--home` to an engine command.
 
@@ -171,7 +172,7 @@ env -u FLOX_EXTENSION_NAME flox activate -d <bootstrap> -m run -- flox-agent onb
 ```
 
 It exits 0 and prints a usage that starts `Usage: flox-agent onboard`.
-If it prints `Usage: flox-agent [flags] <command>` instead, with no `onboard` among its commands, this flox-agent has no `onboard`: stop, and say onboarding needs a newer flox-agent than the Flox Catalog serves yet.
+If it prints `Usage: flox-agent [flags] <command>` instead, with no `onboard` among its commands, this flox-agent has no `onboard` yet: go to [Without the engine](#without-the-engine), in place of 2 to 5 and Later.
 If it fails any other way, show what it printed, and stop.
 
 From here on, `<engine>` is `env -u FLOX_EXTENSION_NAME flox activate -d <bootstrap> -m run -- flox-agent onboard`, with `<bootstrap>` written out, and the `PATH` prefix in front when Flox needed one.
@@ -297,6 +298,137 @@ Keep this order: `shortcut` is refused while a sync of the stack runs.
   Then ask which of the packages of theirs that `status` lists to publish there (multiSelect in Claude Code, numbered in chat), each option described as "Publishes `<plugin>` to `<org>`'s catalog, where every member of `<org>` can install it, and later syncs publish its changes there too."
   `<engine> promote <plugin> --org <org> --stack <dir> --dry-run` shows the steps first, and does nothing.
   Then run `<engine> promote <plugin> --org <org> --stack <dir>` for each package they picked, and no other, one at a time: a promote holds the stack while it runs.
+
+## Without the engine
+
+When flox-agent has no `onboard` yet, you make a simpler stack: a Flox environment holding flox-agent, the person's agent, and the Flox Catalog's packages of the Claude Code plugins they use, which `flox-agent launch` starts.
+Tell the person, in a few lines, first:
+
+- The stack brings their agent and the plugins the catalog has.
+- Their own skills, their other plugins, their MCP servers and their settings stay where they are.
+  The stack's agent still loads them on this computer, but not on another.
+- It does not make `claude` (or `codex`) start the stack.
+- Once flox-agent has onboarding, pasting the same prompt again makes the full stack.
+
+### Read their setup
+
+Read only what is named here, and change nothing.
+
+- **The agent.** Run `claude --version` and `codex --version`.
+  When only one of them runs, `<agent>` is that one: `claude` or `codex`.
+  When both run, ask, with header `Agent` and question "Which agent should the stack start?":
+  - `Claude Code`: "The stack starts Claude Code, with the plugins below."
+  - `Codex`: "The stack starts Codex, with the skills of the plugins below."
+
+  When neither runs, `<agent>` is `claude`, which the stack brings.
+  For `claude`, `<id>` is `claude-code`, `<agent-pkg>` is `agent-stacks/claude-code`, and `<title>` is Claude Code.
+  For `codex`, they are `codex`, `agent-stacks/codex` and Codex.
+- **Plugins**, when `claude` runs.
+  `claude plugin list --json` lists Claude Code's plugins: each has an `id`, `<plugin>@<marketplace>`, a `scope` and `enabled`.
+  `claude plugin marketplace list --json` lists its marketplaces: each has a `name` and a `source`, and a `github` source has a `repo`, `<owner>/<repo>`.
+  A candidate is a plugin whose `scope` is `user`, whose `enabled` is true, and whose marketplace's `source` is `github`.
+  Never open Claude Code's settings files for this: they may hold secrets.
+- **Skills.** List the folder names in `~/.claude/skills`, and in `~/.codex/skills` and `~/.agents/skills` for Codex, only to say they stay here.
+
+### Match plugins to the catalog
+
+For each candidate, run:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/agent-stacks/agent-pkgs/main/pkgs/agent-plugin-<plugin>/default.json
+```
+
+It matches when the command succeeds and the file's `src.owner` and `src.repo` are the marketplace's `<owner>` and `<repo>`, in any case: the catalog's package `agent-stacks/agent-plugin-<plugin>` is made from the same repository.
+A plugin of the same name from another repository is another plugin, and does not match.
+`<version>` is the file's `version`.
+Every plugin that does not match stays here.
+
+### Propose
+
+`<handle>` is the FloxHub handle `flox auth status` printed, in "You are logged in as `<handle>`".
+`<name>` is `my-agent`, or the name the person gave: lowercase letters, digits and dashes.
+`<dir>` is the folder `printf '%s\n' "${XDG_DATA_HOME:-$HOME/.local/share}/agent-stacks/environments/<name>"` prints.
+
+If `<dir>/.flox` is there, an earlier run made this stack.
+Ask, with header `Stack` and question "`<dir>` is already a stack. What now?":
+
+- `Use it as it is (Recommended)`: "Changes nothing, and shows how to start it."
+- `Make another stack`: "Makes a new stack beside it, named `<name>-2` or a name you give."
+- `Stop`: "Changes nothing."
+
+For the first, go to [Finish, without the engine](#finish-without-the-engine).
+For the second, start this step again with that name.
+
+Show the stack you propose, in a `text` block, in this shape:
+
+```text
+Stack <handle>/<name> · <title> · started with flox-agent launch
+Kept in <dir>
+
+  From the catalog  <plugin> <version>, …
+  Stays here        <plugin> (not in the catalog), <skill> (your skill), …
+                    and your MCP servers and settings
+```
+
+Leave out a line that would list nothing.
+Then ask, with header `Create` and question "Create this stack?":
+
+- `Create it, on all my computers (Recommended)`: "Makes the Flox environment `<dir>` with <title>, flox-agent and the plugins from the catalog, then pushes it to FloxHub as `<handle>/<name>`. That page is public: its name, package names and versions. Your other computers start it with one command."
+- `Create it on this computer only`: "Makes the Flox environment `<dir>` here. Nothing leaves this computer."
+- `Not now`: "Changes nothing."
+
+On `Not now`, stop: nothing was written.
+An answer in their own words, such as to leave a plugin out, to add a catalog plugin by name, or to give the stack another name, is a change.
+Check a plugin they name with `flox show agent-stacks/agent-plugin-<plugin>` first.
+Make the change, show the stack again, and ask again.
+
+### Build
+
+1. Run `mkdir -p <dir>`, then `flox init -d <dir> -n <name> --no-auto-setup`, and read `<format>` from the manifest it wrote, as in 1.
+2. Write the manifest and lock it, which downloads every package and can take a few minutes:
+
+   ```sh
+   flox edit -d <dir> -f - <<'EOF'
+   <format>
+
+   [install]
+   flox-agent.pkg-path = "flox/flox-agent"
+   flox-agent.pkg-group = "flox-agent"
+   <id>.pkg-path = "<agent-pkg>"
+   <id>.pkg-group = "<id>"
+   agent-plugin-<plugin>.pkg-path = "agent-stacks/agent-plugin-<plugin>"
+   agent-plugin-<plugin>.pkg-group = "agent-plugin-<plugin>"
+
+   [options]
+   systems = ["aarch64-darwin", "aarch64-linux", "x86_64-linux"]
+   EOF
+   ```
+
+   Write the two `agent-plugin-<plugin>` lines once for each plugin from the catalog, and not at all when there is none.
+   Each package has a group of its own: in one group, packages must all resolve together, and these do not.
+   If it fails naming a plugin's package, which the catalog may not serve, or not build for one of these systems, take that plugin out, say so, and run it again.
+   If it fails any other way, show what Flox said, and stop.
+3. Show what the stack's agent gets, as it prints it: `flox activate -d <dir> -- flox-agent list`.
+4. **If they chose "Create it, on all my computers"**, run `flox push -d <dir>`, and show what it prints.
+   If FloxHub already has an environment named `<handle>/<name>`, say so: the stack works here, and to share it, the person deletes the old one at hub.flox.dev, or makes another stack under another name.
+
+### Finish, without the engine
+
+End with:
+
+- How to start the stack here: `flox activate -d <dir> -- flox-agent launch <agent>`.
+- After a push, on any computer logged in to FloxHub as them, this computer included: `flox activate -r <handle>/<name> -- flox-agent launch <agent>`.
+- On macOS, after a push: Flox.app lists the stack.
+- On this computer, Claude Code also loads its own copy of a plugin the stack brings too.
+  The person can turn theirs off with `/plugin` in Claude Code; never change their settings yourself.
+- Once flox-agent has onboarding, the prompt they pasted makes the full stack, which packages their own skills and can make `<agent>` start it.
+
+### Later, without the engine
+
+- `flox activate -d <dir> -- flox-agent list`: what the stack's agent gets.
+- To add or take out a catalog plugin: `flox edit -d <dir>` opens the manifest, where each plugin has its two lines, as in Build.
+  After a change to a stack on FloxHub, `flox push -d <dir>` shares it.
+- On another computer, after a push: `flox activate -r <handle>/<name> -- flox-agent launch <agent>`.
 
 ## When something fails
 
