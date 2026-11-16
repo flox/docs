@@ -96,9 +96,9 @@ flox auth status
 - Otherwise they are logged out: the person runs `flox auth login` in a terminal, which opens a browser and waits for them.
   Then check again.
 
-### Beta features, Flox.app and flox-agent
+### Beta features and flox-agent
 
-Check all three, then ask about every one not set up yet in one call (one message, in other agents), and do what they said yes to, in this order.
+Check both, then ask about every one not set up yet in one call (one message, in other agents), and do what they said yes to, in this order.
 
 **Beta features.**
 `flox agent` commands, such as `flox agent launch`, need them.
@@ -110,17 +110,6 @@ If they are off, ask:
   - `Not now`: "Onboarding works without them, but `flox agent` commands do not run until you turn them on."
 
 On yes, run `flox config --set features.beta true`.
-
-**Flox.app**, on macOS only: the menu bar app that lists the person's agent stacks and launches one.
-It is installed when `ls -d ~/Applications/Flox.app /Applications/Flox.app` finds either.
-If it finds neither, ask:
-
-- Header `Flox.app`, question "Get Flox.app, the menu bar app that lists your agent stacks and launches one?"
-  - `Open its download page`: "Opens the page in your browser. You install it from there, and onboarding goes on meanwhile."
-  - `Not now`: "Onboarding does not need it."
-
-On yes, run `open FLOX_APP_DOWNLOAD_URL` and carry on: never wait for the install.
-If it fails, say the page did not open, and carry on; never download or install the app yourself, or look for it anywhere else.
 
 **flox-agent**, which runs the onboarding, from a Flox environment of its own:
 
@@ -247,7 +236,6 @@ Meanwhile, ask decide's `shortcut` question exactly as given (plan's, if decide 
 When apply has finished, read its JSON.
 If it failed, show its error and the log it names, and stop.
 Show each entry of its `notes` the way you show the engine's text.
-If its `shape.isStack` is false, Flox.app will not list this stack: say so, and show `shape.problems`.
 
 ## 5. Finish
 
@@ -273,8 +261,7 @@ Keep this order: `shortcut` is refused while a sync of the stack runs.
   Without it: apply's `launch`.
   Then, with `<onboard>` being apply's `onboard` as it is (it works once this session is over):
   - "After you edit a skill, run `<onboard> sync --stack <dir>`";
-  - when sharing: "`<onboard> status --stack <dir>` shows how the upload to your other computers is going";
-  - on macOS, when apply's `shape.isStack` was true: Flox.app lists the stack once it is on FloxHub (once the upload finishes when sharing, else once they share it).
+  - when sharing: "`<onboard> status --stack <dir>` shows how the upload to your other computers is going".
 
 ## Later
 
@@ -418,7 +405,6 @@ End with:
 
 - How to start the stack here: `flox activate -d <dir> -- flox-agent launch <agent>`.
 - After a push, on any computer logged in to FloxHub as them, this computer included: `flox activate -r <handle>/<name> -- flox-agent launch <agent>`.
-- On macOS, after a push: Flox.app lists the stack.
 - On this computer, Claude Code also loads its own copy of a plugin the stack brings too.
   The person can turn theirs off with `/plugin` in Claude Code; never change their settings yourself.
 - Once flox-agent has onboarding, the prompt they pasted makes the full stack, which packages their own skills and can make `<agent>` start it.

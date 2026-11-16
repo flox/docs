@@ -61,11 +61,7 @@ It checks each step first, skips the ones already done, and asks before it insta
    If you are logged out, it asks you to run `flox auth login` in a terminal, which opens your browser and waits for you to log in.
 4. **Beta features.**
    `flox agent` is a beta Flox extension, so the agent asks to turn on beta features with `flox config --set features.beta true`.
-5. **Flox.app, on macOS.**
-   Flox.app is a menu bar app that lists your agent stacks and starts one.
-   If it is not in `~/Applications` or `/Applications`, the agent offers to open its download page, and you install it.
-   Onboarding does not need it, so you can skip this step.
-6. **`flox-agent`.**
+5. **`flox-agent`.**
    The agent installs `flox/flox-agent`, the newest build the catalog is known to serve, into an environment of its own at `~/.cache/agent-stacks/bootstrap`, named `agent-stacks-bootstrap`.
    That environment is for this system only, and stays on this machine.
    The agent checks that this `flox-agent` has the `onboard` command.
@@ -99,7 +95,7 @@ Then the agent makes a simpler stack itself: a Flox environment holding `flox/fl
   flox activate -d ~/.local/share/agent-stacks/environments/my-agent -- flox-agent launch claude
   ```
 
-  Once the stack is on FloxHub, any computer logged in to FloxHub as you starts it with `flox activate -r <your-handle>/my-agent -- flox-agent launch claude`, and Flox.app lists it.
+  Once the stack is on FloxHub, any computer logged in to FloxHub as you starts it with `flox activate -r <your-handle>/my-agent -- flox-agent launch claude`.
 
 Once `flox/flox-agent` has onboarding, paste the same prompt again for the full stack described below.
 
@@ -189,9 +185,6 @@ Without it, run the `flox activate` command the agent shows, such as:
 ```bash
 flox activate -d ~/.local/share/agent-stacks/stacks/my-stack/stack -- flox-agent launch claude
 ```
-
-On macOS, Flox.app lists the stack once it is on FloxHub.
-If Flox.app would not list it, the agent says why when the build is done.
 
 ## What onboarding reads
 
