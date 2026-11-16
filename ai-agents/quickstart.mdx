@@ -1,11 +1,11 @@
 ---
 title: "AI agent quickstart"
 sidebarTitle: "Quickstart"
-description: "Paste one prompt into the AI agent you already use, and it turns your skills, plugins, and sandbox into an agent stack that starts the same agent on your other computers too."
+description: "Paste one prompt into the AI agent you already use, and it turns your skills, plugins, and sandbox into an agent stack that starts the same agents on your other computers too."
 ---
 
 Your agent already has a setup: skills you installed or wrote, plugins from marketplaces, commands, agents, and perhaps a sandbox.
-In this quickstart you onboard that setup into an agent stack: an environment that holds your agent, its plugins, and its sandbox, and starts the same agent here and on your other computers.
+In this quickstart you onboard that setup into an agent stack: an environment that holds the agents you use, their plugins, and your sandbox, and starts the same agents here and on your other computers.
 You start it from the agent you already use, with one prompt.
 The agent helps you set up what is missing on the way, Flox and Agent Stacks included, so you need nothing installed first.
 For the ideas behind it (harnesses, plugins and sandboxes), see [AI coding agents](/ai-agents/overview).
@@ -44,7 +44,7 @@ The conversation is the same in any agent.
 Claude Code shows each question with options to pick from.
 Other agents ask in the chat, with numbered options, and wait for your answer.
 The agent never answers a question for you.
-It asks before each install, before it uploads or pushes anything to FloxHub, and before it changes what `claude` (or `codex`) starts.
+It asks before each install, before it uploads or pushes anything to FloxHub, and before it changes what `claude`, or another agent's own command, starts.
 Your agent may also ask your permission before each command it runs, as it does for any other command.
 If your agent runs commands in a sandbox, it asks to run onboarding's commands outside it, because they use the network and write to the Nix store.
 
@@ -95,15 +95,18 @@ From here on, the agent runs each `flox-agent` command from that environment, on
 ## Before flox-agent has onboarding
 
 The `init` command is new, and the `flox/flox-agent` the catalog serves may not have it yet.
-Then the agent makes a simpler stack itself: a Flox environment holding `flox/flox-agent`, your agent, and the catalog's packages of the Claude Code plugins you use.
+Then the agent makes a simpler stack itself: a Flox environment holding `flox/flox-agent`, the agents you use, and the catalog's packages of the Claude Code plugins you use.
 
+- **Your agents.**
+  The agent runs `claude --version`, `codex --version`, `opencode --version`, and `pi --version`.
+  The stack brings each of Claude Code, Codex, opencode, and pi whose command runs, or Claude Code when none does.
 - **Your plugins.**
   The agent asks Claude Code which plugins you have enabled, with `claude plugin list` and `claude plugin marketplace list`.
   A plugin goes in the stack when the catalog has a package of the same name made from the same GitHub repository, as [agent-pkgs](https://github.com/agent-stacks/agent-pkgs) records it.
   The stack takes the catalog's newest version, which may differ from yours.
 - **What stays here.**
   Your own skills, plugins the catalog does not have, your MCP servers, and your settings stay where they are.
-  The stack's agent still loads them on this computer, but not on another.
+  The stack's agents still load them on this computer, but not on another.
   On this computer, Claude Code also loads its own copy of a plugin the stack brings too, until you turn yours off with `/plugin`.
 - **What it asks.**
   It shows the stack it proposes, then asks whether to create it on all your computers, which pushes it to FloxHub, or on this computer only.
@@ -111,13 +114,14 @@ Then the agent makes a simpler stack itself: a Flox environment holding `flox/fl
 - **Where it is kept.**
   The environment is `~/.local/share/agent-stacks/environments/my-agent`, or the name you give.
 - **How you start it.**
-  The stack does not change what `claude` starts.
-  Start it with the command the agent shows:
+  The stack does not change what `claude`, or another agent's own command, starts.
+  Start it with the commands the agent shows, one for each agent, such as this one for Claude Code:
 
   ```bash
   flox activate -d ~/.local/share/agent-stacks/environments/my-agent -- flox-agent launch claude
   ```
 
+  For another agent, replace `claude` with its command, such as `codex`.
   Once the stack is on FloxHub, any computer logged in to FloxHub as you starts it with `flox activate -r <your-handle>/my-agent -- flox-agent launch claude`.
 
 Once `flox/flox-agent` has onboarding, ask your agent again, or paste the same prompt again, for the full stack described below.
@@ -140,10 +144,11 @@ Kept in ~/.local/share/agent-stacks/stacks/my-stack
 Builds 2 packages here, a few minutes the first time.
 ```
 
-The first lines name the stack, its agent, its sandbox, and where it is kept.
-The stack's agent is Claude Code or Codex: whichever your shell history shows you start more often, else whichever is installed.
-When that leaves both or neither, it is Claude Code.
-It gets a sandbox only if you already use one.
+The first lines name the stack, its main agent, its sandbox, and where it is kept.
+The stack brings every agent you use among Claude Code, Codex, opencode, and pi: each one that is installed, that you have run, or whose configuration holds something.
+When you use none of them, it brings Claude Code.
+Its main agent is the one your shell history shows you start most often.
+The stack gets a sandbox only if you already use one.
 The rest is grouped by what you will notice:
 
 - **Same as now** is what the stack carries as you have it.
@@ -186,25 +191,27 @@ An agent that cannot run a command in the background asks just before the build 
 
 | Answer | What it does |
 | ------ | ------------ |
-| **Make `claude` start it** | `claude` starts the stack in every new terminal, and in tools that run `claude`, such as Agent Deck. This is the recommended answer. |
+| **Make `claude` start it** | Onboarding adds the stack to your default environment, so `claude` starts the stack in every new terminal, and in tools that run `claude`, such as Agent Deck. This is the recommended answer. |
 | **Make `claude` start it, on all my computers** | The same, and onboarding pushes the change it makes to your default environment to FloxHub, so `flox pull -D` brings it to your other computers. Offered in place of the first answer when your default environment is on FloxHub and the stack is going to all your computers. |
 | **Make `claude` start it on this computer only** | Offered in the same case: the same, but only this computer's copy of your default environment changes. |
-| **Start it myself** | Nothing in your shell changes. You start the stack with the command shown at the end. |
+| **Start it myself** | Nothing in your shell changes. You start the stack with the commands shown at the end. |
 
-For a Codex stack, the answers name `codex` in place of `claude`.
+The answers name the command of every agent the stack brings, such as **Make `claude` and `codex` start it**.
 [The shortcut](#the-shortcut) describes what each answer changes.
+If your shell activates no default environment, the shortcut changes nothing until you set one up, as [Without a default environment](#without-a-default-environment) describes.
 
 When the build is done, the agent:
 
 1. Makes the shortcut, if you chose it.
+   Without a default environment, it shows you how to set one up instead.
 2. Starts a sync in the background, if you chose all your computers.
    The sync publishes your own packages and pushes the stack to FloxHub while you go on.
    The `status` command shows how it is going.
 3. Ends with how to start the stack, and the [commands to use later](#run-agent-stacks-commands-later), such as `sync` after you edit a skill.
    It writes each one out to run through the stack's environment, as `flox activate -d <stack repository>/stack -- flox-agent <command>`, so it works in any terminal.
 
-With the shortcut, open a new terminal and run `claude`.
-Without it, run the `flox activate` command the agent shows, such as:
+With the shortcut, open a new terminal and run `claude`, or the command of another agent the stack brings.
+Without it, run the `flox activate` command the agent shows for each agent, such as this one for Claude Code:
 
 ```bash
 flox activate -d ~/.local/share/agent-stacks/stacks/my-stack/stack -- flox-agent launch claude
@@ -225,7 +232,7 @@ Onboarding reads your agents' own configuration, and changes none of it:
   To read them, it starts your shell once, with no input and its history turned off, for at most 15 seconds.
   Your shell's startup files run as they do when you open a terminal.
 
-It runs `claude --version` and `codex --version`, and the interpreters and tools your own skills use, each with its version flag.
+It runs each of `claude`, `codex`, `opencode`, and `pi` it finds with `--version`, and the interpreters and tools your own skills use, each with its version flag.
 
 It never opens `.credentials.json` or `auth.json`.
 An MCP server is kept as its name, transport, program, and host: its environment by variable names only, and its headers and tokens not at all.
@@ -244,10 +251,11 @@ Where a file looks like it holds a credential, onboarding names the file and lin
 | The Nix store | The packages it builds |
 
 The paths follow `XDG_CACHE_HOME`, `XDG_DATA_HOME`, and `XDG_STATE_HOME` when you set them.
-The shortcut, if you choose it, changes your shell's startup file or your default environment, as [the shortcut](#the-shortcut) describes.
+The shortcut, if you choose it, changes only your default environment, as [the shortcut](#the-shortcut) describes.
+Onboarding never writes your shell's startup files.
 
 The stack repository is a git repository on this machine.
-`stack/` holds the stack's environment: `flox/flox-agent`, the agent, the sandbox, and each package.
+`stack/` holds the stack's environment: `flox/flox-agent`, the agents, the sandbox, and each package.
 `plugins/` holds copies of your own skills, commands, and agents, which the environment at the repository's root builds into packages.
 `onboard.json` records where each piece came from, and `README.md` describes the stack and the commands for later.
 
@@ -280,8 +288,8 @@ What onboarding prints goes to your agent, as any command's output does: the sum
 
 ## The shortcut
 
-The shortcut makes `claude` (or `codex`) start the stack in every terminal you open after it.
-The stack then starts Claude Code with the stack's plugins, in its sandbox if it has one.
+The shortcut makes the command of each agent the stack brings, such as `claude` and `codex`, start the stack in every terminal you open after it.
+`claude` then starts Claude Code with the stack's plugins, in the stack's sandbox if it has one, and each other command starts its agent the same way.
 To run plain Claude Code once, set `AGENT_STACKS_PLAIN`:
 
 ```bash
@@ -290,30 +298,48 @@ AGENT_STACKS_PLAIN=1 claude
 
 ### Through your default environment
 
-When a startup file of your shell activates a [default environment](/tutorials/default-environment), such as with `eval "$(flox activate -D)"`, the shortcut goes through it.
+The shortcut goes through your [default environment](/tutorials/default-environment): the environment a startup file of your shell activates, such as with `eval "$(flox activate -D -m run)"`.
 Onboarding adds the stack to that environment's `[include]` section with `flox edit`.
-It comments out what the stack brings too, such as the environment's own Claude Code, and turns it back on when you undo the shortcut.
-Your startup files stay as they are.
+The stack's environment then puts a command for each of its agents first on `PATH`, which starts that agent with `flox-agent launch`.
+Onboarding comments out what the stack brings too, such as the environment's own Claude Code, and turns it back on when you undo the shortcut.
+It never writes your shell's startup files, and puts no script of its own on `PATH`.
 
 A default environment on FloxHub can include the stack only once the stack is on FloxHub too.
 Until the background sync pushes the stack, `claude` is what it was.
-If the stack stays on this computer, the shortcut is a script on `PATH` instead.
+If the stack stays on this computer, share it first with `sync --publish --push`, then run `shortcut` again.
 
 For a default environment on FloxHub, without **on all my computers**, only this computer's copy changes.
 To bring the change to your other computers, run `flox push -D` here, which sends any other change of this copy too, and `flox pull -D` there.
 
-### As a script on `PATH`
-
-Otherwise, onboarding writes a script, `~/.local/share/agent-stacks/bin/claude`, that starts the stack.
-It adds a block to the end of your shell's startup file that puts that folder first on `PATH`: `~/.zshrc` for zsh, `~/.bashrc` and bash's login file for bash, or `config.fish` for fish.
-For another shell, it tells you to put the folder first on `PATH` yourself.
-A startup file it may not write, such as one home-manager manages, is left as it is, and onboarding prints the lines to add.
-
-Onboarding never edits your aliases.
-If something in your shell runs before the shortcut, such as an alias to Claude Code's own path, it prints a line starting with `But` that says what to change.
+Onboarding checks what a new terminal runs for each command, and never edits your aliases.
+If something in your shell runs before the stack, such as an alias to Claude Code's own path, it prints a line starting with `But` that says what to change.
 
 A terminal that was open before the shortcut keeps what it had.
 Open a new terminal to use it.
+
+### Without a default environment
+
+If no startup file of your shell activates a default environment, the shortcut changes nothing.
+The `shortcut` command says so and shows how to set one up, and your agent shows you what it printed.
+Setting one up is yours to do, because it changes your shell's startup files, so your agent never does it for you:
+
+1. Create a default environment with `flox init -D`, or bring the one you already have on FloxHub to this computer with `flox pull -D`.
+2. Add the line [the default environment tutorial](/tutorials/default-environment#initial-setup) gives for your shell to the end of its startup files.
+   For zsh, add this line to the end of `~/.zprofile` and `~/.zshrc`:
+
+   ```bash
+   eval "$(flox activate -D -m run)"
+   ```
+
+3. Run `shortcut` again from the stack repository, or ask your agent to:
+
+   ```bash
+   cd ~/.local/share/agent-stacks/stacks/my-stack &&
+   flox activate -d stack -- flox-agent shortcut
+   ```
+
+`flox init -D` makes your default environment on FloxHub, so it includes the stack once the stack is on FloxHub too, as [Through your default environment](#through-your-default-environment) describes.
+Until then, start the stack with the `flox activate` commands your agent showed.
 
 ### Undo the shortcut
 
@@ -324,8 +350,7 @@ cd ~/.local/share/agent-stacks/stacks/my-stack &&
 flox activate -d stack -- flox-agent shortcut --off
 ```
 
-It takes away what the shortcut added: the stack's include in your default environment, with what it turned off turned back on, or the script and the block in your startup files.
-A startup file you have not changed since comes back as it was.
+It takes the stack's include out of your default environment, and turns back on what the shortcut turned off there.
 
 ## Use the stack on another computer
 
@@ -335,6 +360,7 @@ Once the background sync has pushed the stack, `status` says so, and the stack r
 $ flox activate -r <your-handle>/my-stack -- flox-agent launch claude
 ```
 
+For another agent the stack brings, replace `claude` with its command, such as `codex`.
 The stack is written for Macs with Apple silicon and for Linux machines.
 Your own packages are published for this computer's kind only, so the stack's other kinds start it without them, as the `README.md` says.
 
@@ -353,10 +379,10 @@ These commands come with onboarding: a `flox/flox-agent` without `init`, and [th
 
 | Command | What it does |
 | ------- | ------------ |
-| `status` | Shows what is where, what changed since the last build, how the last sync went, and what `claude` starts |
+| `status` | Shows what is where, what changed since the last build, how the last sync went, and what each of the stack's commands, such as `claude`, starts |
 | `sync` | Picks up your edits to your own skills, moves overlays onto newer catalog releases, and rebuilds what changed |
 | `sync --publish --push` | Shares the stack with your other computers, asking before the first push |
-| `shortcut` | Makes `claude` start the stack |
+| `shortcut` | Adds the stack to your default environment, so `claude` and the stack's other commands start it |
 | `shortcut --off` | Takes the shortcut away |
 | `overlay <plugin>` | Shows your overlay on a catalog package, and changes what it carries |
 | `promote <plugin> --org <org>` | Publishes one of your own packages to the catalog of a FloxHub organization you belong to, where its members can install it, and points the stack and later syncs at it there |
