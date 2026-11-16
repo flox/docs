@@ -3,6 +3,30 @@ title: "Install Flox"
 description: "How to install or upgrade the Flox CLI"
 ---
 
+## Install with your AI agent
+
+An AI coding agent that can run shell commands, such as Claude Code or Codex, can install Flox for you.
+Paste this prompt into it:
+
+```text
+Install Flox on this machine.
+Download the flox skill with
+curl -fsSL https://raw.githubusercontent.com/flox/flox-skills/main/flox-plugin/skills/flox/SKILL.md
+and follow its "Installing Flox" section.
+Read the whole file as it is, not a summary of it.
+```
+
+The prompt has your agent download the `flox` skill with `curl` and follow it.
+It names `curl` because a web fetch tool may hand the agent a summary of the page, and the skill has to be read whole.
+The agent picks the install method for your machine, usually the install script on the **Install Script** tab below.
+The script runs its install with `sudo`, which may ask for your password, and your agent's shell cannot answer that prompt.
+If the agent gives you the command to run, run it in a terminal of your own, then tell the agent it finished.
+To read the skill first, open [the `flox` skill](https://github.com/flox/flox-skills/blob/main/flox-plugin/skills/flox/SKILL.md).
+
+The same skill also installs Agent Stacks, and turns the agent setup you already have into an agent stack, as the [AI agent quickstart](/ai-agents/quickstart) shows.
+
+To install Flox yourself, pick a method below.
+
 <Note>
   **Verify your download**
 

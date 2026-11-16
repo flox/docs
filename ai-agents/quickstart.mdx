@@ -7,7 +7,7 @@ description: "Paste one prompt into the AI agent you already use, and it turns y
 Your agent already has a setup: skills you installed or wrote, plugins from marketplaces, commands, agents, and perhaps a sandbox.
 In this quickstart you onboard that setup into an agent stack: an environment that holds your agent, its plugins, and its sandbox, and starts the same agent here and on your other computers.
 You start it from the agent you already use, with one prompt.
-The agent helps you set up what is missing on the way, Flox included, so you need nothing installed first.
+The agent helps you set up what is missing on the way, Flox and Agent Stacks included, so you need nothing installed first.
 For the ideas behind it (harnesses, plugins and sandboxes), see [AI coding agents](/ai-agents/overview).
 To set up an agent stack yourself, step by step, see [Onboard your agent setup by hand](/ai-agents/guides/onboard-your-setup).
 
@@ -25,16 +25,19 @@ Before you paste the prompt, you can read [what onboarding reads](#what-onboardi
 Paste this prompt into your agent:
 
 ```text
-Onboard my current agent setup into Agent Stacks, using Flox.
-Download the onboarding skill with
-curl -fsSL https://raw.githubusercontent.com/flox/docs/main/ai-agents/skills/agent-stacks-onboard/SKILL.md
-and follow it from start to finish. Read the whole file as it is, not a summary of it.
+Install Flox and Agent Stacks if they are missing, then turn my current agent setup into an agent stack.
+Download the flox skill with
+curl -fsSL https://raw.githubusercontent.com/flox/flox-skills/main/flox-plugin/skills/flox/SKILL.md
+and follow it from start to finish, with the reference it sends you to for Agent Stacks.
+Read each file whole, as it is, not a summary of it.
 ```
 
-The prompt has your agent download the onboarding skill with `curl` and follow it.
+The prompt has your agent download Flox's `flox` skill with `curl` and follow it.
+The skill sends the agent to its Agent Stacks reference, which the agent downloads the same way and follows from start to finish.
 It names `curl` because a web fetch tool may hand the agent a summary of the page, and the skill has to be read whole.
+[Install Flox](/install-flox/install#install-with-your-ai-agent) gives a prompt for the same skill that installs Flox alone.
 
-To read the skill before you run it, open [the onboarding skill](https://github.com/flox/docs/blob/main/ai-agents/skills/agent-stacks-onboard/SKILL.md).
+To read the skill before you run it, open [the `flox` skill](https://github.com/flox/flox-skills/blob/main/flox-plugin/skills/flox/SKILL.md) and its [Agent Stacks reference](https://github.com/flox/flox-skills/blob/main/flox-plugin/skills/flox/references/agent-stacks.md).
 
 The conversation is the same in any agent.
 Claude Code shows each question with options to pick from.
@@ -43,6 +46,10 @@ The agent never answers a question for you.
 It asks before each install, before it uploads or pushes anything to FloxHub, and before it changes what `claude` (or `codex`) starts.
 Your agent may also ask your permission before each command it runs, as it does for any other command.
 If your agent runs commands in a sandbox, it asks to run onboarding's commands outside it, because they use the network and write to the Nix store.
+
+You can also onboard without an agent, in a terminal of your own.
+Once the machine is [set up](#set-up-the-machine), run `flox agent init` in an environment that has `flox/flox-agent` installed.
+It asks the same questions in the terminal, as numbered choices, and makes the same stack.
 
 ## Set up the machine
 
@@ -67,14 +74,15 @@ It checks each step first, skips the ones already done, and asks before it insta
 5. **`flox-agent`.**
    The agent installs `flox/flox-agent`, the newest build the catalog is known to serve, into an environment of its own at `~/.cache/agent-stacks/bootstrap`, named `agent-stacks-bootstrap`.
    That environment is for this system only, and stays on this machine.
-   The agent checks that this `flox-agent` has the `onboard` command.
+   The agent checks that this `flox-agent` has onboarding: `flox-agent init --help` prints a usage that starts with `Usage: flox-agent init`.
    If it does not, the agent makes [a simpler stack](#before-flox-agent-has-onboarding) instead.
 
-From here on, the agent runs onboarding's commands from that environment, one at a time, as `flox activate -d ~/.cache/agent-stacks/bootstrap -m run -- flox-agent onboard <command>`.
+From here on, the agent runs each `flox-agent` command from that environment, one at a time, as `flox activate -d ~/.cache/agent-stacks/bootstrap -m run -- flox-agent <command>`.
+`init plan`, `init decide`, and `init apply` make the stack, and `shortcut` and `sync` finish it, as the sections below describe.
 
 ## Before flox-agent has onboarding
 
-The `onboard` command is new, and the `flox/flox-agent` the catalog serves may not have it yet.
+The `init` command is new, and the `flox/flox-agent` the catalog serves may not have it yet.
 Then the agent makes a simpler stack itself: a Flox environment holding `flox/flox-agent`, your agent, and the catalog's packages of the Claude Code plugins you use.
 
 - **Your plugins.**
@@ -100,7 +108,7 @@ Then the agent makes a simpler stack itself: a Flox environment holding `flox/fl
 
   Once the stack is on FloxHub, any computer logged in to FloxHub as you starts it with `flox activate -r <your-handle>/my-agent -- flox-agent launch claude`.
 
-Once `flox/flox-agent` has onboarding, paste the same prompt again for the full stack described below.
+Once `flox/flox-agent` has onboarding, ask your agent again, or paste the same prompt again, for the full stack described below.
 
 ## Answer the onboarding's questions
 
@@ -180,7 +188,8 @@ When the build is done, the agent:
 2. Starts a sync in the background, if you chose all your computers.
    The sync publishes your own packages and pushes the stack to FloxHub while you go on.
    The `status` command shows how it is going.
-3. Ends with how to start the stack, and the commands to use later.
+3. Ends with how to start the stack, and the [commands to use later](#run-agent-stacks-commands-later), such as `sync` after you edit a skill.
+   It writes each one out to run through the stack's environment, as `flox activate -d <stack repository>/stack -- flox-agent <command>`, so it works in any terminal.
 
 With the shortcut, open a new terminal and run `claude`.
 Without it, run the `flox activate` command the agent shows, such as:
@@ -300,7 +309,7 @@ Run the undo command onboarding printed with the shortcut, or, from the stack re
 
 ```bash
 cd ~/.local/share/agent-stacks/stacks/my-stack &&
-flox activate -d stack -- flox-agent onboard shortcut --off
+flox activate -d stack -- flox-agent shortcut --off
 ```
 
 It takes away what the shortcut added: the stack's include in your default environment, with what it turned off turned back on, or the script and the block in your startup files.
@@ -317,26 +326,27 @@ $ flox activate -r <your-handle>/my-stack -- flox-agent launch claude
 The stack is written for Macs with Apple silicon and for Linux machines.
 Your own packages are published for this computer's kind only, so the stack's other kinds start it without them, as the `README.md` says.
 
-## Run the onboarding commands later
+## Run Agent Stacks commands later
 
-The stack installs `flox/flox-agent`, so you run onboarding's commands from the stack repository, through the stack's environment:
+The stack installs `flox/flox-agent`, so you run Agent Stacks' commands from the stack repository, through the stack's environment:
 
 ```bash
 cd ~/.local/share/agent-stacks/stacks/my-stack &&
-flox activate -d stack -- flox-agent onboard status
+flox activate -d stack -- flox-agent status
 ```
 
 Replace `my-stack` with your stack's name if you chose another.
-In an environment that has `flox/flox-agent` installed, `flox agent onboard <command>` runs the same command.
+In an environment that has `flox/flox-agent` installed, such as the stack's own once you activate it, `flox agent <command>` runs the same command.
 
 | Command | What it does |
 | ------- | ------------ |
-| `status` | Shows what is where, what changed since the last build, how the last sync went, and what `claude` starts |
-| `sync` | Picks up your edits to your own skills, moves overlays onto newer catalog releases, and rebuilds what changed |
-| `sync --publish --push` | Shares the stack with your other computers, asking before the first push |
-| `shortcut` | Makes `claude` start the stack |
-| `shortcut --off` | Takes the shortcut away |
-| `overlay <plugin>` | Shows your overlay on a catalog package, and changes what it carries |
+| `flox agent status` | Shows what is where, what changed since the last build, how the last sync went, and what `claude` starts |
+| `flox agent sync` | Picks up your edits to your own skills, moves overlays onto newer catalog releases, and rebuilds what changed |
+| `flox agent sync --publish --push` | Shares the stack with your other computers, asking before the first push |
+| `flox agent shortcut` | Makes `claude` start the stack |
+| `flox agent shortcut --off` | Takes the shortcut away |
+| `flox agent overlay <plugin>` | Shows your overlay on a catalog package, and changes what it carries |
+| `flox agent promote <plugin> --org <org>` | Publishes one of your own packages to the catalog of a FloxHub organization you belong to, where its members can install it, and points the stack and later syncs at it there |
 
 Edit a skill in one place: where it came from, such as `~/.claude/skills`, or its copy under `plugins/` in the stack repository.
 Once both have changed, `sync` reports a conflict until you make the two the same.
