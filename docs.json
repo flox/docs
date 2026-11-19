@@ -316,6 +316,12 @@
       "proxy": false
     }
   },
+  "integrations": {
+    "cookies": {
+      "key": "flox-docs-analytics-consent",
+      "value": "granted"
+    }
+  },
   "redirects": [
     {
       "source": "/reference/command-reference/README",
