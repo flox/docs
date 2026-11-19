@@ -2,7 +2,7 @@
   try {
     if (typeof window === 'undefined') return;
 
-    const PROD_HOSTS = ['flox.dev', 'www.flox.dev', 'flox.mintlify.dev'];
+    const PROD_HOSTS = ['flox.dev', 'www.flox.dev'];
     if (!PROD_HOSTS.includes(location.hostname)) return;
 
     if (document.getElementById('hs-script-loader')) return;

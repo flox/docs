@@ -2,7 +2,9 @@
   try {
     if (typeof window === 'undefined') return;
 
-    // Production only. flox.mintlify.dev is left out so previews don't count as flox.dev traffic.
+    // Plausible loads only at flox.dev, the address Flox sends visitors to,
+    // and not at Mintlify's own addresses for the docs, such as
+    // flox.mintlify.dev and preview deployments.
     const PROD_HOSTS = ['flox.dev', 'www.flox.dev'];
     if (!PROD_HOSTS.includes(location.hostname)) return;
 
