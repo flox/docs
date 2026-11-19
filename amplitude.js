@@ -2,7 +2,7 @@
   try {
     if (typeof window === 'undefined') return;
 
-    const PROD_HOSTS = ['flox.dev', 'www.flox.dev', 'flox.mintlify.dev'];
+    const PROD_HOSTS = ['flox.dev', 'www.flox.dev'];
     const AMPLITUDE_API_KEY = PROD_HOSTS.includes(location.hostname)
       ? '6f89e78c468a7da6fecfd717437fcb32'
       : '820bc93b6feb09134fb8ed7b25af09a1';
