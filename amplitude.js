@@ -1,30 +1,30 @@
-(function () {
+(() => {
   try {
     if (typeof window === 'undefined') return;
 
-    var PROD_HOSTS = ['flox.dev', 'www.flox.dev', 'flox.mintlify.dev'];
-    var AMPLITUDE_API_KEY = PROD_HOSTS.indexOf(location.hostname) !== -1
+    const PROD_HOSTS = ['flox.dev', 'www.flox.dev', 'flox.mintlify.dev'];
+    const AMPLITUDE_API_KEY = PROD_HOSTS.includes(location.hostname)
       ? '6f89e78c468a7da6fecfd717437fcb32'
       : '820bc93b6feb09134fb8ed7b25af09a1';
 
-    window._hsp = window._hsp || [];
+    window._hsp ||= [];
     window._hsp.push([
       'addPrivacyConsentListener',
-      function (consent) {
+      (consent) => {
         try {
-          if (!(consent && consent.categories && consent.categories.analytics)) return;
+          if (!consent?.categories?.analytics) return;
           if (document.getElementById('amplitude-script-loaded')) return;
 
-          var b = document.createElement('script');
-          b.id = 'amplitude-script-loaded';
-          b.type = 'text/javascript';
-          b.async = true;
-          b.src = 'https://cdn.amplitude.com/script/' + AMPLITUDE_API_KEY + '.js';
-          b.onload = function () {
+          const script = document.createElement('script');
+          script.id = 'amplitude-script-loaded';
+          script.type = 'text/javascript';
+          script.async = true;
+          script.src = `https://cdn.amplitude.com/script/${AMPLITUDE_API_KEY}.js`;
+          script.onload = () => {
             try {
-              if (!window.amplitude || typeof window.amplitude.init !== 'function') return;
+              if (typeof window.amplitude?.init !== 'function') return;
 
-              if (window.sessionReplay && typeof window.sessionReplay.plugin === 'function') {
+              if (typeof window.sessionReplay?.plugin === 'function') {
                 window.amplitude.add(window.sessionReplay.plugin({ sampleRate: 0.3 }));
               }
 
@@ -47,11 +47,11 @@
                   }
                 }
               });
-            } catch (e) { /* noop */ }
+            } catch { /* noop */ }
           };
-          document.head.appendChild(b);
-        } catch (e) { /* noop */ }
+          document.head.appendChild(script);
+        } catch { /* noop */ }
       }
     ]);
-  } catch (e) { /* noop */ }
+  } catch { /* noop */ }
 })();
