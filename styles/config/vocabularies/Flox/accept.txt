@@ -19,7 +19,7 @@ Nixpkgs
 _oldAttrs
 oldAttrs
 sourceRoot
-substituters
+substituters?
 vendorHash
 
 # === AI agents ===

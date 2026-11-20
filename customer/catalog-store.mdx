@@ -1,10 +1,42 @@
 ---
-title: "Catalog Store"
-description: "Create a Catalog Store for publishing your own Flox packages"
+title: "Catalog stores"
+description: "Choose where Flox stores the binaries for packages published to your catalog: on Flox, in your own binary cache, or metadata only"
 ---
 
-Note that this page is only relevant if your organization has chosen to provide its own Catalog Store.
-By default, Flox provides a pre-configured Catalog Store to each organization as part of the organization's private Catalog.
+When you run `flox publish`, the package metadata always goes to Flox so that `flox search`, `flox show`, and `flox install` can find the package.
+The package binaries go to the catalog's Catalog Store.
+Flox supports three kinds of Catalog Store.
+You choose one per catalog, and all three work with FloxHub.
+
+| Catalog Store | Who stores the binaries | Who signs them | What installs need |
+| --- | --- | --- | --- |
+| [Flox-hosted](#flox-hosted-store) (default) | Flox | Flox | Nothing extra |
+| [Your own binary cache](#your-own-binary-cache) | You, in an S3-compatible bucket | You, with your own key | Credentials for your cache and your public key |
+| [Metadata only](#metadata-only-store) | Nobody | Not applicable | The binaries already in the local Nix store or a configured substituter |
+
+To use your own binary cache or a metadata-only store, contact your Flox point of contact to configure the catalog.
+
+## Flox-hosted store
+
+By default, Flox provides a pre-configured Catalog Store as part of each catalog.
+Flox signs the binaries you publish with the `floxhub-1` key and hosts them.
+The Flox installer configures your system to trust `floxhub-1`, so installs work out of the box.
+If you installed Flox with Nix instead, see [Signing keys](/customer/signing-keys) to trust the key.
+
+## Metadata-only store
+
+With a metadata-only store, `flox publish` sends only the package metadata to Flox and uploads no binaries.
+The package still appears in `flox search`, `flox show`, and `flox install`.
+
+`flox install` only succeeds when the package's binaries are already in your local Nix store or in one of the substituters in your Nix configuration.
+Flox doesn't fall back to building the package from source.
+
+## Your own binary cache
+
+With your own binary cache, your organization keeps complete control over the package binaries, and Flox never stores them.
+`flox publish` signs the binaries with your private key and copies them to your cache.
+Flox stores the package metadata, including where to download the binaries from.
+`flox install` downloads the binaries directly from your cache, so anyone installing the package needs credentials for the cache and must trust your public key.
 
 A user-provided Catalog Store is an AWS S3 bucket
 or any S3 compatible service, like [MinIO](https://min.io/product/s3-compatibility)
@@ -12,13 +44,11 @@ or [Backblaze B2](https://www.backblaze.com/cloud-storage). (For the
 sake of simplicity, this guide focuses on S3, but there are other providers
 available if you prefer them to AWS.)
 
-To configure your Catalog to use this Catalog Store, you will need to set ingress (where new packages are uploaded to) and egress (where packages are downloaded from) URIs for the Catalog.
-This is done with a command line utility provided by Flox.
+To configure your catalog to use this Catalog Store, Flox sets ingress (where new packages are uploaded to) and egress (where packages are downloaded from) URIs for the catalog.
 
+### Configure an AWS S3 bucket
 
-## Configure an AWS S3 bucket
-
-The first step in setting up your Catalog Store is creation and configuration of
+The first step in setting up your own binary cache is creation and configuration of
 an AWS S3 Bucket. There are numerous ways to accomplish this, including the AWS
 Console, the AWS CLI, and Terraform (or another infrastructure-as-code tool),
 to name a few. These processes are well documented, but to get started,
@@ -35,7 +65,7 @@ the setup process. Simply reach out to your designated point of contact,
 and we'll work with you to get you up and running.
 
 
-### Policy example
+#### Policy example
 
 By default, S3 buckets are normally confined to be read by the bucket owner or users within the same AWS account. This is likely a decent starting point for the Catalog Store. However, if you'd like to make your published Flox software available to a wider audience, you can use the following policy as a starting point. Note this will make the contents of the bucket public, so be sure to understand the implications of this before applying it.
 
@@ -54,7 +84,7 @@ By default, S3 buckets are normally confined to be read by the bucket owner or u
 }
 ```
 
-## Ensure the Nix Daemon has access to the S3 Bucket
+### Ensure the Nix daemon has access to the S3 bucket
 
 As you probably know by now, the underlying technology powering Flox is Nix.
 Accordingly, we need to take a couple steps to ensure that the Nix daemon
@@ -64,12 +94,14 @@ Use the `aws configure` or `aws configure sso` command [as described in the CLI 
 
 You can confirm that everything is set up correctly by inspecting the values stored in `$HOME/.aws/credentials`.
 
+Every machine that publishes to or installs from this catalog needs credentials with access to the bucket.
 
-## Set Catalog Store ingress and egress URIs
+
+### Set Catalog Store ingress and egress URIs
 
 Reach out to your Flox point of contact to accomplish this step.
 
-## Create and set a signing key
+### Create and set a signing key
 
 At this point, you should have an appropriately configured Catalog Store
 to which you can publish your own software via the `flox publish` command.

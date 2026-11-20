@@ -49,12 +49,16 @@ A published package consists of two parts:
 - The package itself
 
 The package metadata is uploaded to Flox servers so that the Flox CLI can see that it's available via the [`flox search`](/man/flox-search), [`flox show`](/man/flox-show), and [`flox install`](/man/flox-install) commands.
-The package itself is uploaded to a Catalog Store.
+The package itself goes to the catalog's Catalog Store, which is effectively a binary cache for published packages.
 
-A Catalog Store is effectively a cache for published packages, and Flox provides one by default.
-An organization can choose to provide their own Catalog Store in the form of an S3-compatible storage provider.
-In this case, it means that your organization has complete control over your packages and they will never be stored by Flox.
-To pursue this option, contact Flox directly.
+Each catalog uses one of three kinds of Catalog Store:
+
+- **Flox-hosted** (default): Flox signs and hosts the package binaries.
+- **Your own binary cache**: `flox publish` signs the binaries with your key and copies them to an S3-compatible bucket you provide. Flox never stores the binaries, and installs need credentials for your cache.
+- **Metadata only**: Flox stores only the metadata and no binaries are uploaded. Installs only work if the binaries are already in the local Nix store or a configured substituter.
+
+See [Catalog stores](/customer/catalog-store) for details on each option.
+To use your own binary cache or a metadata-only store, contact Flox directly.
 
 ## Consuming published packages
 
@@ -63,7 +67,8 @@ To distinguish these packages from those provided by the Base Catalog, published
 For example, if your user is called `myuser` and you publish a package named `hello`, the package will appear as `myuser/hello` in the Flox CLI.
 
 When a user runs `flox install myuser/hello`, the package is downloaded directly from the Catalog Store that it was published to.
-If organizations configure their own Catalog Store (rather than using the default Catalog Store provided by Flox), it is never downloaded to or cached on Flox servers.
+If your organization uses its own binary cache, the package is never downloaded to or cached on Flox servers.
+If the catalog uses a metadata-only store, Flox doesn't download anything, so the package must already be available locally or from a configured substituter.
 
 ### Sharing
 

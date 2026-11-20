@@ -160,7 +160,7 @@ Key terms:
 
 ## Enterprise and operations
 
-- [Catalog Store](https://flox.dev/docs/customer/catalog-store.md): Create a Catalog Store for publishing your own Flox packages
+- [Catalog stores](https://flox.dev/docs/customer/catalog-store.md): Choose where Flox stores the binaries for packages published to your catalog: on Flox, in your own binary cache, or metadata only
 - [Known issues](https://flox.dev/docs/customer/known-issues.md): Known Flox limitations and their workarounds, including false-positive build dependencies
 - [Signing keys](https://flox.dev/docs/customer/signing-keys.md): Create and use signing keys to sign built artifacts
 
