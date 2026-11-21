@@ -1,117 +1,41 @@
 ---
 title: "AI agent quickstart"
 sidebarTitle: "Quickstart"
-description: "Install Claude Code and an agent plugin into a Flox environment, then launch the agent with that plugin."
+description: "Paste one prompt into the AI agent you already use, and it turns your skills, plugins, and sandbox into an agent stack that starts the same agents on your other computers too."
 ---
 
-In this guide you create an environment holding Claude Code and the `frontend-design` plugin, check what the agent will get, and launch it.
-You need [Flox installed](/install-flox/install), a free FloxHub account, and a Claude account.
-For the ideas behind it (harnesses, plugins and sandboxes), see [AI coding agents](/ai-agents/overview).
+Paste one prompt into the AI agent you already use, and it turns your skills, plugins, and sandbox into an agent stack: an environment that starts the same agents, with the same plugins, here and on your other computers.
+It installs Flox and Agent Stacks first if they are missing.
 
-## Log in and enable the extension
+## What you need
 
-Installing packages from the Flox Catalog needs you to be logged in to FloxHub.
-Log in once per machine:
+- A Mac with Apple silicon, or a Linux machine on `x86_64` or `aarch64`.
+  Intel Macs are not supported, because `flox/flox-agent` is not built for them.
+- A free FloxHub account.
+  The onboarding helps you log in.
+- An AI agent that can run shell commands on this machine, such as Claude Code or Codex.
 
-```bash
-flox auth login
+## Run the prompt
+
+Paste this prompt into your agent:
+
+```text
+Install Flox and Agent Stacks if they are missing, then turn my current agent setup into an agent stack.
+Save the flox skill to a new temporary folder with
+curl -fsSL -o <folder>/SKILL.md https://raw.githubusercontent.com/flox/flox-skills/main/flox-plugin/skills/flox/SKILL.md
+then read that file whole with your file tool, not a summary of it.
+Follow its "Installing Agent Stacks" section, then the reference it sends you to, from start to finish.
 ```
 
-`flox agent` is a beta Flox extension, and Flox only runs beta commands once you opt in.
-Turn on beta features once:
+Answer the agent's questions as they come.
+The first build takes a few minutes, and the agent ends with how to start your stack.
+If you choose your other computers too, it waits for the upload to FloxHub before it ends, which takes a few minutes more.
 
-```bash
-flox config --set features.beta true
-```
-
-## Create the environment
-
-The environment holds everything the agent gets.
-Whatever you install into it is pinned in its lockfile, so anyone who activates the same environment gets the same agent and plugins.
-Make a folder for your project and create an environment in it:
-
-```bash
-mkdir my-agent && cd my-agent && flox init
-```
-
-Install the harness, a plugin, and the `flox agent` extension:
-
-```bash
-flox install agent-stacks/claude-code agent-stacks/agent-plugin-frontend-design flox/flox-agent
-```
-
-- `agent-stacks/claude-code` is the harness: the Claude Code program.
-- `agent-stacks/agent-plugin-frontend-design` is an agent plugin with a skill for building polished web interfaces.
-- `flox/flox-agent` provides the `flox agent` command.
-
-## See what the agent gets
-
-Activating the environment puts its packages, including `flox agent`, on your `PATH`:
-
-```bash
-flox activate
-```
-
-Then list the stack.
-`flox agent list` reads what is installed and shows what a launch would hand each harness, without starting anything:
-
-```console
-$ flox agent list
-Agent stack
-1 harness · 1 plugin · 1 skill · 0 MCP servers
-
-Harnesses
- ✔ claude            claude-code 2.1.304 · skills, MCP, hooks
-
-Plugins
- ✔ frontend-design   agent-plugin-frontend-design 0.0.0-unstable.2026-10-19.ga0b04d9 · 1 skill
-
---long shows each plugin's skills and MCP servers.
-Shows what launch gives each harness; agent-stacks writes nothing to a harness's own config.
-```
-
-Each row names the package and version it came from.
-Run `flox agent list --long` to see the skills each plugin provides.
-
-## Launch the agent
-
-```bash
-flox agent launch claude
-```
-
-`flox agent launch` starts Claude Code with the environment's plugins.
-It stages them inside the environment, so your own Claude Code settings in your home directory are left as they are.
-Claude Code starts with the `frontend-design` skill loaded.
-Ask it to build a page, and it uses the skill.
-
-To pass flags to Claude Code, put them after `--`:
-
-```bash
-flox agent launch claude -- --continue
-```
-
-## Add or remove plugins
-
-Plugins are packages, so you manage them with the usual commands.
-Browse the available plugins with [`flox search`](/man/flox-search):
-
-```bash
-flox search agent-plugin
-```
-
-Install another one with [`flox install`](/man/flox-install), or remove one with [`flox uninstall`](/man/flox-uninstall).
-The next `flox agent launch` picks up the change.
-
-## If something is missing
-
-`flox agent doctor` reports the plugins it found, each harness's readiness, and the package to install for a harness that is missing:
-
-```bash
-flox agent doctor
-```
+To read what the prompt does before you run it, open [the `flox` skill](https://github.com/flox/flox-skills/blob/main/flox-plugin/skills/flox/SKILL.md) and its [Agent Stacks reference](https://github.com/flox/flox-skills/blob/main/flox-plugin/skills/flox/references/agent-stacks.md).
 
 ## Next steps
 
+- [AI coding agents](/ai-agents/overview): the ideas behind agent stacks
+- [Onboard an existing agent](/ai-agents/guides/onboard-your-setup) step by step, without the prompt
 - [Launch an agent in a sandbox](/ai-agents/guides/launch-in-a-sandbox)
 - [Audit an agent plugin](/ai-agents/guides/audit-a-plugin) before you install it
-- [`flox agent launch`](/ai-agents/reference/flox-agent-launch) reference

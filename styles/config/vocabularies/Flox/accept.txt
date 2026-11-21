@@ -27,6 +27,7 @@ Anthropic
 bubblewrap
 frontmatter
 Landlock
+[Oo]nboarding
 opencode
 seccomp
 SkillSpector
