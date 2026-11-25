@@ -19,10 +19,16 @@ The agent replaces the `flox agent` process, so its exit status and terminal are
 | Agent | Harness package | What it receives |
 | ----- | --------------- | ---------------- |
 | `claude` | `agent-stacks/claude-code` | Whole plugins: skills, MCP servers, hooks, agents, and commands |
+| `claude-code-desktop` | `agent-stacks/claude-code`, plus the Claude app | Skills |
 | `codex` | `agent-stacks/codex` | Skills |
+| `codex-desktop` | None; it uses the Codex CLI inside the ChatGPT app | Skills |
 | `opencode` | `agent-stacks/opencode` | Skills |
 | `pi` | `agent-stacks/pi` | Skills |
 | `agent-deck` | `agent-stacks/agent-deck` | Nothing directly; every Claude Code session it starts runs through `flox agent launch claude` |
+
+`claude-code-desktop` and `codex-desktop` are macOS only, and they work differently from the other agents.
+They open a copy of the installed app, named `Claude (Flox: <environment>)` or `ChatGPT (Flox: <environment>)`, with the environment's skills installed, and then return.
+The copy runs on its own profile, so your own app and its settings are not changed.
 
 The agent is found on `PATH`, so the environment's harness wins over one installed elsewhere.
 When the agent comes from outside the Nix store, such as a copy installed with npm or Homebrew, launch warns and runs it anyway.
