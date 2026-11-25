@@ -18,16 +18,21 @@ It comes from the `agent-stacks` catalog on FloxHub as an ordinary package, so i
 | Harness | Package | Launch name |
 | ------- | ------- | ----------- |
 | Claude Code | `agent-stacks/claude-code` | `claude` |
+| Claude Desktop | Your installed Claude app, plus `agent-stacks/claude-code` | `claude-code-desktop` |
 | OpenAI Codex | `agent-stacks/codex` | `codex` |
+| Codex in the ChatGPT app | Your installed ChatGPT app | `codex-desktop` |
 | opencode | `agent-stacks/opencode` | `opencode` |
 | pi | `agent-stacks/pi` | `pi` |
 | Agent Deck | `agent-stacks/agent-deck` | `agent-deck` |
+
+The two desktop harnesses are macOS only.
+They use the app you already have installed, so there is no package for the app itself.
 
 **Agent plugins** carry what the agent can use: skills, MCP servers, and, for Claude Code, hooks, agents, and commands.
 Each plugin is a package named `agent-stacks/agent-plugin-<name>`, built from a pinned commit of its upstream repository.
 An installed plugin lands in the environment under `share/agent-plugins/<name>/`.
 Claude Code receives whole plugins.
-Codex, opencode, and pi receive the plugins' skills only.
+Codex, opencode, pi, and the two desktop apps receive the plugins' skills only.
 
 **A sandbox** limits what the agent can reach once it runs: which files it can write, which files it can read, and which hosts it can contact.
 Each sandbox is a package named `agent-stacks/agent-sandbox-<name>`, and you choose one when you launch.
