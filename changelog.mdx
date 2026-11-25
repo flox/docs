@@ -9,6 +9,42 @@ order. Subscribe to the [RSS feed](/changelog/rss.xml) to follow along.
 
 {/* changelog:insert */}
 
+<Update label="November 17" description="v1.20.0">
+  ## Build against a different catalog source without changing the lock
+
+  You can build a Nix expression build against a different source for one
+  catalog input, such as a local checkout. Pass
+  `flox build --override-input <input> <flakeref>` or
+  `flox develop --override-input <input> <flakeref>` for that build. The
+  committed catalog lock is not changed. See
+  [overriding a catalog input](/man/flox-build#overriding-a-catalog-input).
+
+  ## Turn off telemetry with `DO_NOT_TRACK`
+
+  You can set `DO_NOT_TRACK` to any value other than empty, `0`, or
+  `false` to turn telemetry off. Flox honors it even when
+  `FLOX_DISABLE_METRICS` or `disable_metrics` would leave telemetry on.
+  See [turn off telemetry](/concepts/data-collection#turn-off-telemetry).
+
+  ## Also in this release
+
+  - Upgrading Flox now takes effect in shells that are already open
+    because the `flox activate` hook calls `flox` through its install
+    path, but restart once any shell opened before this release.
+  - You can install packages published to FloxHub catalogs on systems
+    configured with the Flox NixOS, nix-darwin, and home-manager modules
+    because those modules now trust the `floxhub-1` signing key.
+  - Nix expression builds now work when the project path contains spaces
+    or other URL-special characters.
+  - `flox show` now reports that no builds are available for a known
+    package instead of saying the package was not found.
+
+  See the
+  [v1.20.0 release notes](https://github.com/flox/flox/releases/tag/v1.20.0)
+  for the full list of fixes.
+</Update>
+{/* changelog-id: flox/flox@v1.20.0 */}
+
 <Update label="November 5" description="v1.19.4">
   ## Repair Homebrew upgrades to v1.19.4 on macOS
 
