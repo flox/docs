@@ -12,8 +12,16 @@ step.
 
 ## Enabling auto-activation
 
-Auto-activation is on by default and only requires the Flox prompt hook
-installed in your shell.
+With `auto_activate` set to `prompt` (the default) or `allowlist`,
+auto-activation requires both of the following:
+
+- The Flox prompt hook is installed in your shell.
+- You have allowed the environment in its local directory.
+
+The prompt hook checks your current directory at each prompt or directory
+change, depending on your shell.
+The `flox activate allow` command records permission for a directory; it does
+not install the hook or activate the environment immediately.
 
 ### Install the prompt hook
 
@@ -22,6 +30,14 @@ activation.
 Add an in-place activation of your
 [default environment](/tutorials/default-environment) to your shell's startup
 file:
+
+<Note>
+  These startup commands do two things: install the prompt hook and activate
+  your default environment in every new shell, regardless of its directory.
+  The default environment stays active when you leave an auto-activated
+  environment's directory.
+  These commands are not a directory-only shell initializer.
+</Note>
 
 <Tabs>
   <Tab title="Bash">
@@ -63,6 +79,20 @@ file:
   which disables auto-activation along with other features like
   `flox deactivate`.
 </Note>
+
+### Directory-only activation in Flox 1.19.4
+
+Directory auto-activation loads allowed local environments when you enter
+their directory tree and removes those activations when you leave.
+The startup commands above additionally activate your default environment,
+which remains active outside those directories.
+
+Flox 1.19.4 installs its prompt hook as part of an in-place activation.
+Its public CLI does not provide a separate initializer that installs only the
+hook.
+`flox activate allow` records permission but does not install shell integration.
+Removing that activation from your shell startup file also removes the
+documented hook initialization for new shells.
 
 ## How it works
 
@@ -113,11 +143,11 @@ you are asked again in a new shell or when you re-enter the directory.
 
 This prompt appears only when the `auto_activate` config option is `prompt`
 (the default).
-Set it to `allowed` to skip the prompt and auto-activate only environments you
+Set it to `allowlist` to skip the prompt and auto-activate only environments you
 have already allowed:
 
 ```bash
-flox config --set auto_activate allowed
+flox config --set auto_activate allowlist
 ```
 
 ### Allowing and denying ahead of time
@@ -136,6 +166,14 @@ flox activate deny
 
 Both target the environment in the current directory by default; pass `-d`
 to target another environment.
+For example, to allow an environment in `$HOME/projects/my-env`:
+
+```bash
+flox activate allow -d "$HOME/projects/my-env"
+```
+
+This permission takes effect when you enter the directory in a shell with the
+Flox prompt hook installed.
 To stop being prompted for a specific directory:
 
 ```bash
