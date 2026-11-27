@@ -14,7 +14,65 @@ Flox achieves isolation through pre-configured sub-shells, not containers, so it
 Flox makes it easy to work locally, test in CI, and deploy to production—all with the same environment.
 
 
- <iframe width="550" height="300" src="https://www.youtube-nocookie.com/embed/aidi5svDml8" title="What is Flox?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+export const YouTubeVideo = ({ id, title }) => {
+  const [allowed, setAllowed] = useState(false)
+  const [pressed, setPressed] = useState(false)
+  useEffect(() => {
+    // HubSpot cannot remove a listener, so the flag stops one registered by an
+    // earlier visit to this page from updating the component after Mintlify
+    // unmounts it.
+    let mounted = true
+    window._hsp = window._hsp || []
+    window._hsp.push([
+      'addPrivacyConsentListener',
+      (consent) => {
+        if (mounted) setAllowed(consent?.categories?.functionality === true)
+      }
+    ])
+    return () => {
+      mounted = false
+    }
+  }, [])
+  const showPlayer = pressed || allowed
+  return (
+    <div className="flox-video">
+      <div className="flox-video-frame">
+        {showPlayer ? (
+          <iframe
+            className="flox-video-player"
+            src={`https://www.youtube-nocookie.com/embed/${id}${pressed ? '?autoplay=1' : ''}`}
+            title={title}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        ) : (
+          <button
+            type="button"
+            className="flox-video-preview"
+            aria-label={`Play video: ${title}`}
+            onClick={() => setPressed(true)}
+          >
+            <span className="flox-video-title" aria-hidden="true">
+              {title}
+            </span>
+            <span className="flox-video-label" aria-hidden="true">
+              <span className="flox-video-icon" />
+              Play video
+            </span>
+          </button>
+        )}
+      </div>
+      {!showPlayer && (
+        <p className="flox-video-note">
+          When you play the video, your browser sends your IP address and the address of this page to Google, which runs YouTube, and YouTube stores data in your browser to run the player. Google may combine what it receives with other information it has about you.{' '}
+          <a href="https://policies.google.com/privacy">Google's privacy policy</a>
+        </p>
+      )}
+    </div>
+  )
+}
+
+<YouTubeVideo id="aidi5svDml8" title="What is Flox?" />
 
 ---
 
